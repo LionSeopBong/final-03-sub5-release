@@ -43,11 +43,7 @@ const config: Config = {
         "customRed-light": "#F56F6F",
         gaugeColor: "#0000FF",
       },
-      backgroundColor: {
-        primary: "#ffffff",
-        secondary: "#f8f8f8",
-        tertiary: "#f4f4f4",
-      },
+
       textColor: {
         primary: "#000000",
         secondary: "#686868",

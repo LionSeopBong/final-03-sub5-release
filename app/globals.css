@@ -43,3 +43,8 @@
   --border-medium: #d3d3d3;
   --border-dark: #acacac;
 }
+
+/* 빌드 시, 지울 것 !!!!!!!!!!!!!!!!!!!!!!!  */
+body {
+  font-family: "Pretendard", sans-serif;
+}

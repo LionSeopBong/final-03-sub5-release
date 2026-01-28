@@ -7,15 +7,133 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>프로필 메인</title>
+    <script src="https://cdn.tailwindcss.com"></script>
   </head>
   <body>
-    <!-- ProfileHeader start -->
-    <header class="app-header">
-      <button class="back-btn" aria-label="뒤로가기">
-        <img src="./../../icons/back-btn.svg" alt="뒤로가기 버튼" />
+    <!-- ■■■■■ ProfileHeader start ■■■■■ -->
+    <div class="area-header p-4 my-3">
+      <header class="app-header flex items-center gap-8 relative">
+        <button class="back-btn" aria-label="뒤로가기">
+          <img src="./../../icons/back-btn.svg" alt="뒤로가기 버튼" />
+        </button>
+        <h2
+          class="font-pretendard profile-title text-xl font-semibold absolute left-1/2 -translate-x-1/2"
+        >
+          프로필
+        </h2>
+      </header>
+    </div>
+    <!-- ■■■■■ ProfileHeader end ■■■■■ -->
+
+    <!-- 닉네임 + 수정 버튼 : area-profile -->
+    <div class="area-profile p-4 m-2 flex items-center relative gap-8">
+      <img src="../../icons/profile-main.svg" />
+      <h3 class="font-semibold">닉네임</h3>
+      <button
+        class="profile-edit ml-auto border border-gray-200 px-4 py-2 rounded-[30px]"
+      >
+        수정
       </button>
-      <h2 class="profile-title">프로필</h2>
-    </header>
-    <!-- ProfileHeader start -->
+    </div>
+
+    <main>
+      <!-- 러닝 요약 카드 영역 -->
+      <div class="record-card bg-[#f8f8f8] p-4 mx-8 my-0 rounded-[20px]">
+        <a class="cursor-pointer">
+          <p
+            class="pb-0.5 mb-4 border-b-2 border-b-gray-400 font-medium inline-block"
+          >
+            전체 기록 보기
+          </p>
+        </a>
+        <div class="flex items-center gap-0 m-2">
+          <div class="record-runner flex-1 text-center min-w-0">
+            <div class="runner-icon flex items-center justify-center gap-2">
+              <img src="./../../icons/record-runner.svg" class="w-4 h-4" />
+              <p class="font-semibold">0.00 km</p>
+            </div>
+            <p>총 거리</p>
+          </div>
+          <div class="record-frequency flex-1 text-center min-w-0">
+            <div
+              class="frequency-icon flex items-center justify-center gap-2 border-l-2 border-gray-400 ml-3"
+            >
+              <img src="./../../icons/record-frequency.svg" class="w-4 h-4" />
+              <p class="font-semibold">0 회</p>
+            </div>
+            <p>러닝 횟수</p>
+          </div>
+          <div class="record-calendar flex-1 text-center min-w-0">
+            <div
+              class="calendar-icon flex items-center justify-center gap-2 border-l-2 border-gray-400 ml-3"
+            >
+              <img src="./../../icons/record-calendar.svg" class="w-4 h-4" />
+              <p class="font-semibold">0 일</p>
+            </div>
+            <p>활동일</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- 러닝지표, 내 게시글, 고객센터, 로그아웃 영역 -->
+      <ul class="px-8 m-2">
+        <li class="py-4 border-b border-gray-200 cursor-pointer">
+          <a class="flex items-center justify-between"
+            >내 러닝 지표<img
+              src="./../../icons/right-btn.svg"
+              class="w-4 h-4"
+              alt=""
+          /></a>
+        </li>
+        <li class="py-4 border-b border-gray-200 cursor-pointer">
+          <a class="flex items-center justify-between"
+            >내 게시글<img
+              src="./../../icons/right-btn.svg"
+              class="w-4 h-4"
+              alt=""
+          /></a>
+        </li>
+        <li class="py-4 border-b border-gray-200 cursor-pointer">
+          <a class="flex items-center justify-between"
+            >고객센터<img
+              src="./../../icons/right-btn.svg"
+              class="w-4 h-4"
+              alt=""
+          /></a>
+        </li>
+        <li class="py-4 border-b border-gray-200 cursor-pointer">
+          <a class="flex items-center justify-between"
+            >로그아웃<img
+              src="./../../icons/right-btn.svg"
+              class="w-4 h-4"
+              alt=""
+          /></a>
+        </li>
+      </ul>
+    </main>
+
+    <!-- ■■■■■ ProfileFooter start ■■■■■ -->
+    <div
+      class="profile-footer fixed bottom-0 left-0 right-0 h-16 flex items-center justify-around gap-2 border border-gray-200 my-4 text-center"
+    >
+      <div class="profile-footer-home flex flex-col items-center gap-0.5">
+        <img src="./../../icons/tab-home.svg" />
+        <p>홈</p>
+      </div>
+      <div class="profile-footer-record flex flex-col items-center gap-0.5">
+        <img src="./../../icons/tab-record.svg" />
+        <p>기록</p>
+      </div>
+      <div class="profile-footer-target flex flex-col items-center gap-0.5">
+        <img src="./../../icons/tab-target.svg" />
+        <p>목표</p>
+      </div>
+      <div class="profile-footer-profile flex flex-col items-center gap-0.5">
+        <img src="./../../icons/tab-profile.svg" />
+        <p>프로필</p>
+      </div>
+    </div>
+
+    <!-- ■■■■■ ProfileFooter end ■■■■■ -->
   </body>
 </html>

@@ -1,0 +1,216 @@
+<link rel="stylesheet" href="./../../../app/globals.css" />
+<link rel="stylesheet" href="./../profile.css" />
+
+<!doctype html>
+<html lang="ko-KR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>프로필 메인</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+  </head>
+  <body>
+    <!-- ■■■■■ ProfileHeader start ■■■■■ -->
+    <div class="area-header p-4 my-3">
+      <header class="app-header flex items-center gap-8 relative">
+        <button class="back-btn" aria-label="뒤로가기">
+          <img src="./../../icons/back-btn.svg" alt="뒤로가기 버튼" />
+        </button>
+        <h2
+          class="font-pretendard profile-title text-xl font-semibold absolute left-1/2 -translate-x-1/2"
+        >
+          프로필 수정
+        </h2>
+      </header>
+    </div>
+    <!-- ■■■■■ ProfileHeader end ■■■■■ -->
+
+    <!----------------- 프로필 수정 : edit-profile ----------------->
+
+    <main class="edit-profile mx-4">
+      <!-- 프로필 사진 + 카메라 아이콘 -->
+      <div
+        class="flex items-center justify-center relative w-[70px] h-[70px] mx-auto"
+      >
+        <img src="../../icons/profile-main.svg" />
+        <button type="button" aria-label="프로필 사진 설정 버튼">
+          <img
+            src="../../icons/profile-camera.svg"
+            class="absolute w-[30px] h-[30px] bottom-0 right-0"
+          />
+        </button>
+      </div>
+
+      <!-- 닉네임  |  성별  |  생년월일  |  완료 버튼 -->
+      <div class="flex flex-col my-4">
+        <!-- 닉네임 + input -->
+        <div class="input-name flex flex-col m-4 gap-1.5">
+          <label class="font-semibold">닉네임</label>
+          <input
+            type="text"
+            placeholder="닉네임을 입력하세요"
+            class="border border-[--border-medium] p-2 rounded-[6px]"
+          />
+        </div>
+
+        <!-- 성별 radio -->
+        <div class="input-radio flex flex-col m-4 gap-1.5">
+          <h3 class="font-semibold">성별</h3>
+          <div class="radio-pair flex items-center justify-center gap-4">
+            <label
+              class="flex items-center justify-center bg-[--bg-tertiary] w-full py-3 cursor-pointer gap-4 rounded-lg"
+            >
+              <input type="radio" name="gender" class="hidden" checked />
+              <span
+                class="w-4 h-4 rounded border border-[--border-medium] flex items-center justify-center"
+              >
+                <span class="w-2 h-2 rounded-full bg-black"></span>
+              </span>
+              <span>남성</span>
+            </label>
+            <label
+              class="flex items-center justify-center bg-[--bg-tertiary] w-full py-3 cursor-pointer gap-4 rounded-lg"
+            >
+              <input type="radio" name="gender" class="hidden" />
+              <span
+                class="w-4 h-4 rounded border border-[--border-medium] flex items-center justify-center"
+              >
+              </span>
+              <span>여성</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- 생년월일 dropdown -->
+        <div class="input-birth flex flex-col m-4 gap-1.5">
+          <label class="font-semibold">생년월일</label>
+          <input
+            type="date"
+            class="border border-[--border-medium] p-2 rounded-[6px]"
+          />
+        </div>
+
+        <!-- ■■■■■ 완료 버튼 컴포넌트 ■■■■■ -->
+        <button
+          class="m-4 p-2 text-[--text-inverse] rounded-[20px] bg-[--color-secondary] border border-[--color-secondary]"
+        >
+          완료
+        </button>
+      </div>
+    </main>
+
+    <!-- ■■■■■ ProfileFooter start ■■■■■ -->
+    <div
+      class="profile-footer fixed bottom-0 left-0 right-0 h-16 flex items-center justify-around gap-2 border border-gray-200 my-4 text-center"
+    >
+      <div class="profile-footer-home flex flex-col items-center gap-0.5">
+        <img src="./../../icons/tab-home.svg" />
+        <p>홈</p>
+      </div>
+      <div class="profile-footer-record flex flex-col items-center gap-0.5">
+        <img src="./../../icons/tab-record.svg" />
+        <p>기록</p>
+      </div>
+      <div class="profile-footer-target flex flex-col items-center gap-0.5">
+        <img src="./../../icons/tab-target.svg" />
+        <p>목표</p>
+      </div>
+      <div class="profile-footer-profile flex flex-col items-center gap-0.5">
+        <img src="./../../icons/tab-profile.svg" />
+        <p>프로필</p>
+      </div>
+    </div>
+    <!-- ■■■■■ ProfileFooter end ■■■■■ -->
+
+    <!-- ●●●●● ① 프로필 사진 설정 modal 전체 레이어 -->
+    <div
+      id="photo-modal"
+      class="fixed inset-0 z-50 flex items-center justify-center hidden"
+    >
+      <!-- ★ dim 추가 -->
+      <div class="absolute inset-0 bg-black/50 z-0"></div>
+
+      <!-- 모달 카드 -->
+      <div class="modal-setter-wrap px-8 w-full relative z-10">
+        <div
+          class="modal-photo-setter flex flex-col items-center justify-center border border-[--border-light] rounded-[20px] mx-auto max-w-[420px] w-full bg-[--bg-primary]"
+        >
+          <h2
+            class="font-semibold border-b border-[--border-light] p-3 w-full text-center text-[--color-gray-500]"
+          >
+            프로필 사진 설정
+          </h2>
+          <button
+            class="modal-photo-action flex items-center gap-3 border-b border-[--border-light] px-7 py-3 w-full"
+          >
+            <img src="./../../icons/edit-camera.svg" class="w-5 h-5" /><span
+              >사진 촬영</span
+            >
+          </button>
+          <button
+            class="modal-photo-select flex items-center gap-3 border-b border-[--border-light] px-7 py-3 w-full"
+          >
+            <img src="./../../icons/edit-photo.svg" class="w-5 h-5" /><span
+              >갤러리에서 선택</span
+            >
+          </button>
+          <button
+            class="modal-photo-remove flex items-center gap-3 border-b border-[--border-light] px-7 py-3 w-full"
+          >
+            <img src="./../../icons/edit-remove.svg" class="w-5 h-5" /><span
+              >현재 사진 삭제</span
+            >
+          </button>
+          <button
+            class="modal-photo-cancel font-semibold text-[--color-primary] border-t border-[--border-light] p-3 w-full"
+          >
+            취소
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ●●●●● ② 갤러리 사진 선택 modal 전체 레이어 -->
+    <div
+      id="gallery-modal"
+      class="fixed inset-0 z-50 flex items-center justify-center hidden"
+    >
+      <!-- ★ dim 추가 -->
+      <div class="absolute inset-0 bg-black/50 z-0"></div>
+
+      <!-- 모달 카드 -->
+      <div class="modal-gallery-wrap px-8 w-full relative z-10">
+        <div
+          class="modal-gallery-setter rounded-[20px] mx-auto max-w-[420px] w-full bg-[--bg-primary]"
+        >
+          <h2
+            class="font-semibold border-b border-[--border-light] py-4 w-full text-center text-[--color-gray-500] text-lg"
+          >
+            갤러리에서 사진 선택
+          </h2>
+          <img
+            src="./../../icons/photo-gallery.svg"
+            alt="프로필 선택"
+            class="px-4 py-2"
+          />
+          <div
+            class="modal-gallery-actions flex items-center justify-between gap-3 w-full p-3"
+          >
+            <button
+              type="button"
+              class="w-1/2 border border-[--border-light] rounded-[5px] py-3"
+            >
+              취소
+            </button>
+            <button
+              type="button"
+              class="w-1/2 border border-[--color-primary] rounded-[5px] py-3 bg-[--color-primary] text-[--color-white]"
+            >
+              선택
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

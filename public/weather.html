@@ -1,0 +1,372 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <title>Weather Layout</title>
+  </head>
+
+  <body class="font-Pretendard">
+    <div class="bg-gray-50 flex justify-center py-8">
+      <div class="w-full max-w-md px-4">
+        <!-- 검색바 -->
+        <div class="relative mb-4">
+          <input
+            type="text"
+            placeholder="위치를 검색하세요"
+            class="w-full rounded-full px-5 py-3 pr-12 shadow-sm border text-sm focus:outline-none"
+          />
+          <span class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400">
+            <img src="/icon/search--local.svg" />
+          </span>
+        </div>
+
+        <!-- 위치 -->
+        <p class="text-red-400 font-semibold mb-4">역삼동</p>
+        <!-- 일별 예보 -->
+        <div class="bg-white rounded-xl p-4 shadow mb-6">
+          <p class="text-sm text-gray-400 mb-3">일별 예보</p>
+
+          <div class="overflow-x-auto pb-2">
+            <div class="min-w-[600px] border-collapse text-[10px] text-center">
+              <div
+                class="grid grid-cols-[60px_repeat(8,1fr)] border-b border-t border-gray-100 items-stretch"
+              >
+                <div
+                  class="flex items-center justify-center bg-gray-50 font-medium border-r border-gray-100"
+                >
+                  날짜
+                </div>
+                <div class="py-2 bg-blue-50 border-x border-blue-200">
+                  <p class="font-bold">21일(수)</p>
+                  <p class="text-blue-500 text-[9px]">오늘</p>
+                </div>
+                <div class="py-2 border-r border-gray-100">
+                  22일(목)
+                  <p class="text-gray-400 text-[9px]">내일</p>
+                </div>
+                <div class="py-2 border-r border-gray-100">
+                  23일(금)
+                  <p class="text-gray-400 text-[9px]">모레</p>
+                </div>
+                <div class="py-2 border-r border-gray-100 text-blue-500">
+                  24일(토)
+                </div>
+                <div class="py-2 border-r border-gray-100 text-red-500">
+                  25일(일)
+                </div>
+                <div class="py-2 border-r border-gray-100">26일(월)</div>
+                <div class="py-2 border-r border-gray-100">27일(화)</div>
+                <div class="py-2 border-r border-gray-100">28일(수)</div>
+              </div>
+
+              <div
+                class="grid grid-cols-[60px_repeat(8,1fr)] border-b border-gray-100"
+              >
+                <div
+                  class="py-1 bg-gray-50 font-medium border-r border-gray-100"
+                >
+                  시각
+                </div>
+                <div
+                  class="col-span-1 grid grid-cols-2 bg-blue-50 border-x border-blue-200"
+                >
+                  <span class="border-r border-blue-100">오전</span
+                  ><span>오후</span>
+                </div>
+                <div
+                  class="col-span-1 grid grid-cols-2 border-r border-gray-100"
+                >
+                  <span class="border-r border-gray-100">오전</span
+                  ><span>오후</span>
+                </div>
+                <div
+                  class="col-span-1 grid grid-cols-2 border-r border-gray-100"
+                >
+                  <span class="border-r border-gray-100">오전</span
+                  ><span>오후</span>
+                </div>
+                <div
+                  class="col-span-1 grid grid-cols-2 border-r border-gray-100"
+                >
+                  <span class="border-r border-gray-100">오전</span
+                  ><span>오후</span>
+                </div>
+                <div
+                  class="col-span-1 grid grid-cols-2 border-r border-gray-100"
+                >
+                  <span class="border-r border-gray-100">오전</span
+                  ><span>오후</span>
+                </div>
+                <div
+                  class="col-span-1 grid grid-cols-2 border-r border-gray-100"
+                >
+                  <span class="border-r border-gray-100">오전</span
+                  ><span>오후</span>
+                </div>
+                <div
+                  class="col-span-1 grid grid-cols-2 border-r border-gray-100"
+                >
+                  <span class="border-r border-gray-100">오전</span
+                  ><span>오후</span>
+                </div>
+                <div
+                  class="col-span-1 grid grid-cols-2 border-r border-gray-100"
+                >
+                  <span class="border-r border-gray-100">오전</span
+                  ><span>오후</span>
+                </div>
+              </div>
+
+              <div
+                class="grid grid-cols-[60px_repeat(8,1fr)] border-b border-gray-100"
+              >
+                <div
+                  class="py-2 bg-gray-50 font-medium border-r border-gray-100"
+                >
+                  날씨
+                </div>
+                <div
+                  class="grid grid-cols-2 bg-blue-50 border-x border-blue-200"
+                >
+                  <span>-</span><span>☀️</span>
+                </div>
+                <div class="grid grid-cols-2 border-r border-gray-100">
+                  <span>☀️</span><span>☀️</span>
+                </div>
+                <div class="grid grid-cols-2 border-r border-gray-100">
+                  <span>☀️</span><span>🌤️</span>
+                </div>
+                <div class="grid grid-cols-2 border-r border-gray-100">
+                  <span>☀️</span><span>☀️</span>
+                </div>
+                <div class="grid grid-cols-2 border-r border-gray-100">
+                  <span>☀️</span><span>☀️</span>
+                </div>
+                <div class="grid grid-cols-2 border-r border-gray-100">
+                  <span>🌤️</span><span>🌤️</span>
+                </div>
+                <div class="grid grid-cols-2 border-r border-gray-100">
+                  <span>☀️</span><span>☀️</span>
+                </div>
+                <div class="grid grid-cols-2 border-r border-gray-100">
+                  <span>☀️</span><span>☀️</span>
+                </div>
+              </div>
+
+              <div
+                class="grid grid-cols-[60px_repeat(8,1fr)] border-b border-gray-100"
+              >
+                <div
+                  class="py-2 bg-gray-50 font-medium border-r border-gray-100"
+                >
+                  기온
+                </div>
+                <div
+                  class="grid grid-cols-2 bg-blue-50 border-x border-blue-200 px-1"
+                >
+                  <span class="text-blue-500">-14°</span
+                  ><span class="text-red-500">-5°</span>
+                </div>
+                <div class="grid grid-cols-2 border-r border-gray-100 px-1">
+                  <span class="text-blue-500">-14°</span
+                  ><span class="text-red-500">-5°</span>
+                </div>
+                <div class="grid grid-cols-2 border-r border-gray-100 px-1">
+                  <span class="text-blue-500">-11°</span
+                  ><span class="text-red-500">-2°</span>
+                </div>
+                <div class="grid grid-cols-2 border-r border-gray-100 px-1">
+                  <span class="text-blue-500">-10°</span
+                  ><span class="text-red-500">-2°</span>
+                </div>
+                <div class="grid grid-cols-2 border-r border-gray-100 px-1">
+                  <span class="text-blue-500">-10°</span
+                  ><span class="text-red-500">-2°</span>
+                </div>
+                <div class="grid grid-cols-2 border-r border-gray-100 px-1">
+                  <span class="text-blue-500">-8°</span
+                  ><span class="text-red-500">-1°</span>
+                </div>
+                <div class="grid grid-cols-2 border-r border-gray-100 px-1">
+                  <span class="text-blue-500">-8°</span
+                  ><span class="text-red-500">0°</span>
+                </div>
+                <div class="grid grid-cols-2 border-r border-gray-100 px-1">
+                  <span class="text-blue-500">-8°</span
+                  ><span class="text-red-500">-1°</span>
+                </div>
+              </div>
+
+              <div class="grid grid-cols-[60px_repeat(8,1fr)]">
+                <div
+                  class="py-2 bg-gray-50 font-medium border-r border-gray-100"
+                >
+                  강수확률
+                </div>
+                <div
+                  class="grid grid-cols-2 bg-blue-50 border-x border-blue-200"
+                >
+                  <span>-</span><span>0%</span>
+                </div>
+                <div class="grid grid-cols-2 border-r border-gray-100">
+                  <span>0%</span><span>0%</span>
+                </div>
+                <div class="grid grid-cols-2 border-r border-gray-100">
+                  <span>10%</span><span>10%</span>
+                </div>
+                <div class="grid grid-cols-2 border-r border-gray-100">
+                  <span>0%</span><span>0%</span>
+                </div>
+                <div class="grid grid-cols-2 border-r border-gray-100">
+                  <span>10%</span><span>20%</span>
+                </div>
+                <div class="grid grid-cols-2 border-r border-gray-100">
+                  <span>30%</span><span>20%</span>
+                </div>
+                <div class="grid grid-cols-2 border-r border-gray-100">
+                  <span>20%</span><span>10%</span>
+                </div>
+                <div class="grid grid-cols-2 border-r border-gray-100">
+                  <span>10%</span><span>10%</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- 시간별 예보 -->
+        <div class="bg-white rounded-xl p-4 shadow mb-6">
+          <p class="text-sm text-gray-400 mb-3">시간별 예보</p>
+
+          <div class="overflow-x-auto pb-2">
+            <div class="min-w-[700px] text-[10px] text-center border-collapse">
+              <div
+                class="grid grid-cols-[60px_repeat(11,1fr)] border-b border-t border-gray-100 bg-gray-50/50"
+              >
+                <div
+                  class="py-2 font-medium border-r border-gray-100 bg-gray-50"
+                >
+                  시각
+                </div>
+                <div class="py-2 border-r border-gray-100">12시</div>
+                <div class="py-2 border-r border-gray-100">15시</div>
+                <div class="py-2 border-r border-gray-100">18시</div>
+                <div
+                  class="py-2 border-r border-gray-100 font-bold text-blue-600 bg-blue-50/50"
+                >
+                  21시
+                </div>
+                <div class="py-2 border-r border-gray-100">0시</div>
+                <div class="py-2 border-r border-gray-100">03시</div>
+                <div class="py-2 border-r border-gray-100">06시</div>
+                <div class="py-2 border-r border-gray-100">09시</div>
+                <div class="py-2 border-r border-gray-100">12시</div>
+                <div class="py-2 border-r border-gray-100">15시</div>
+                <div class="py-2">18시</div>
+              </div>
+
+              <div
+                class="grid grid-cols-[60px_repeat(11,1fr)] border-b border-gray-100"
+              >
+                <div
+                  class="py-3 bg-gray-50 font-medium border-r border-gray-100 flex items-center justify-center"
+                >
+                  날씨
+                </div>
+                <div class="py-3 text-lg">☀️</div>
+                <div class="py-3 text-lg">☀️</div>
+                <div class="py-3 text-lg">☀️</div>
+                <div class="py-3 text-lg bg-blue-50/30">🌙</div>
+                <div class="py-3 text-lg">🌙</div>
+                <div class="py-3 text-lg">🌙</div>
+                <div class="py-3 text-lg">🌙</div>
+                <div class="py-3 text-lg">☀️</div>
+                <div class="py-3 text-lg">☀️</div>
+                <div class="py-3 text-lg">☀️</div>
+                <div class="py-3 text-lg">☀️</div>
+              </div>
+
+              <div
+                class="grid grid-cols-[60px_1fr] relative h-24 border-b border-gray-100"
+              >
+                <div
+                  class="bg-gray-50 font-medium border-r border-gray-100 flex items-center justify-center"
+                >
+                  기온
+                </div>
+                <div class="relative w-full h-full">
+                  <div
+                    class="absolute inset-0 grid grid-cols-11 items-start pt-2 z-10"
+                  >
+                    <span>-9°</span><span>-7°</span><span>-9°</span
+                    ><span class="font-bold text-blue-600">-11°</span
+                    ><span>-13°</span><span>-14°</span><span>-14°</span
+                    ><span>-14°</span><span>-9°</span><span>-7°</span
+                    ><span>-9°</span>
+                  </div>
+                  <svg
+                    class="absolute bottom-4 left-0 w-full h-12 overflow-visible"
+                    preserveAspectRatio="none"
+                  >
+                    <polyline
+                      fill="none"
+                      stroke="#3b82f6"
+                      stroke-width="1.5"
+                      points="30,30 90,10 150,30 210,50 270,70 330,80 390,80 450,80 510,30 570,10 630,30"
+                      vector-effect="non-scaling-stroke"
+                    />
+                    <circle cx="210" cy="50" r="3" fill="#3b82f6" />
+                  </svg>
+                </div>
+              </div>
+
+              <div
+                class="grid grid-cols-[60px_repeat(11,1fr)] border-b border-gray-100 text-gray-500"
+              >
+                <div
+                  class="py-2 bg-gray-50 font-medium border-r border-gray-100"
+                >
+                  체감온도
+                </div>
+                <div class="py-2">-13°</div>
+                <div class="py-2">-12°</div>
+                <div class="py-2">-14°</div>
+                <div class="py-2 bg-blue-50/30 font-semibold">-16°</div>
+                <div class="py-2">-19°</div>
+                <div class="py-2">-20°</div>
+                <div class="py-2">-20°</div>
+                <div class="py-2">-20°</div>
+                <div class="py-2">-15°</div>
+                <div class="py-2">-13°</div>
+                <div class="py-2">-14°</div>
+              </div>
+
+              <div
+                class="grid grid-cols-[60px_repeat(11,1fr)] border-b border-gray-100 text-gray-500"
+              >
+                <div
+                  class="py-2 bg-gray-50 font-medium border-r border-gray-100"
+                >
+                  강수확률
+                </div>
+                <div class="py-2">10%</div>
+                <div class="py-2">10%</div>
+                <div class="py-2">0%</div>
+                <div class="py-2 bg-blue-50/30">0%</div>
+                <div class="py-2">0%</div>
+                <div class="py-2">0%</div>
+                <div class="py-2">0%</div>
+                <div class="py-2">0%</div>
+                <div class="py-2">0%</div>
+                <div class="py-2">0%</div>
+                <div class="py-2">10%</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- 시간별 예보 끝-->
+      </div>
+    </div>
+  </body>
+</html>

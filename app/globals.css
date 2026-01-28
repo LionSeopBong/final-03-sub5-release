@@ -1,9 +1,10 @@
 @config "../tailwind.config.ts";
+
 @import "tailwindcss";
 
 :root {
-  --color-primary: #000080;
-  --color-secondary: #003458;
+  --color-primary: #003458;
+  --color-secondary: #000080;
   --color-accent: #2c7fb8;
 
   --color-success: #34a853;

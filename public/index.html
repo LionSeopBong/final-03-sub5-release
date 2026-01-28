@@ -1,0 +1,196 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title></title>
+  </head>
+  <body class="font-Pretendard pb-20 p-2">
+    <!-- Header -->
+    <header class="w-full bg-white-100 border border-0">
+      <div
+        class="flex items-center justify-between h-[64px] px-4 min-w-[360px]"
+      >
+        <!-- Logo -->
+        <div class="text-lg font-bold">
+          <img src="/icon/logo.svg" />
+        </div>
+        <!-- Right icons -->
+        <div class="flex bg-white-300 items-center gap-8">
+          <button
+            aria-label="weather"
+            onclick="location.href = './weather.html'"
+          >
+            <img
+              src="/icon/arcticons--weather.svg"
+              alt="날씨"
+              class="w-6 h-6"
+            />
+          </button>
+          <button aria-label="profile">
+            <img
+              src="/icon/healthicons--ui-user-profile-outline.svg"
+              alt="프로필"
+              class="w-6 h-6"
+            />
+          </button>
+        </div>
+      </div>
+    </header>
+    <!-- 날씨 페이지-->
+
+    <div class="min-w-[375px] items-stretch space-y-6">
+      <!-- 제목 -->
+      <div class="flex-1 flex flex-col">
+        <h1 class="text-xl font-bold">실시간 날씨</h1>
+        <p class="text-sm text-gray-500">
+          현재 위치의 날씨와 러닝 최적도를 확인하세요
+        </p>
+      </div>
+      <!-- 날씨 카드 -->
+      <div
+        class="bg-sky-50 border border-gray-200 rounded-xl p-5 shadow-sm space-y-6"
+      >
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-2 text-sm font-medium">
+            <img src="/icon/ep--location.svg" alt="location" /> 서울특별시
+            강남구
+          </div>
+          <span class="text-xs text-gray-500">1월 15일 오후 03:56</span>
+        </div>
+
+        <div class="flex items-center gap-2">
+          <div class="flex items-center justify-center w-10">
+            <span class="text-4xl leading-none block">☁️</span>
+          </div>
+          <div class="flex flex-col justify-center leading-none pl-1">
+            <div class="flex items-end text-3xl font-semibold">
+              18<span class="text-xl text-gray-500 ml-1">°C</span>
+            </div>
+            <div class="text-xs text-gray-500 -mt-0.5">체감 16°C</div>
+          </div>
+        </div>
+
+        <div class="flex flex-wrap gap-3 justify-center">
+          <div
+            class="bg-white rounded-xl flex items-center p-3 text-xs shadow gap-3 min-w-[80px]"
+          >
+            <div class="text-lg bg-[#DBEAFE] rounded-md">
+              <img src="/icon/humidity-mid-outline.svg" />
+            </div>
+            <div class="text-left">
+              <div class="font-semibold">습도</div>
+              <div class="text-gray-500">65%</div>
+            </div>
+          </div>
+          <div
+            class="bg-white rounded-xl flex items-center p-3 text-xs shadow gap-3 min-w-[80px]"
+          >
+            <div class="text-lg bg-[#DBFCE7] rounded-md">
+              <img src="/icon/wind-line.svg" />
+            </div>
+            <div class="text-left">
+              <div class="font-semibold">풍속</div>
+              <div class="text-gray-500">3.2 m/s</div>
+            </div>
+          </div>
+
+          <div
+            class="bg-white rounded-xl flex items-center p-3 text-xs shadow gap-3 min-w-[85px]"
+          >
+            <div class="text-lg bg-[#F3E8FF] rounded-md">
+              <img src="/icon/view-fill.svg" />
+            </div>
+            <div class="text-left">
+              <div class="text-gray-500 text-xs">가시거리</div>
+              <div class="text-gray-900 font-semibold">10 Km</div>
+            </div>
+          </div>
+
+          <div
+            class="bg-white rounded-xl flex items-center p-3 text-xs shadow gap-3 min-w-[80px]"
+          >
+            <div class="text-lg rounded-md bg-[#FFEDD4]">
+              <img src="/icon/ultraviolet-outline.svg" />
+            </div>
+            <div class="text-left">
+              <div class="font-semibold">자외선</div>
+              <div class="text-gray-500">지수 5</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 러닝 최적도 분석 -->
+    <div
+      class="bg-white border border-gray-200 rounded-xl p-5 mt-3 shadow-sm space-y-3"
+    >
+      <div class="flex items-center gap-2">
+        <img src="/icon/cbi--bulb.svg" />
+        <h2>러닝 최적도 분석</h2>
+      </div>
+
+      <p class="text-xs text-gray-500">현재 날씨 기준 러닝 가이드</p>
+
+      <div class="flex items-center gap-3 p-3">
+        <div
+          class="flex items-center justify-center w-10 h-10 bg-green-100 rounded-full"
+        >
+          <img src="/icon/picon--rise.svg" class="w-6 h-6" />
+        </div>
+        <div>
+          <div class="font-semibold text-green-700">러닝하기 최적</div>
+          <div class="text-xs text-gray-600">날씨 조건 분석 완료</div>
+        </div>
+      </div>
+
+      <div
+        class="bg-gray-200 text-gray-700 text-xs font-semibold rounded-xl p-3"
+      >
+        분석요인
+        <br />
+        <span class="text-gray-500"> 적정 기온 </span>
+      </div>
+
+      <div class="bg-blue-50 text-blue-700 text-xs rounded-xl p-3">
+        러닝 팁
+        <br /><span class="text-gray-900">
+          가벼운 바람이 불고 있습니다. 호흡에 유의하며 페이스를 유지하세요!
+        </span>
+      </div>
+    </div>
+    <!-- 하단 네비게이션 -->
+    <nav class="fixed bottom-0 left-0 right-0 bg-white border-t shadow-sm">
+      <ul class="flex justify-around items-center py-2">
+        <!-- 홈 -->
+        <li class="flex flex-col items-center text-gray-400 text-xs">
+          <span class="text-xl"><img src="/icon/mynaui--home.svg" /></span>
+          홈
+        </li>
+
+        <!-- 기록 -->
+        <li class="flex flex-col items-center text-gray-400 text-xs">
+          <span class="text-xl"><img src="/icon/uil--chart.svg" /></span>
+          기록
+        </li>
+
+        <!-- 목표 -->
+        <li class="flex flex-col items-center text-gray-400 text-xs">
+          <span class="text-xl"><img src="/icon/mage--goals.svg" /></span>
+          목표
+        </li>
+
+        <!-- 프로필 -->
+        <li class="flex flex-col items-center text-gray-400 text-xs">
+          <span class="text-xl"
+            ><img src="/icon/iconamoon--profile-duotone.svg"
+          /></span>
+          프로필
+        </li>
+      </ul>
+    </nav>
+  </body>
+</html>

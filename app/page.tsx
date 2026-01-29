@@ -16,6 +16,9 @@ export default function LandingPage() {
       <div>
         <Link href="/home">메인</Link>
       </div>
+      <div>
+        <Link href="/goals/">목표 페이지</Link>
+      </div>
     </>
   );
 }

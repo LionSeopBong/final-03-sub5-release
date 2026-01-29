@@ -39,7 +39,7 @@ export default function HomePage() {
       {/* 대회 카드 리스트 */}
       <section className="py-6 px-10 ">
         <div>
-          <p className="font-bold text-xs py-2">KR D-15</p>
+          <p className="font-b ld text-xs py-2">KR D-15</p>
           <h2 className="font-bold text-lg">서울 국제 마라톤</h2>
           <p className="text-xs py-1 text-gray-600">서울 광화문광장</p>
           <p className="text-xs py-1 text-gray-600">2026년 2월4일 (일) 오전 8:00</p>

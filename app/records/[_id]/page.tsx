@@ -30,12 +30,12 @@ export default function DetailPage() {
               <path
                 d="M12 22C12 22 19 14.8 19 10C19 9.08075 18.8189 8.1705 18.4672 7.32122C18.1154 6.47194 17.5998 5.70026 16.9497 5.05025C16.2997 4.40024 15.5281 3.88463 14.6788 3.53284C13.8295 3.18106 12.9193 3 12 3C11.0807 3 10.1705 3.18106 9.32122 3.53284C8.47194 3.88463 7.70026 4.40024 7.05025 5.05025C6.40024 5.70026 5.88463 6.47194 5.53284 7.32122C5.18106 8.1705 5 9.08075 5 10C5 14.8 12 22 12 22Z"
                 stroke="#FFCA3A"
-                stroke-width="2"
+                strokeWidth="2"
               />
               <path
                 d="M12 12.5C13.3807 12.5 14.5 11.3807 14.5 10C14.5 8.61929 13.3807 7.5 12 7.5C10.6193 7.5 9.5 8.61929 9.5 10C9.5 11.3807 10.6193 12.5 12 12.5Z"
                 stroke="#FFCA3A"
-                stroke-width="2"
+                strokeWidth="2"
               />
             </svg>
             <span className="mx-1">거리</span>
@@ -49,9 +49,9 @@ export default function DetailPage() {
               <path
                 d="M12 21C16.9706 21 21 16.9706 21 12C21 7.02944 16.9706 3 12 3C7.02944 3 3 7.02944 3 12C3 16.9706 7.02944 21 12 21Z"
                 stroke="#684BE9"
-                stroke-width="2"
+                strokeWidth="2"
               />
-              <path d="M12 7V12L15 14" stroke="#684BE9" stroke-width="2" stroke-linecap="round" />
+              <path d="M12 7V12L15 14" stroke="#684BE9" strokeWidth="2" strokeLinecap="round" />
             </svg>
             <span className="mx-1">시간</span>
           </div>

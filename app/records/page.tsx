@@ -1,13 +1,17 @@
 "use client";
 
+import { getRecords } from "@/app/lib/recordsAPI";
 import Image from "next/image";
+import { useEffect, useState } from "react";
 
 export default function RecordPage() {
+  const [data, setData] = useState([]);
+
+  useEffect(() => {});
   return (
     <>
       {/* 헤더 */}
       <header className="flex justify-center items-center px-6 py-4 border-b border-gray-100">
-        <div></div>
         <h1 className="text-2xl font-bold text-gray-700 ">러닝 기록 관리</h1>
       </header>
       {/* 네비탭 */}

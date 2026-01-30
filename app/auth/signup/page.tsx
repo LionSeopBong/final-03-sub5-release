@@ -134,6 +134,7 @@ export default function SignupPage() {
           <button
             type="button"
             className="h-14 w-full rounded-2xl bg-primary text-base font-semibold text-white"
+            onClick={() => router.push("/onboarding/profile")}
           >
             계정 생성
           </button>

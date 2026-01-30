@@ -116,12 +116,12 @@ export default function OnboardingBodyPage() {
           </section>
         </div>
 
-        {/* Bottom button */}
+        {/* 버튼 */}
         <div className="px-5 py-8">
           <button
             type="button"
             className="h-14 w-full rounded-2xl bg-[#003458] text-base font-semibold text-white"
-            onClick={() => router.push("/onboarding/body")}
+            onClick={() => router.push("/auth/login")}
           >
             완료
           </button>

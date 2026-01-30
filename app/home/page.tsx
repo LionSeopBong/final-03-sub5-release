@@ -1,8 +1,14 @@
+import Footer from "@/app/components/common/Footer";
+import Header from "@/app/components/common/Header";
+import Navi from "@/app/components/common/Navi";
 import Link from "next/link";
 
 export default function HomePage() {
   return (
     <>
+      {/* 헤더 */}
+      <Header />
+
       {/* 메인배너 */}
       <section className="grid place-items-center py-6">
         <div className="bg-gradient-to-br from-[#4DB6E9] to-[#2C7FB8] rounded-xl w-[300px] h-[262px] px-4 py-4">
@@ -54,6 +60,10 @@ export default function HomePage() {
           <button className=" bg-primary rounded-lg py-3 text-white font-bold text-lg">대회 신청하기</button>
         </div>
       </section>
+      {/* 푸터 */}
+      <Footer />
+      {/* 네비바 */}
+      <Navi />
     </>
   );
 }

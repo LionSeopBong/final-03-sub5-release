@@ -120,7 +120,7 @@ export default function OnboardingBodyPage() {
         <div className="px-5 py-8">
           <button
             type="button"
-            className="h-14 w-full rounded-2xl bg-[#003458] text-base font-semibold text-white"
+            className="h-14 w-full rounded-2xl bg-primary text-base font-semibold text-white"
             onClick={() => router.push("/auth/login")}
           >
             완료

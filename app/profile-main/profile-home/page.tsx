@@ -1,14 +1,15 @@
-import ProfileFooter from "@/app/profile-main/components/ProfileFooter";
-import ProfileHeader from "@/app/profile-main/components/ProfileHeader";
+import Footer from "@/app/components/common/Footer";
+import Header from "@/app/components/common/Header";
+import Navi from "@/app/components/common/Navi";
 import Image from "next/image";
 
 export default function ProfileHome() {
   return (
     <>
-      <ProfileHeader />
+      <Header />
 
       {/* 닉네임 + 수정 버튼 : area-profile */}
-      <div className="area-profile p-4 m-2 flex items-center relative gap-8">
+      <div className="area-profile p-4 m-2 flex items-center relative gap-8 pt-16">
         <Image
           src="/icons/profile-main.svg"
           alt="프로필 이미지"
@@ -98,7 +99,8 @@ export default function ProfileHome() {
         </ul>
       </main>
 
-      <ProfileFooter />
+      <Footer />
+      <Navi />
     </>
   );
 }

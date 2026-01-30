@@ -1,32 +1,34 @@
+import Link from "next/link";
+
 export default function Navi() {
   return (
-    <nav className="fixed bottom-0 left-0 right-0 bg-white border-t shadow-sm">
+    <nav className="sticky bottom-0 left-0 right-0 bg-white border-0 shadow-sm">
       <ul className="flex justify-around items-center py-2">
         <li className="flex flex-col items-center text-gray-400 text-xs">
-          <span className="text-xl">
+          <Link href="/home" className="text-xl">
             <img src="/icons/mynaui--home.svg" />
-          </span>
+          </Link>
           홈
         </li>
 
         <li className="flex flex-col items-center text-gray-400 text-xs">
-          <span className="text-xl">
+          <Link href="/records" className="text-xl">
             <img src="/icons/uil--chart.svg" />
-          </span>
+          </Link>
           기록
         </li>
 
         <li className="flex flex-col items-center text-gray-400 text-xs">
-          <span className="text-xl">
+          <Link href="/goals" className="text-xl">
             <img src="/icons/mage--goals.svg" />
-          </span>
+          </Link>
           목표
         </li>
 
         <li className="flex flex-col items-center text-gray-400 text-xs">
-          <span className="text-xl">
+          <Link href="/profile-main/profile-home" className="text-xl">
             <img src="/icons/iconamoon--profile-duotone.svg" />
-          </span>
+          </Link>
           프로필
         </li>
       </ul>

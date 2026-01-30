@@ -2,44 +2,68 @@
 import Footer from "@/app/components/common/Footer";
 import Header from "@/app/components/common/Header";
 import Navi from "@/app/components/common/Navi";
-import { getRecords } from "@/app/lib/recordsAPI";
 import Image from "next/image";
-import { useEffect, useState } from "react";
+import Link from "next/link";
+import { useEffect, useRef, useState } from "react";
 
 export default function RecordPage() {
   const [data, setData] = useState([]);
 
+  // const homeRef = useRef<HTMLDivElement>(null);
+  const recordRef = useRef<HTMLDivElement>(null);
+  const analysisRef = useRef<HTMLDivElement>(null);
+  const resentRef = useRef<HTMLDivElement>(null);
   useEffect(() => {});
+
+  const scrollToSection = (sectionName: "home" | "record" | "analysis" | "resent") => {
+    if (sectionName === "home") {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      return;
+    }
+    const sections = {
+      // home: homeRef, // 홈
+      record: recordRef, // 기록
+      analysis: analysisRef, // 분석
+      resent: resentRef, // 오늘 기록
+    };
+    sections[sectionName]?.current?.scrollIntoView({ behavior: "smooth" });
+  };
+
   return (
     <>
-    <Header />
-      {/* 헤더 */}
-      <header className="flex justify-center items-center px-6 py-4 border-b border-gray-100">
-        <h1 className="text-2xl font-bold text-gray-700 ">러닝 기록 관리</h1>
-      </header>
-      {/* 네비탭 */}
-      <nav className="flex px-6 py-4 gap-3 overflow-x-auto scrollbar-hide">
-        <button onClick={() => scrollToSection("home")} className="bg-primary text-sm text-white px-9 py-2 rounded-lg whitespace-nowrap">
-          홈
-        </button>
-        <button onClick={() => scrollToSection("record")} className="text-sm border-gray-200 border px-9 py-2 rounded-lg whitespace-nowrap">
-          기록
-        </button>
-        <button onClick={() => scrollToSection("analysis")} className="text-sm border-gray-200 border px-9 py-2 rounded-lg whitespace-nowrap">
-          분석
-        </button>
-        <button onClick={() => scrollToSection("resnet")} className="text-sm border-gray-200 border px-9 py-2 rounded-lg whitespace-nowrap">
-          최근기록
-        </button>
-      </nav>
+      <Header />
+      <div className="sticky top-0 z-20 bg-white">
+        {/* 본문제목 */}
+        <div className="flex justify-center items-center px-6 py-4 border-b border-gray-100">
+          <h1 className="text-2xl font-bold text-gray-700 ">러닝 기록 관리</h1>
+        </div>
+
+        {/* 네비탭 */}
+        <nav className=" flex px-6 py-4 gap-3 overflow-x-auto scrollbar-hide">
+          <button onClick={() => scrollToSection("home")} className="bg-primary text-sm text-white px-9 py-2 rounded-lg whitespace-nowrap">
+            홈
+          </button>
+          <button onClick={() => scrollToSection("record")} className="text-sm border-gray-200 border px-9 py-2 rounded-lg whitespace-nowrap">
+            기록
+          </button>
+          <button onClick={() => scrollToSection("analysis")} className="text-sm border-gray-200 border px-9 py-2 rounded-lg whitespace-nowrap">
+            분석
+          </button>
+          <button onClick={() => scrollToSection("resent")} className="text-sm border-gray-200 border px-9 py-2 rounded-lg whitespace-nowrap">
+            최근기록
+          </button>
+        </nav>
+      </div>
       {/* 데이터 작업 버튼 탭 */}
       <div className="flex gap-3 justify-center py-4">
         <button className="bg-primary text-sm text-white px-5 py-2 rounded-lg">필터</button>
         <button className="text-sm border-gray-200 border px-5 py-2 rounded-lg">내보내기</button>
-        <button className="text-sm border-gray-200 border px-5 py-2 rounded-lg">기록추가</button>
+        <Link href="/records/new" className="text-sm border-gray-200 border px-5 py-2 rounded-lg">
+          기록추가
+        </Link>
       </div>
       {/* 러닝 요약 탭 */}
-      <div className="px-4">
+      <div ref={resentRef} className="px-4">
         <h2 className=" font-semibold text-xl my-3">오늘의 러닝 요약</h2>
         <div className="flex gap-3 text-left overflow-x-auto scrollbar-hide">
           <div className="flex-col border border-gray-200 rounded-lg px-6 py-3 whitespace-nowrap">
@@ -63,7 +87,7 @@ export default function RecordPage() {
         </div>
       </div>
       {/* 주간 러닝 거리 차트 */}
-      <div className="bg-white rounded-lg border border-gray-200 mx-4 my-3 p-5">
+      <div ref={analysisRef} className="bg-white rounded-lg border border-gray-200 mx-4 my-3 p-5">
         <h2 className="text-lg font-semibold mb-2">주간 러닝 거리</h2>
         <p className="text-sm text-gray-500 mb-4">210 &#40;km&#41;</p>
         {/* 차트 */}
@@ -81,7 +105,7 @@ export default function RecordPage() {
         </div>
       </div>
       {/* 최근 기록 */}
-      <div className="bg-white rounded-lg border border-gray-200 mx-4 my-3 p-5">
+      <div ref={resentRef} className="bg-white rounded-lg border border-gray-200 mx-4 my-3 p-5">
         <h2 className="text-lg font-semibold mt-4">최근 기록</h2>
         <p className="text-gray-500 text-sm pb-3">최근 활동 내역을 확인 하세요</p>
         {/* 기록 리스트 */}
@@ -98,7 +122,9 @@ export default function RecordPage() {
               <div className="flex items-center gap-2">
                 <span className="font-semibold text-xs px-3">1월 12일</span>
                 <span className="bg-blue-500 text-white text-xs px-2 py-0.5 rounded">맑음</span>
-                <span className="bg-gray-300 text-gray-700 text-xs px-2 py-0.5 rounded">수정</span>
+                <Link href="records/1/edit" className="bg-gray-300 text-gray-700 text-xs px-2 py-0.5 rounded">
+                  수정
+                </Link>
               </div>
 
               {/* 데이터들 */}
@@ -139,7 +165,9 @@ export default function RecordPage() {
               <div className="flex items-center gap-2">
                 <span className="font-semibold text-xs px-3">1월 17일</span>
                 <span className="bg-gray-500 text-white text-xs px-2 py-0.5 rounded">흐림</span>
-                <span className="bg-gray-300 text-gray-700 text-xs px-2 py-0.5 rounded">수정</span>
+                <Link href="records/1/edit" className="bg-gray-300 text-gray-700 text-xs px-2 py-0.5 rounded">
+                  수정
+                </Link>
               </div>
 
               {/* 데이터들 */}
@@ -171,7 +199,7 @@ export default function RecordPage() {
         </div>
       </div>
       {/* 평균 페이스 통계 */}
-      <div className="px-4 py-3">
+      <div ref={recordRef} className="px-4 py-3">
         <h2 className="font-semibold text-xl my-3"> 평균 페이스 통계</h2>
         {/* 2개 컬럼*/}
         <div className="flex justify-center gap-4">

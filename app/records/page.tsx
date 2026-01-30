@@ -10,21 +10,26 @@ export default function RecordPage() {
   const [data, setData] = useState([]);
 
   // const homeRef = useRef<HTMLDivElement>(null);
-  const recordRef = useRef<HTMLDivElement>(null);
-  const analysisRef = useRef<HTMLDivElement>(null);
-  const resentRef = useRef<HTMLDivElement>(null);
+  const dailyRef = useRef<HTMLDivElement>(null);
+  const statsRef = useRef<HTMLDivElement>(null);
+  const recentRef = useRef<HTMLDivElement>(null);
+  const monthRecordRef = useRef<HTMLDivElement>(null);
+  const weeklyRecordRef = useRef<HTMLDivElement>(null);
+
   useEffect(() => {});
 
-  const scrollToSection = (sectionName: "home" | "record" | "analysis" | "resent") => {
+  const scrollToSection = (sectionName: "home" | "daily" | "stats" | "recent" | "monthRecord" | "weeklyRecord") => {
     if (sectionName === "home") {
       window.scrollTo({ top: 0, behavior: "smooth" });
       return;
     }
     const sections = {
       // home: homeRef, // 홈
-      record: recordRef, // 기록
-      analysis: analysisRef, // 분석
-      resent: resentRef, // 오늘 기록
+      daily: dailyRef, // 오늘 기록
+      weeklyRecord: weeklyRecordRef, // 주간기록
+      monthRecord: monthRecordRef, // 월간기록
+      recent: recentRef, // 최근 기록
+      stats: statsRef, // 분석
     };
     sections[sectionName]?.current?.scrollIntoView({ behavior: "smooth" });
   };
@@ -43,14 +48,20 @@ export default function RecordPage() {
           <button onClick={() => scrollToSection("home")} className="bg-primary text-sm text-white px-9 py-2 rounded-lg whitespace-nowrap">
             홈
           </button>
-          <button onClick={() => scrollToSection("record")} className="text-sm border-gray-200 border px-9 py-2 rounded-lg whitespace-nowrap">
-            기록
+          <button onClick={() => scrollToSection("daily")} className="text-sm border-gray-200 border px-9 py-2 rounded-lg whitespace-nowrap">
+            오늘의 기록
           </button>
-          <button onClick={() => scrollToSection("analysis")} className="text-sm border-gray-200 border px-9 py-2 rounded-lg whitespace-nowrap">
-            분석
+          <button onClick={() => scrollToSection("weeklyRecord")} className="text-sm border-gray-200 border px-9 py-2 rounded-lg whitespace-nowrap">
+            주간 러닝 거리
           </button>
-          <button onClick={() => scrollToSection("resent")} className="text-sm border-gray-200 border px-9 py-2 rounded-lg whitespace-nowrap">
-            최근기록
+          <button onClick={() => scrollToSection("monthRecord")} className="text-sm border-gray-200 border px-9 py-2 rounded-lg whitespace-nowrap">
+            월간 러닝 거리
+          </button>
+          <button onClick={() => scrollToSection("recent")} className="text-sm border-gray-200 border px-9 py-2 rounded-lg whitespace-nowrap">
+            최근 기록
+          </button>
+          <button onClick={() => scrollToSection("stats")} className="text-sm border-gray-200 border px-9 py-2 rounded-lg whitespace-nowrap">
+            통계
           </button>
         </nav>
       </div>
@@ -63,7 +74,7 @@ export default function RecordPage() {
         </Link>
       </div>
       {/* 러닝 요약 탭 */}
-      <div ref={resentRef} className="px-4">
+      <div ref={dailyRef} className="px-4 scroll-mt-34">
         <h2 className=" font-semibold text-xl my-3">오늘의 러닝 요약</h2>
         <div className="flex gap-3 text-left overflow-x-auto scrollbar-hide">
           <div className="flex-col border border-gray-200 rounded-lg px-6 py-3 whitespace-nowrap">
@@ -83,11 +94,11 @@ export default function RecordPage() {
             <div>
               <span className="text-lg font-bold">6:01 /km</span>
             </div>
-          </div>{" "}
+          </div>
         </div>
       </div>
       {/* 주간 러닝 거리 차트 */}
-      <div ref={analysisRef} className="bg-white rounded-lg border border-gray-200 mx-4 my-3 p-5">
+      <div ref={weeklyRecordRef} className="bg-white scroll-mt-34 rounded-lg border border-gray-200 mx-4 my-3 p-5">
         <h2 className="text-lg font-semibold mb-2">주간 러닝 거리</h2>
         <p className="text-sm text-gray-500 mb-4">210 &#40;km&#41;</p>
         {/* 차트 */}
@@ -96,7 +107,7 @@ export default function RecordPage() {
         </div>
       </div>
       {/* 월간 러닝 거리 */}
-      <div className="bg-white rounded-lg border border-gray-200 mx-4 my-3 p-5">
+      <div ref={monthRecordRef} className="bg-white scroll-mt-34 rounded-lg border border-gray-200 mx-4 my-3 p-5">
         <h2 className="text-lg font-semibold mb-2">월간 러닝 거리</h2>
         <p className="text-sm text-gray-500 mb-4">754 km</p>
         {/* 차트 영역 - 나중에 Recharts 들어갈 자리 */}
@@ -105,7 +116,7 @@ export default function RecordPage() {
         </div>
       </div>
       {/* 최근 기록 */}
-      <div ref={resentRef} className="bg-white rounded-lg border border-gray-200 mx-4 my-3 p-5">
+      <div ref={recentRef} className="bg-white rounded-lg border border-gray-200 mx-4 my-3 p-5">
         <h2 className="text-lg font-semibold mt-4">최근 기록</h2>
         <p className="text-gray-500 text-sm pb-3">최근 활동 내역을 확인 하세요</p>
         {/* 기록 리스트 */}
@@ -199,7 +210,7 @@ export default function RecordPage() {
         </div>
       </div>
       {/* 평균 페이스 통계 */}
-      <div ref={recordRef} className="px-4 py-3">
+      <div ref={statsRef} className="px-4 py-3">
         <h2 className="font-semibold text-xl my-3"> 평균 페이스 통계</h2>
         {/* 2개 컬럼*/}
         <div className="flex justify-center gap-4">

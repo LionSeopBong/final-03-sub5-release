@@ -1,0 +1,33 @@
+meta {
+  name: 게시글쓰기예
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{url}}/posts/
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "type": "record",
+      "title": "2026-01-31 아침 러닝",
+    "extra":{
+      "date":"2026-01-31",
+      "duration": "00:35:55",
+      "distance": "6",
+      "pace": "06:00",
+      "exerciseType":"running",
+      "location" : "광교호수공원",
+      "calories": 300,
+      "memo": "컨디션 난조"
+    }
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

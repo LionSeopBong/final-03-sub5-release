@@ -1,0 +1,16 @@
+meta {
+  name: 러닝기록조회
+  type: http
+  seq: 4
+}
+
+get {
+  url: {{url}}/posts/users
+  body: json
+  auth: inherit
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

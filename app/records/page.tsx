@@ -1,13 +1,19 @@
 "use client";
+
 import Footer from "@/app/components/common/Footer";
 import Header from "@/app/components/common/Header";
 import Navi from "@/app/components/common/Navi";
+import { getMyRecords } from "@/app/lib/recordsAPI";
+import { RunningRecord } from "@/app/lib/types";
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 
+const TEST_TOKEN =
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOjQsInR5cGUiOiJ1c2VyIiwiaWF0IjoxNzY5ODU5MDk0LCJleHAiOjE3Njk5NDU0OTQsImlzcyI6IkZFQkMifQ.Uy-kTkoupc5Tggt19TgfxLqRlH5az0WB7NDvMBcxPBo";
+
 export default function RecordPage() {
-  const [data, setData] = useState([]);
+  const [data, setData] = useState<RunningRecord[]>([]);
 
   // const homeRef = useRef<HTMLDivElement>(null);
   const dailyRef = useRef<HTMLDivElement>(null);
@@ -16,7 +22,22 @@ export default function RecordPage() {
   const monthRecordRef = useRef<HTMLDivElement>(null);
   const weeklyRecordRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {});
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        console.log("데이터 조회시작");
+        const result = await getMyRecords(TEST_TOKEN);
+        console.log("응답", result);
+        if (result.ok) {
+          setData(result.item);
+          console.log("기록 개수:", result.item.length);
+        }
+      } catch (error) {
+        console.error("에러 발생", error);
+      }
+    };
+    fetchData();
+  }, []);
 
   const scrollToSection = (sectionName: "home" | "daily" | "stats" | "recent" | "monthRecord" | "weeklyRecord") => {
     if (sectionName === "home") {
@@ -124,11 +145,6 @@ export default function RecordPage() {
           {/* 기록 아이템 1 */}
           <div className="border rounded-lg border-gray-200 px-1 py-1">
             <div className="flex items-center  gap-3 mb-2">
-              {/* 아이콘 */}
-              {/* <div className="w-5 h-10 flex-shrink-0">
-                <Image src="/images/management-symbol.png" alt="운동 아이콘" width={40} height={40} className="object-contain" />
-              </div> */}
-
               {/* 날짜 + 뱃지들 */}
               <div className="flex items-center gap-2">
                 <span className="font-semibold text-xs px-3">1월 12일</span>
@@ -168,9 +184,6 @@ export default function RecordPage() {
           <div className="border rounded-lg border-gray-200 px-1 py-1">
             <div className="flex items-center  gap-3 mb-2">
               {/* 아이콘 */}
-              {/* <div className="w-5 h-10 flex-shrink-0">
-                <Image src="/images/management-symbol.png" alt="운동 아이콘" width={40} height={40} className="object-contain" />
-              </div> */}
 
               {/* 날짜 + 뱃지들 */}
               <div className="flex items-center gap-2">

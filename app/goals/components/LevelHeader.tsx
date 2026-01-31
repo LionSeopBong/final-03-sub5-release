@@ -1,41 +1,11 @@
 "use client";
 import { useState } from "react";
-import { LevelInfo } from "../types";
+import { LevelDummy } from "../config/levelConfig";
 export default function LevelHeader() {
   const [level, setLevel] = useState([]);
 
-  const nowLevel = "고급";
+  const nowLevel = "초급";
 
-  const LevelDummy: LevelInfo[] = [
-    {
-      level: "초급",
-      icon: "🌱",
-      pace: "7,00",
-      totalDistance: 5,
-      monthlyRuns: 3,
-    },
-    {
-      level: "중급",
-      icon: "🏃",
-      pace: "6,00",
-      totalDistance: 10,
-      monthlyRuns: 3,
-    },
-    {
-      level: "고급",
-      icon: "🔥",
-      pace: "8,00",
-      totalDistance: 21,
-      monthlyRuns: 3,
-    },
-    {
-      level: "초급",
-      icon: "🌱",
-      pace: "9,00",
-      totalDistance: 42,
-      monthlyRuns: 3,
-    },
-  ];
   const leveling = LevelDummy.find((item) => {
     if (item.level === nowLevel) {
       return true;
@@ -43,12 +13,6 @@ export default function LevelHeader() {
   });
   console.log("==hi", leveling);
 
-  // const levels = leveling.map((item) => {
-  //   return {
-  //     level: item.level,
-  //     icon: item.icon,
-  //   };
-  // });
   return (
     <>
       {/* 탭 LevelIcon 상단 */}

@@ -1,6 +1,6 @@
-import ProfileButton from "@/app/profile-main/components/ProfileButton";
-import ProfileFooter from "@/app/profile-main/components/ProfileFooter";
-import ProfileHeader from "@/app/profile-main/components/ProfileHeader";
+import ProfileButton from "@/app/profile/components/ProfileButton";
+import ProfileFooter from "@/app/profile/components/ProfileFooter";
+import ProfileHeader from "@/app/profile/components/ProfileHeader";
 import Image from "next/image";
 
 export default function ProfileEdit() {
@@ -18,7 +18,11 @@ export default function ProfileEdit() {
             fill
             className="object-cover"
           />
-          <button type="button" aria-label="프로필 사진 설정 버튼">
+          <button
+            type="button"
+            aria-label="프로필 사진 설정 버튼"
+            className="cursor-pointer"
+          >
             <Image
               src="/icons/profile-camera.svg"
               alt="프로필 사진 선택"

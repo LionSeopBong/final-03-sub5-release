@@ -1,5 +1,6 @@
-import ProfileFooter from "@/app/profile-main/components/ProfileFooter";
-import ProfileHeader from "@/app/profile-main/components/ProfileHeader";
+import ProfileFooter from "@/app/profile/components/ProfileFooter";
+import ProfileHeader from "@/app/profile/components/ProfileHeader";
+import Link from "next/link";
 
 export default function MyBoard() {
   return (
@@ -7,9 +8,12 @@ export default function MyBoard() {
       <ProfileHeader />
 
       <div className="flex justify-end mx-5 my-6">
-        <a className="border border-[#003458] bg-[#003458] px-3 py-1.5 rounded-lg text-white cursor-pointer">
+        <Link
+          href="/profile/board/inquiry-board"
+          className="border border-[#003458] bg-[#003458] px-3 py-1.5 rounded-lg text-white cursor-pointer"
+        >
           문의 게시판
-        </a>
+        </Link>
       </div>
 
       <section className="rounded-lg bg-gray-100 border border-gray-100 px-3 py-6 mx-5 my-9 text-center">

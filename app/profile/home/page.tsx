@@ -1,12 +1,12 @@
-import Footer from "@/app/components/common/Footer";
-import Header from "@/app/components/common/Header";
 import Navi from "@/app/components/common/Navi";
+import ProfileHeader from "@/app/profile/components/ProfileHeader";
 import Image from "next/image";
+import Link from "next/link";
 
 export default function ProfileHome() {
   return (
     <>
-      <Header />
+      <ProfileHeader />
 
       {/* 닉네임 + 수정 버튼 : area-profile */}
       <div className="area-profile p-4 m-2 flex items-center relative gap-8 pt-16">
@@ -17,19 +17,21 @@ export default function ProfileHome() {
           height={30}
         />
         <h3 className="font-semibold">닉네임</h3>
-        <button className="profile-edit ml-auto border border-gray-200 px-4 py-2 rounded-[30px]">
-          수정
-        </button>
+        <Link href="/profile/edit" className="ml-auto inline-flex">
+          <button className="profile-edit ml-auto border border-gray-200 px-4 py-2 rounded-[30px] cursor-pointer">
+            수정
+          </button>
+        </Link>
       </div>
 
       <main>
         {/* 러닝 요약 카드 영역 */}
         <div className="record-card bg-[#f8f8f8] p-4 mx-8 my-0 rounded-[20px]">
-          <a className="cursor-pointer">
+          <Link href="/records" className="cursor-pointer">
             <p className="pb-0.5 mb-4 border-b-2 border-b-gray-400 font-medium inline-block">
               전체 기록 보기
             </p>
-          </a>
+          </Link>
           <div className="flex items-center gap-0 m-2">
             <div className="record-runner flex-1 text-center min-w-0">
               <div className="runner-icon flex items-center justify-center gap-2">
@@ -73,33 +75,86 @@ export default function ProfileHome() {
         {/* 러닝지표, 내 게시글, 고객센터, 로그아웃 영역 */}
         <ul className="px-8 m-2">
           <li className="py-4 border-b border-gray-200 cursor-pointer">
-            <a className="flex items-center justify-between">
+            <Link
+              href="/profile/record"
+              className="flex items-center justify-between"
+            >
               내 러닝 지표
               <Image src="/icons/right-btn.svg" alt="" width={16} height={16} />
-            </a>
+            </Link>
           </li>
           <li className="py-4 border-b border-gray-200 cursor-pointer">
-            <a className="flex items-center justify-between">
+            <Link
+              href="/profile/board/my"
+              className="flex items-center justify-between"
+            >
               내 게시글
               <Image src="/icons/right-btn.svg" alt="" width={16} height={16} />
-            </a>
+            </Link>
           </li>
           <li className="py-4 border-b border-gray-200 cursor-pointer">
-            <a className="flex items-center justify-between">
+            <Link
+              href="/profile/board/inquiry-board"
+              className="flex items-center justify-between"
+            >
               고객센터
               <Image src="/icons/right-btn.svg" alt="" width={16} height={16} />
-            </a>
+            </Link>
           </li>
           <li className="py-4 border-b border-gray-200 cursor-pointer">
-            <a className="flex items-center justify-between">
+            <button className="flex items-center justify-between w-full cursor-pointer">
               로그아웃
               <Image src="/icons/right-btn.svg" alt="" width={16} height={16} />
-            </a>
+            </button>
           </li>
         </ul>
       </main>
 
-      <Footer />
+      {/* ●●●●● 로그아웃 경고 모달 */}
+      <div
+        id="logout-modal"
+        className="fixed inset-0 z-50 flex items-center justify-center hidden"
+      >
+        {/* ★ dim 추가 */}
+        <div className="absolute inset-0 bg-black/50 z-0"></div>
+
+        {/* 모달 카드 */}
+        <div className="modal-logout-wrap px-8 w-full relative z-10">
+          <div className="modal-logout-setter rounded-[20px] mx-auto max-w-[420px] w-full bg-[#ffffff]">
+            <div className="relative w-full h-[160px] px-4 py-2 flex flex-col items-center justify-center">
+              <Image
+                src="/icons/logout.svg"
+                alt="프로필 선택"
+                width={64}
+                height={64}
+                className="object-contain"
+              />
+              <h2 className="mb-4 text-gray-600 font-bold text-xl">
+                로그아웃하시겠어요?
+              </h2>
+              <p className="text-gray-400 font-semibold mb-4">
+                로그아웃 시, 현재 세션이 종료됩니다.
+              </p>
+            </div>
+
+            <div className="modal-gallery-actions flex items-center justify-between gap-3 w-full p-3">
+              <button
+                type="button"
+                className="w-1/2 bg-gray-200 border border-gray-200 rounded-[5px] py-3 cursor-pointer"
+              >
+                취소
+              </button>
+              <button
+                type="button"
+                className="w-1/2 border border-[#003458] rounded-[5px] py-3 bg-[#003458] text-white cursor-pointer"
+              >
+                로그아웃
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <Navi />
     </>
   );

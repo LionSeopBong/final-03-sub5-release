@@ -1,5 +1,5 @@
-import ProfileFooter from "@/app/profile-main/components/ProfileFooter";
-import ProfileHeader from "@/app/profile-main/components/ProfileHeader";
+import ProfileFooter from "@/app/profile/components/ProfileFooter";
+import ProfileHeader from "@/app/profile/components/ProfileHeader";
 import Image from "next/image";
 
 export default function InquiryListPage() {

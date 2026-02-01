@@ -1,5 +1,5 @@
-import ProfileFooter from "@/app/profile-main/components/ProfileFooter";
-import ProfileHeader from "@/app/profile-main/components/ProfileHeader";
+import ProfileFooter from "@/app/profile/components/ProfileFooter";
+import ProfileHeader from "@/app/profile/components/ProfileHeader";
 import Image from "next/image";
 
 export default function ProfileRecord() {
@@ -11,14 +11,14 @@ export default function ProfileRecord() {
       <section className="flex flex-col items-center justify-center min-h-[calc(100vh-120px)] pb-[64px]">
         <ul className="m-0 w-full">
           <li className="py-5 border-b border-gray-200 cursor-pointer">
-            <button className="flex items-center justify-between px-7 gap-2 w-full">
+            <button className="flex items-center justify-between px-7 gap-2 w-full cursor-pointer">
               <p className="basis-1/2 text-left shrink-0">신장</p>
               <p className="basis-1/2 text-left">183cm</p>
               <Image src="/icons/right-btn.svg" alt="" width={16} height={16} />
             </button>
           </li>
           <li className="py-5 border-b border-gray-200 cursor-pointer">
-            <button className="flex items-center justify-between px-7 gap-2 w-full">
+            <button className="flex items-center justify-between px-7 gap-2 w-full cursor-pointer">
               <p className="basis-1/2 text-left shrink-0">체중</p>
               <p className="basis-1/2 text-left">80kg</p>
               <Image src="/icons/right-btn.svg" alt="" width={16} height={16} />

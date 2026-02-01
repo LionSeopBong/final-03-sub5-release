@@ -26,7 +26,7 @@ export default function Navi() {
         </li>
 
         <li className="flex flex-col items-center text-gray-400 text-xs">
-          <Link href="/profile-main/profile-home" className="text-xl">
+          <Link href="/profile/home" className="text-xl">
             <img src="/icons/iconamoon--profile-duotone.svg" />
           </Link>
           프로필

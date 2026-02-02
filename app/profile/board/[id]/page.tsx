@@ -1,5 +1,5 @@
-import ProfileFooter from "@/app/profile-main/components/ProfileFooter";
-import ProfileHeader from "@/app/profile-main/components/ProfileHeader";
+import ProfileFooter from "@/app/profile/components/ProfileFooter";
+import ProfileHeader from "@/app/profile/components/ProfileHeader";
 
 export default function PostDetailPage() {
   return (

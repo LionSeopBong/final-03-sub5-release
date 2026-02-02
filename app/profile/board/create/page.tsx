@@ -45,6 +45,43 @@ export default function CreatePost() {
         </div>
       </main>
 
+      {/* ●●●●● 문의 제출 완료 후 모달창 */}
+      <div
+        id="post-submit-modal"
+        className="fixed inset-0 z-50 flex items-center justify-center hidden"
+      >
+        {/* ★ dim 추가 */}
+        <div className="absolute inset-0 bg-black/50 z-0"></div>
+
+        {/* 모달 카드 */}
+        <div className="post-submit-card px-8 w-full relative z-10">
+          <div className="modal-photo-setter flex flex-col items-center justify-center rounded-[20px] mx-auto max-w-[420px] w-full bg-[#ffffff]">
+            <Image
+              src="/icons/post-submitted.svg"
+              alt=""
+              width={65}
+              height={65}
+              className="my-4"
+            />
+
+            <div className="submit-alert items-center justify-center flex flex-col mb-4 pb-5">
+              <h2 className="font-semibold w-full text-gray-600 text-lg">
+                문의 제출이 완료되었습니다.
+              </h2>
+              <p className="text-gray-400 text-left w-full font-semibold mt-2">
+                <span>문의 접수 후 처리는</span>
+                <br />
+                <span>영업일 기준 1~2일이 소요됩니다.</span>
+              </p>
+            </div>
+
+            <button className="post-submit-btn font-semibold text-white border border-[#003458] bg-[#003458] rounded-b-[20px] p-3 w-full cursor-pointer">
+              확인
+            </button>
+          </div>
+        </div>
+      </div>
+
       <ProfileFooter />
     </>
   );

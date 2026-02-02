@@ -19,7 +19,9 @@ export default function NoticePost() {
             </h2>
           </div>
           {/* 관리자 + 날짜 */}
-          <p className="text-sm text-gray-500">관리자 | 2026-01-21</p>
+          <p className="text-sm text-gray-500">
+            관리자 &nbsp;|&nbsp; 2026-01-21
+          </p>
           <p className="border border-gray-200 rounded-md p-3 leading-relaxed">
             문의 접수 후 처리는 영업일 기준 1~2일이 소요됩니다. 고객센터
             운영시간 내에는 02-000-0000으로 전화 상담도 가능합니다.

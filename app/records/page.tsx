@@ -6,6 +6,7 @@ import Navi from "@/app/components/common/Navi";
 import { getMyRecords } from "@/app/lib/recordsAPI";
 import { calculateMonthlyStats, calculateWeeklyStats } from "@/app/lib/stats";
 import { RunningRecord } from "@/app/lib/types";
+import useStatsStore from "@/zustand/statsStore";
 import useUserStore from "@/zustand/user";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
@@ -21,17 +22,17 @@ export default function RecordPage() {
   const monthRecordRef = useRef<HTMLDivElement>(null);
   const weeklyRecordRef = useRef<HTMLDivElement>(null);
 
-  const [weeklyStats, setWeeklyStats] = useState({
-    totalDistance: 0,
-    averagePace: "0:00",
-    weeklyRuns: 0,
-  });
-  const [monthlyStats, setMonthlyStats] = useState({
-    totalDistance: 0,
-    averagePace: "0:00",
-    monthlyRuns: 0,
-  });
-
+  // const [weeklyStats, setWeeklyStats] = useState({
+  //   totalDistance: 0,
+  //   averagePace: "0:00",
+  //   weeklyRuns: 0,
+  // });
+  // const [monthlyStats, setMonthlyStats] = useState({
+  //   totalDistance: 0,
+  //   averagePace: "0:00",
+  //   monthlyRuns: 0,
+  // });
+  const { weeklyStats, monthlyStats, setWeeklyStats, setMonthlyStats } = useStatsStore();
   const user = useUserStore((state) => state.user);
 
   useEffect(() => {
@@ -58,7 +59,7 @@ export default function RecordPage() {
       }
     };
     fetchData();
-  }, [user]);
+  }, [user, setWeeklyStats, setMonthlyStats]);
 
   const scrollToSection = (sectionName: "home" | "daily" | "stats" | "recent" | "monthRecord" | "weeklyRecord") => {
     if (sectionName === "home") {
@@ -151,7 +152,7 @@ export default function RecordPage() {
       <div ref={weeklyRecordRef} className="bg-white scroll-mt-34 rounded-lg border border-gray-200 mx-4 my-3 p-5">
         <h2 className="text-lg font-semibold mb-2">주간 러닝 거리</h2>
         <p className="text-sm text-gray-500 mb-4">
-          {weeklyStats.totalDistance} &#40;km&#41; {weeklyStats.weeklyRuns} 회
+          {weeklyStats?.totalDistance} &#40;km&#41; {weeklyStats?.weeklyRuns} 회
         </p>
         {/* 차트 */}
         <div className="h-48 bg-gray-100 rounded flex items-center justify-center">
@@ -162,7 +163,7 @@ export default function RecordPage() {
       <div ref={monthRecordRef} className="bg-white scroll-mt-34 rounded-lg border border-gray-200 mx-4 my-3 p-5">
         <h2 className="text-lg font-semibold mb-2">월간 러닝 거리</h2>
         <p className="text-sm text-gray-500 mb-4">
-          {monthlyStats.totalDistance} &#40;km&#41; {monthlyStats.monthlyRuns} 회
+          {monthlyStats?.totalDistance} &#40;km&#41; {monthlyStats?.monthlyRuns} 회
         </p>
         {/* 차트 영역 - 나중에 Recharts 들어갈 자리 */}
         <div className="h-48 bg-gray-50 rounded-lg flex items-center justify-center border border-dashed border-gray-300">
@@ -226,11 +227,11 @@ export default function RecordPage() {
         <div className="flex justify-center gap-4">
           <div className="text-center p-4 rounded-lg border border-gray-200">
             <p className="text-gray-500 text-xs">주간페이스 평균</p>
-            <p className="text-lg font-bold">{weeklyStats.averagePace} /km</p>
+            <p className="text-lg font-bold">{weeklyStats?.averagePace} /km</p>
           </div>
           <div className="text-center p-4 rounded-lg border border-gray-200">
             <p className="text-gray-500 text-xs">월간페이스 평균</p>
-            <p className="text-lg font-bold">{monthlyStats.averagePace} /km</p>
+            <p className="text-lg font-bold">{monthlyStats?.averagePace} /km</p>
           </div>
         </div>
       </div>

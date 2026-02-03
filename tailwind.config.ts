@@ -53,6 +53,8 @@ const config: Config = {
         secondary: "#686868",
         tertiary: "#acacac",
         inverse: "#ffffff",
+        subTitle: "#8E8E93",
+        logText: "#003458",
       },
       borderColor: {
         light: "#e8e8e8",

@@ -27,11 +27,11 @@ export default function LoginPage() {
 
         {/* 제목 */}
         <section className="mt-2">
-          <h1 className="text-4xl font-extrabold tracking-tight">Welcome!</h1>
+          <h1 className="text-4xl font-bold tracking-tight">Welcome!</h1>
         </section>
 
         {/* 서브 title */}
-        <p className="mt-4 text-sm leading-6 font-medium text-sub-title whitespace-pre-line">
+        <p className="mt-4 text-sm leading-6 font-medium text-subTitle whitespace-pre-line">
           기록으로 완성되는 나만의 러닝{"\n"}
           분석된 데이터로 더 똑똑하게 달려요
         </p>

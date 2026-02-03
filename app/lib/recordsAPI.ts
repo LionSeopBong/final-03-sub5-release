@@ -37,7 +37,7 @@ export function createRecord(
   return fetchAPI(`/posts`, {
     method: "POST",
     body: {
-      type: "record", // 👈 필수!
+      type: "record",
       ...data,
     },
     token,

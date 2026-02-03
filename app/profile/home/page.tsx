@@ -24,7 +24,7 @@ export default function ProfileHome() {
         </Link>
       </div>
 
-      <main>
+      <main className="pb-16">
         {/* 러닝 요약 카드 영역 */}
         <div className="record-card bg-[#f8f8f8] p-4 mx-8 my-0 rounded-[20px]">
           <Link href="/records" className="cursor-pointer">

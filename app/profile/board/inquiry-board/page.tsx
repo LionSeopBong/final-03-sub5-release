@@ -1,6 +1,7 @@
-import ProfileFooter from "@/app/profile/components/ProfileFooter";
+import Navi from "@/app/components/common/Navi";
 import ProfileHeader from "@/app/profile/components/ProfileHeader";
 import Image from "next/image";
+import Link from "next/link";
 
 export default function InquiryListPage() {
   return (
@@ -220,9 +221,12 @@ export default function InquiryListPage() {
               검색
             </button>
           </div>
-          <a className="w-full border border-gray-300 rounded-sm py-2 cursor-pointer">
+          <Link
+            href="/profile/board/create"
+            className="w-full border border-gray-300 rounded-sm py-2 cursor-pointer"
+          >
             문의하기
-          </a>
+          </Link>
         </div>
 
         {/* Pagination */}
@@ -256,7 +260,7 @@ export default function InquiryListPage() {
         </div>
       </main>
 
-      <ProfileFooter />
+      <Navi />
     </>
   );
 }

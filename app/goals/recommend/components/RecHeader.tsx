@@ -1,10 +1,11 @@
+import { LevelInfo, leveltype } from "@/app/goals/types";
 import Link from "next/link";
 
-export default function RecHeader() {
+export default function RecHeader({ level }: { level: leveltype }) {
   return (
     <>
-      <div className="flex flex-row items-center ">
-        <Link href="/goals">
+      <div className="relative flex items-center w-full h-10">
+        <Link href="/goals" className="absolute left-0">
           <svg
             width="24"
             height="24"
@@ -31,7 +32,10 @@ export default function RecHeader() {
           </svg>
         </Link>
         {/* ===== 초급 카드들 ===== */}
-        <section className="font-bold inline-block text-2xl">초급</section>
+
+        <section className="absolute left-1/2 -translate-x-1/2 font-bold text-2xl whitespace-nowrap">
+          {level}
+        </section>
       </div>
     </>
   );

@@ -4,7 +4,7 @@ export interface LevelInfo {
   userId: number;
   level: leveltype;
   icon: string;
-  pace: string;
+  pace: number;
   totalDistance: number;
   monthlyRuns: number;
 }

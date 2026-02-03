@@ -1,11 +1,35 @@
 import { LevelInfo } from "../types";
+// ### 신규 사용자
+// ```
+// 1일차: 5km (pace 4.0) → 기록 1개 → 고급! (빠른 승급)
+// 3일차: 3km (pace 4.2) → 기록 2개 → 고급 유지
+// 7일차: 10km (pace 4.1) → 기록 3개 → 한 달 기준으로 전환
+// ```
 
+// ### 복귀 사용자
+// ```
+// 공백 → 초급 강등
+// 복귀 1일: 10km (pace 4.0) → 기록 1개 → 고급! (빠른 복귀)
+// 복귀 3일: 5km (pace 4.2) → 기록 2개 → 고급 유지
+// 복귀 10일: 7km (pace 4.3) → 기록 3개 이상 → 한 달 안정 모드
+// ```
+
+// ### 꾸준한 사용자
+// ```
+// 매주 2-3회 러닝 → 한 달에 10회 이상
+// → 한 달 평균 페이스로 안정적 레벨 유지
+// → 하루 잘못 뛰어도 레벨 안 떨어짐
+
+// 기록 없음 → 초급
+// 초급: pace >= 5.5;
+// 중급: 4.5 <= pace < 5.5;
+// 고급: pace < 4.5;
 export const LevelDummy: LevelInfo[] = [
   {
     userId: 1,
     level: "초급",
     icon: "🌱",
-    pace: "7,00",
+    pace: 7.0,
     totalDistance: 5,
     monthlyRuns: 3,
   },
@@ -13,7 +37,7 @@ export const LevelDummy: LevelInfo[] = [
     userId: 2,
     level: "중급",
     icon: "🏃",
-    pace: "6,00",
+    pace: 5.3,
     totalDistance: 10,
     monthlyRuns: 3,
   },
@@ -21,7 +45,7 @@ export const LevelDummy: LevelInfo[] = [
     userId: 3,
     level: "고급",
     icon: "🔥",
-    pace: "8,00",
+    pace: 4.2,
     totalDistance: 21,
     monthlyRuns: 3,
   },
@@ -29,7 +53,7 @@ export const LevelDummy: LevelInfo[] = [
     userId: 4,
     level: "초급",
     icon: "🌱",
-    pace: "9,00",
+    pace: 6.0,
     totalDistance: 42,
     monthlyRuns: 3,
   },

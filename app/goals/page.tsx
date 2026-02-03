@@ -7,7 +7,7 @@ import RunningCard from "@/app/goals/components/RunningCard";
 import { LevelDummy } from "@/app/goals/config/levelConfig";
 
 export default function GoalsPage() {
-  const currentUserId = 1;
+  const currentUserId = 2;
 
   const leveling = LevelDummy.find((item) => {
     if (item.userId === currentUserId) {
@@ -29,7 +29,7 @@ export default function GoalsPage() {
           {/* 메인 중간 : 분석결과 카드 */}
           <RunningCard userLevel={leveling} />
           {/* 버튼들 */}
-          <GoalsActions />
+          <GoalsActions userLevel={leveling} />
           {/* 네비게이션 */}
         </div>
       </main>

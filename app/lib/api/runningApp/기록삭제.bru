@@ -1,0 +1,16 @@
+meta {
+  name: 기록삭제
+  type: http
+  seq: 5
+}
+
+delete {
+  url: {{url}}/posts/8
+  body: json
+  auth: inherit
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

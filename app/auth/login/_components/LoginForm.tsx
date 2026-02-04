@@ -1,122 +1,140 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
+import { useActionState, useEffect, useState } from "react";
+
+import { login } from "@/actions/user";
+import Alert from "@/app/components/ui/Alert";
+import { validateLogin } from "@/app/lib/validation";
+import useAlert from "@/hooks/useAlert";
+import useUserStore from "@/zustand/user";
+import SocialLoginButtons from "@/app/auth/login/_components/SocialLoginButtons";
+
 export default function LoginForm() {
+  const [userState, formAction] = useActionState(login, null);
   const router = useRouter();
+  const setUser = useUserStore((state) => state.setUser);
+
+  // password 숨김
+  const [showPassword, setShowPassword] = useState(false);
+
+  // 입력값 상태 (검증용)
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+
+  // Alert 로직 (분리 가능)
+  const { open, message, openAlert, closeAlert } = useAlert();
+
+  useEffect(() => {
+    if (!userState) return;
+
+    if (userState.ok === 1) {
+      setUser(userState.item);
+      alert(`${userState.item.name}님 로그인이 완료되었습니다.`);
+      router.replace("/home");
+      return;
+    }
+
+    if (userState.ok === 0) {
+      openAlert(
+        "이메일 또는 비밀번호가 올바르지 않습니다.\n다시 확인해주세요.",
+      );
+    }
+  }, [userState, router, setUser, openAlert]);
+
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    const emailTrim = email.trim();
+    const passwordValue = password;
+
+    const error = validateLogin(emailTrim, passwordValue);
+    if (error) {
+      openAlert(error);
+      return;
+    }
+  };
 
   return (
-    <form className="space-y-4">
-      {/* 이메일 */}
-      <div className="space-y-1">
-        <input
-          type="email"
-          name="email"
-          autoComplete="email"
-          placeholder="you@example.com"
-          required
-          className={[
-            "w-full border-0 border-b-2 border-gray-300 px-1 py-3 text-base",
-            "caret-primary focus:border-b-primary focus:outline-none",
-          ].join(" ")}
-        />
-        {/* 에러 자리 (디자인 확인용) */}
-        {/* <p className="text-xs text-error">이메일 형식이 올바르지 않아요.</p> */}
-      </div>
+    <>
+      <Alert open={open} message={message} onClose={closeAlert} />
 
-      {/* 비밀번호 */}
-      <div className="space-y-1">
-        <input
-          type="password"
-          name="password"
-          placeholder="password"
-          required
-          className={[
-            "w-full border-0 border-b-2 border-gray-300 px-1 py-3 text-base",
-            "caret-primary focus:border-primary focus:outline-none",
-          ].join(" ")}
-        />
-        {/* 에러 자리 (디자인 확인용) */}
-        {/* <p className="text-xs text-error">
-          비밀번호는 최소 6자 이상이어야 해요.
-        </p> */}
-      </div>
-
-      {/* 서버 에러 자리 (디자인 확인용) */}
-      {/* 
-      <div className="rounded-xl border border-red-200 bg-red-50 px-3 py-2">
-        <p className="text-sm text-error">로그인에 실패했어요.</p>
-      </div>
-      */}
-
-      {/* 로그인 버튼 */}
-      <button
-        type="button"
-        className="w-full rounded-2xl bg-primary px-3 py-2.5 text-lg font-semibold text-white"
-        onClick={() => router.push("/home")}
+      <form
+        action={formAction}
+        onSubmit={handleSubmit}
+        noValidate
+        className="space-y-4"
       >
-        로그인
-      </button>
+        {/* 이메일 */}
+        <div className="space-y-1">
+          <input
+            name="email"
+            type="email"
+            autoComplete="email"
+            placeholder="you@example.com"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            className={[
+              "w-full border-b-2 border-gray-300 px-1 py-3 text-base",
+              "caret-primary focus:border-b-primary focus:outline-none focus:ring-0",
+            ].join(" ")}
+          />
+        </div>
 
-      <div className="mt-6 flex justify-center">
-        <Link
-          href="/auth/terms"
-          className="text-sm font-semibold text-[#003458]"
+        {/* 비밀번호 */}
+        <div className="relative space-y-1">
+          <input
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            name="password"
+            type={showPassword ? "text" : "password"}
+            placeholder="password"
+            className={[
+              "w-full border-b-2 border-gray-300 px-1 py-3 text-base",
+              "caret-primary focus:border-b-primary focus:outline-none focus:ring-0",
+            ].join(" ")}
+          />
+
+          {/* 비밀번호 보임/숨김 버튼 */}
+          <button
+            type="button"
+            aria-label={showPassword ? "비밀번호 숨기기" : "비밀번호 보기"}
+            onClick={() => setShowPassword((prev) => !prev)}
+            className="absolute right-1 top-1/2 -translate-y-1/2 text-gray-500"
+          >
+            {showPassword ? (
+              <Image
+                src="/icons/eye_off.svg"
+                alt="숨김"
+                width={20}
+                height={20}
+              />
+            ) : (
+              <Image src="/icons/eye.svg" alt="보임" width={20} height={20} />
+            )}
+          </button>
+        </div>
+
+        {/* 로그인 버튼 */}
+        <button
+          type="submit"
+          className="w-full rounded-2xl bg-primary px-3 py-2.5 text-lg font-semibold text-white"
         >
-          이메일 회원가입
-        </Link>
-      </div>
+          로그인
+        </button>
 
-      {/* 소셜 로그인 영역 */}
-      <div className="space-y-2 pt-2">
-        <div className="flex items-center gap-3">
-          <div className="h-px flex-1 bg-gray-400" />
-          <span className="text-xs font-normal text-black">
-            다른 서비스 계정으로 로그인
-          </span>
-          <div className="h-px flex-1 bg-gray-400" />
+        <div className="mt-6 flex justify-center">
+          <Link
+            href="/auth/terms"
+            className="text-sm font-semibold text-logText"
+          >
+            이메일 회원가입
+          </Link>
         </div>
 
-        <div className="mt-6 flex items-center justify-center gap-6">
-          <button
-            type="button"
-            aria-label="Google 로그인"
-            className="h-9 w-9  flex items-center justify-center"
-            onClick={() => alert("구글 로그인 연결 예정")}
-          >
-            <Image
-              src="/icons/google.svg"
-              alt="Google"
-              width={36}
-              height={36}
-              priority
-            />
-          </button>
-
-          <button
-            type="button"
-            aria-label="Kakao 로그인"
-            className="h-9 w-9 rounded-full bg-[#FEE500] flex items-center justify-center"
-            onClick={() => alert("카카오 로그인 연결 예정")}
-          >
-            <Image
-              src="/icons/kakao.svg"
-              alt="카카오 로그인"
-              width={34}
-              height={34}
-            />
-          </button>
-        </div>
-
-        {/* 소셜 로그인 안내 문구 */}
-        <p className="mt-8 px-4 text-center text-xs text-gray-500 leading-relaxed">
-          SNS 계정으로 간편하게 가입하여 서비스를 이용할 수 있습니다.
-          <br />
-          <span className="text-red-500">
-            기존 Sub.5 계정과 연동되지 않으니 이용에 참고하세요.
-          </span>
-        </p>
-      </div>
-    </form>
+        <SocialLoginButtons />
+      </form>
+    </>
   );
 }

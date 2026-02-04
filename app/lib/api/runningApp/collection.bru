@@ -1,0 +1,18 @@
+headers {
+  client-id: {{client-id}}
+}
+
+auth {
+  mode: bearer
+}
+
+auth:bearer {
+  token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOjQsInR5cGUiOiJ1c2VyIiwiaWF0IjoxNzY5OTM5NDA3LCJleHAiOjE3NzAwMjU4MDcsImlzcyI6IkZFQkMifQ.TAFy92q4pEKyFGemkDzY8c2IkjEcm6Wwr9G6lDh4K78
+}
+
+script:post-response {
+  if(res.status === 200){
+    bru.setEnvVar('accessToken', res.body.item.token.accessToken);
+    bru.setEnvVar('refreshToken', res.body.item.token.refreshToken);
+  }
+}

@@ -1,5 +1,5 @@
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
-
+const CLIENT_ID = process.env.NEXT_PUBLIC_CLIENT_ID;
 async function fetchAPI(
   endpoint: string,
   options?: {
@@ -11,7 +11,7 @@ async function fetchAPI(
   const url = API_URL + endpoint;
 
   const headers: HeadersInit = {
-    "client-id": "openmarket",
+    "client-id": `${CLIENT_ID}`,
     "Content-Type": "application/json",
   };
 

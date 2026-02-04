@@ -1,11 +1,55 @@
 "use client";
+import { addRecord } from "@/app/action/records";
+import useUserStore from "@/zustand/user";
 import { ArrowLeft } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useActionState } from "react";
+import { useActionState, useEffect, useState } from "react";
 
 export default function AddRecordForm() {
-  // const [state, formAction, isPending] = useActionState(createRecord)
+  const [state, formAction, isPending] = useActionState(addRecord, null);
   const router = useRouter();
+
+  const user = useUserStore((state) => state.user);
+
+  const [hour, setHour] = useState("");
+  const [min, setMin] = useState("");
+  const [sec, setSec] = useState("");
+  const [distance, setDistance] = useState("");
+  const [pace, setPace] = useState("");
+
+  useEffect(() => {
+    const h = parseInt(hour) || 0;
+    const m = parseInt(min) || 0;
+    const s = parseInt(sec) || 0;
+    const d = parseInt(distance) || 0;
+    if (d > 0 && (h > 0 || m > 0 || s > 0)) {
+      const totalMinutes = h * 60 + m + s / 60;
+      const paceInMinutes = totalMinutes / d;
+      const paceMin = Math.floor(paceInMinutes);
+      const paceSec = Math.round((paceInMinutes - paceMin) * 60);
+      if (paceSec >= 60) {
+        setPace(`${paceMin + 1}:00`);
+      } else {
+        setPace(`${paceMin}:${paceSec.toString().padStart(2, "0")}`);
+      }
+    } else {
+      setPace("");
+    }
+  }, [hour, min, sec, distance]);
+
+  useEffect(() => {
+    if (!user) {
+      alert("로그인이 필요합니다");
+      router.push("/login");
+    }
+  }, [user, router]);
+
+  useEffect(() => {
+    if (state?.success) {
+      router.push("/records");
+      router.refresh();
+    }
+  }, [state, router]);
 
   return (
     <>
@@ -15,10 +59,13 @@ export default function AddRecordForm() {
           <ArrowLeft size={24} className="" />
         </button>
         <h1 className="text-2xl font-bold text-gray-700 ">러닝 기록 추가</h1>
-        <button className="text-primary-light">취소</button>
+        <button type="button" onClick={() => router.back()} className="text-primary-light">
+          취소
+        </button>
       </header>
       {/* 입력 폼 */}
-      <form action="" className="w-full">
+      <form action={formAction} className="w-full">
+        <input type="hidden" name="token" value={user?.token?.accessToken || ""} />
         <div className="bg-white grid grid-cols-2 p-5 gap-4">
           {/* 날짜 입력 */}
           <div className="flex flex-col gap-2">
@@ -32,11 +79,38 @@ export default function AddRecordForm() {
           <div className="flex flex-col gap-2">
             <label className="text-s font-bold">운동시간</label>
             <div className="flex justify-center text-xs py-2 border text-center rounded-lg border-gray-200">
-              <input type="number" name="hour" placeholder="00" min="0" max="23" className="w-8 text-center border-0 focus:outline-none" />
+              <input
+                type="number"
+                name="hour"
+                value={hour}
+                onChange={(e) => setHour(e.target.value)}
+                placeholder="00"
+                min="0"
+                max="23"
+                className="w-8 text-center border-0 focus:outline-none"
+              />
               <span>:</span>
-              <input type="number" name="min" placeholder="22" min="0" max="59" className="w-8 text-center border-0 focus:outline-none" />
+              <input
+                type="number"
+                name="min"
+                value={min}
+                onChange={(e) => setMin(e.target.value)}
+                placeholder="22"
+                min="0"
+                max="59"
+                className="w-8 text-center border-0 focus:outline-none"
+              />
               <span>:</span>
-              <input type="number" name="sec" placeholder="13" min="0" max="59" className="w-8 text-center border-0 focus:outline-none" />
+              <input
+                type="number"
+                name="sec"
+                value={sec}
+                onChange={(e) => setSec(e.target.value)}
+                placeholder="13"
+                min="0"
+                max="59"
+                className="w-8 text-center border-0 focus:outline-none"
+              />
             </div>
           </div>
 
@@ -49,6 +123,10 @@ export default function AddRecordForm() {
               type="number"
               id="distance"
               name="distance"
+              value={distance}
+              onChange={(e) => {
+                setDistance(e.target.value);
+              }}
               placeholder="5.00 km"
               step="0.01"
               className="text-sm  text-center py-2 border rounded-lg border-gray-200 focus:outline-none focus:border-primary"
@@ -64,8 +142,9 @@ export default function AddRecordForm() {
               type="text"
               id="pace"
               name="pace"
-              placeholder="5:30 /km"
+              value={pace}
               readOnly
+              placeholder="5:30 /km"
               className="text-center text-sm py-2 border rounded-lg border-gray-200 bg-transparent text-gray-500"
             />
           </div>
@@ -142,9 +221,11 @@ export default function AddRecordForm() {
             className="w-full text-xs border font-bold border-gray-200 px-2 py-2 rounded-md my-1"
           />
         </div>
-        <button type="submit" className="w-full bg-primary text-white rounded-md p-4 font-bold my-3">
-          기록 저장
+        <button type="submit" disabled={isPending} className="w-full bg-primary text-white rounded-md p-4 font-bold my-3">
+          {isPending ? "저장중" : "기록저장"}
         </button>
+        {state?.success && <div className="text-green-500">저장 완료! 이동 중...</div>}
+        {state?.error && <div className="text-red-500 text-sm mb-3">{state.error}</div>}
       </form>
     </>
   );

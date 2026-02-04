@@ -4,7 +4,7 @@ import Footer from "@/app/components/common/Footer";
 import Header from "@/app/components/common/Header";
 import Navi from "@/app/components/common/Navi";
 import { deleteRecord, getMyRecords } from "@/app/lib/recordsAPI";
-import { calculateMonthlyStats, calculateWeeklyStats } from "@/app/lib/stats";
+import { calculateMonthlyStats, calculateRecentPace, calculateWeeklyStats } from "@/app/lib/stats";
 import { RunningRecord } from "@/app/lib/types";
 import useStatsStore from "@/zustand/statsStore";
 import useUserStore from "@/zustand/user";
@@ -23,7 +23,7 @@ export default function RecordPage() {
   const monthRecordRef = useRef<HTMLDivElement>(null);
   const weeklyRecordRef = useRef<HTMLDivElement>(null);
 
-  const { weeklyStats, monthlyStats, setWeeklyStats, setMonthlyStats } = useStatsStore();
+  const { weeklyStats, monthlyStats, recentPace, setWeeklyStats, setMonthlyStats, setRecentPace } = useStatsStore();
   const user = useUserStore((state) => state.user);
 
   useEffect(() => {
@@ -43,6 +43,7 @@ export default function RecordPage() {
           console.log("기록개수", records.length);
           setWeeklyStats(calculateWeeklyStats(records));
           setMonthlyStats(calculateMonthlyStats(records));
+          setRecentPace(calculateRecentPace(records, 2));
           setData(records);
         }
       } catch (error) {
@@ -50,7 +51,7 @@ export default function RecordPage() {
       }
     };
     fetchData();
-  }, [user, setWeeklyStats, setMonthlyStats]);
+  }, [user, setWeeklyStats, setMonthlyStats, setRecentPace]);
 
   const scrollToSection = (sectionName: "home" | "daily" | "stats" | "recent" | "monthRecord" | "weeklyRecord") => {
     if (sectionName === "home") {
@@ -90,6 +91,7 @@ export default function RecordPage() {
         // 삭제 후 통계 데이타도 적용된 데이터로 랜더링 되도록
         setWeeklyStats(calculateWeeklyStats(newData));
         setMonthlyStats(calculateMonthlyStats(newData));
+        setRecentPace(calculateRecentPace(newData, 2));
       } else {
         alert("삭제 실패");
       }

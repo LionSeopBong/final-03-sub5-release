@@ -3,8 +3,13 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
+import { User } from "@/types/user";
 
-export default function ProfileMenu() {
+interface ProfileMenuProps {
+  user: User | null;
+}
+
+export default function ProfileMenu({ user }: ProfileMenuProps) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
@@ -26,13 +31,17 @@ export default function ProfileMenu() {
       <button
         aria-label="profile"
         onClick={() => setOpen((v) => !v)}
-        className="flex items-center justify-center"
+        className="w-7 h-7 rounded-full border border-gray-300 overflow-hidden cursor-pointer flex items-center justify-center"
       >
         <Image
-          src="/icons/healthicons--ui-user-profile-outline.svg"
+          src={
+            user?.image
+              ? user.image
+              : "/icons/healthicons--ui-user-profile-outline.svg"
+          }
+          className="object-cover"
           width={24}
           height={24}
-          priority
           alt="프로필"
         />
       </button>

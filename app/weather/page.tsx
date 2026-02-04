@@ -4,8 +4,128 @@ import Image from "next/image";
 import Header from "../components/common/Header";
 import Footer from "../components/common/Footer";
 import Navi from "../components/common/Navi";
+import type { LocationCoords } from "@/types/kma";
+import { useEffect, useState } from "react";
+
+const KAKAO_REST_API_KEY = "6bfd0836fd0a724e514a804ef6561357";
+
+/*
+const KAKAO_REST_API_KEY =
+  process.env.NEXT_PUBLIC_KAKAO_REST_API_KEY!;
+*/
+/* ================= Kakao Types ================= */
+
+type KakaoRegion = {
+  region_type: "B" | "H";
+  region_1depth_name: string;
+  region_2depth_name: string;
+  region_3depth_name: string;
+  region_4depth_name: string;
+  code: string;
+};
+
+type KakaoCoord2RegionResponse = {
+  documents: KakaoRegion[];
+};
+
+/* ================= Utils ================= */
+
+function getCurrentTimeKoreanFormat(): string {
+  const now = new Date();
+
+  const month = now.getMonth() + 1; // 0-based
+  const day = now.getDate();
+
+  let hours = now.getHours();
+  const minutes = now.getMinutes().toString().padStart(2, "0");
+
+  const period = hours < 12 ? "오전" : "오후";
+  hours = hours % 12;
+  if (hours === 0) hours = 12;
+
+  return `${month}월 ${day}일 ${period} ${hours}:${minutes}`;
+}
+
+export async function getLegalDongName(
+  pos: LocationCoords,
+  kakaoRestApiKey: string,
+): Promise<string | null> {
+  const url = new URL(
+    "https://dapi.kakao.com/v2/local/geo/coord2regioncode.json",
+  );
+
+  url.searchParams.set("x", pos.lon.toString());
+  url.searchParams.set("y", pos.lat.toString());
+  url.searchParams.set("input_coord", "WGS84");
+
+  const res = await fetch(url.toString(), {
+    headers: {
+      Authorization: `KakaoAK ${kakaoRestApiKey}`,
+    },
+  });
+
+  if (!res.ok) {
+    throw new Error(`Kakao API error: ${res.status}`);
+  }
+
+  const data = (await res.json()) as KakaoCoord2RegionResponse;
+
+  const legalDong = data.documents.find((d) => d.region_type === "B");
+  if (!legalDong) return null;
+
+  return [
+    legalDong.region_1depth_name,
+    legalDong.region_2depth_name,
+    legalDong.region_3depth_name,
+    legalDong.region_4depth_name,
+  ]
+    .filter(Boolean)
+    .join(" ");
+}
+
+function getCoordinates(): Promise<LocationCoords> {
+  return new Promise((resolve, reject) => {
+    if (!navigator.geolocation) {
+      reject(new Error("Geolocation not supported"));
+      return;
+    }
+
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        resolve({
+          lat: position.coords.latitude,
+          lon: position.coords.longitude,
+        });
+      },
+      (error) => reject(error),
+    );
+  });
+}
+
+/* ================= Page ================= */
 
 export default function WeatherPage() {
+  const [pos, setPos] = useState<LocationCoords | null>(null);
+  const [dongName, setDongName] = useState<string | null>(null);
+  const [dateTime, setDateTime] = useState<string | null>(null);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const coords = await getCoordinates();
+        setPos(coords);
+
+        const dong = await getLegalDongName(coords, KAKAO_REST_API_KEY);
+        setDongName(dong);
+
+        //console.log("법정동:", dong);
+        const dateTime = getCurrentTimeKoreanFormat();
+        setDateTime(dateTime);
+      } catch (e) {
+        console.error(e);
+      }
+    })();
+  }, []);
   return (
     <>
       <Header />
@@ -28,9 +148,9 @@ export default function WeatherPage() {
                 height={24}
                 alt="location"
               />{" "}
-              서울특별시 강남구
+              {dongName}
             </div>
-            <span className="text-xs text-gray-500">1월 15일 오후 03:56</span>
+            <span className="text-xs text-gray-500">{dateTime}</span>
           </div>
 
           <div className="flex items-center gap-2">

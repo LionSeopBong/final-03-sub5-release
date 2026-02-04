@@ -3,7 +3,7 @@ import {
   WeatherData,
   WeatherDataResponse,
   KmaForecastItem,
-} from "../../types/kma"; // 타입 정의 파일 임포트
+} from "../../../types/kma"; // 타입 정의 파일 임포트
 
 const WEATHER_KEY = "0hdDcseqTPqXQ3LHqpz6Rg";
 

@@ -89,3 +89,17 @@ export interface WeatherData {
 export interface WeatherDataResponse {
   kma_sfctm2: WeatherData[];
 }
+
+export type Station = {
+  stn: number | null;
+  lat: number;
+  lon: number;
+  name: string | null;
+  address: string | null;
+};
+
+export interface LocationCoords {
+  lat: number;
+  lon: number;
+}
+

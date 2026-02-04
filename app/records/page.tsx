@@ -3,11 +3,12 @@
 import Footer from "@/app/components/common/Footer";
 import Header from "@/app/components/common/Header";
 import Navi from "@/app/components/common/Navi";
-import { getMyRecords } from "@/app/lib/recordsAPI";
+import { deleteRecord, getMyRecords } from "@/app/lib/recordsAPI";
 import { calculateMonthlyStats, calculateWeeklyStats } from "@/app/lib/stats";
 import { RunningRecord } from "@/app/lib/types";
 import useStatsStore from "@/zustand/statsStore";
 import useUserStore from "@/zustand/user";
+import { toBeChecked } from "@testing-library/jest-dom/matchers";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 
@@ -22,16 +23,6 @@ export default function RecordPage() {
   const monthRecordRef = useRef<HTMLDivElement>(null);
   const weeklyRecordRef = useRef<HTMLDivElement>(null);
 
-  // const [weeklyStats, setWeeklyStats] = useState({
-  //   totalDistance: 0,
-  //   averagePace: "0:00",
-  //   weeklyRuns: 0,
-  // });
-  // const [monthlyStats, setMonthlyStats] = useState({
-  //   totalDistance: 0,
-  //   averagePace: "0:00",
-  //   monthlyRuns: 0,
-  // });
   const { weeklyStats, monthlyStats, setWeeklyStats, setMonthlyStats } = useStatsStore();
   const user = useUserStore((state) => state.user);
 
@@ -80,7 +71,32 @@ export default function RecordPage() {
     const [hour, minutes, seconds] = duration.split(":");
     return `${parseInt(minutes)}분 ${parseInt(seconds)}초`;
   };
-
+  // 최근 기록 삭제
+  const handleDelete = async (recordId: number) => {
+    if (!confirm("정말 삭제하시겠습니까?")) {
+      return;
+    }
+    try {
+      const token = user?.token?.accessToken;
+      if (!token) {
+        alert("로그인이 필요합니다");
+        return;
+      }
+      const result = await deleteRecord(recordId.toString(), token);
+      if (result.ok) {
+        // setData((prev) => prev.filter((r) => r._id !== recordId));
+        const newData = data.filter((r) => r._id !== recordId);
+        setData(newData);
+        // 삭제 후 통계 데이타도 적용된 데이터로 랜더링 되도록
+        setWeeklyStats(calculateWeeklyStats(newData));
+        setMonthlyStats(calculateMonthlyStats(newData));
+      } else {
+        alert("삭제 실패");
+      }
+    } catch (error) {
+      console.error("삭제에러", error);
+    }
+  };
   return (
     <>
       <Header />
@@ -182,8 +198,14 @@ export default function RecordPage() {
               {/* 날짜 */}
               <div className="flex items-center justify-between mb-2">
                 <span className="text-sm font-semibold text-gray-700">{record.extra.date}</span>
-                <Link href={`/records/${record._id}/edit`} className="text-xs text-primary">
+                <Link href={`/records/${record._id}/edit`} className="text-xs text-blue-500">
                   수정
+                </Link>
+                <button className="text-xs text-red-500" onClick={() => handleDelete(record._id)}>
+                  삭제
+                </button>
+                <Link href={`/records/${record._id}/`} className="text-xs text-primary">
+                  상세
                 </Link>
               </div>
 

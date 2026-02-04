@@ -1,7 +1,7 @@
 "use client";
 
 import Navi from "@/app/components/common/Navi";
-import fetchAPI from "@/app/lib/api";
+// import fetchAPI from "@/app/lib/api";
 import ProfileHeader from "@/app/profile/components/ProfileHeader";
 import Image from "next/image";
 import { useState } from "react";
@@ -9,10 +9,25 @@ import { useState } from "react";
 export default function CreatePost() {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [isSubmitSuccess, setIsSubmitSuccess] = useState(false);
+  const [title, setTitle] = useState("");
+  const [content, setContent] = useState("");
+  const [showValidation, setShowValidation] = useState(false);
+
+  const closeSubmitModal = () => {
+    setIsSubmitSuccess(false);
+    setTitle("");
+    setContent("");
+    setShowValidation(false);
+  };
 
   async function PostSubmit(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault();
-    setErrorMessage(null);
+    e.preventDefault(); // 제출 버튼 클릭 시, 새로 고침 방지
+    setErrorMessage(null); // 제출 시도 시, 기존 에러 초기화
+    setShowValidation(true); // 제출 시도 시, 활성화
+
+    if (!title.trim() || !content.trim()) {
+      return;
+    }
 
     const formData = new FormData(e.currentTarget);
     const body = Object.fromEntries(formData.entries());
@@ -23,20 +38,23 @@ export default function CreatePost() {
       return;
     }
 
-    try {
-      await fetchAPI("/posts", {
-        method: "POST",
-        body,
-        token,
-      });
-      setIsSubmitSuccess(true);
-    } catch (err: unknown) {
-      if (err instanceof Error) {
-        setErrorMessage(err.message);
-      } else {
-        setErrorMessage("일시적인 네트워크 오류가 발생했습니다.");
-      }
-    }
+    // ★★★★★★★★★★★★★★ 임시로 API 호출 주석 처리
+    // try {
+    //   await fetchAPI("/posts", {
+    //     method: "POST",
+    //     body,
+    //     token,
+    //   });
+    //   setIsSubmitSuccess(true);
+    // } catch (err: unknown) {
+    //   if (err instanceof Error) {
+    //     setErrorMessage(err.message);
+    //   } else {
+    //     setErrorMessage("일시적인 네트워크 오류가 발생했습니다.");
+    //   }
+    // }
+
+    setIsSubmitSuccess(true);
   }
 
   return (
@@ -54,14 +72,18 @@ export default function CreatePost() {
               <input type="hidden" name="type" value="inquiry" />
               <input
                 name="title"
+                value={title}
                 id="title"
+                onChange={(e) => setTitle(e.target.value)}
                 type="text"
-                className="w-full rounded-xl border border-gray-200 px-4 py-2 focus:outline-none focus:border-gray-500"
+                className={`w-full rounded-xl px-4 py-2 focus:outline-none ${showValidation && !title.trim() ? "border-1 border-[#e85c5c]" : "border border-gray-200 focus:border-gray-500"}`}
                 placeholder="문의 제목"
               />
-              <p className="text-xs text-[#e85c5c] px-1.5">
-                제목은 필수 입력 영역입니다.
-              </p>
+              {showValidation && !title.trim() && (
+                <p className="text-xs text-[#e85c5c] px-1.5">
+                  제목은 필수 입력 영역입니다.
+                </p>
+              )}
             </div>
             <div className="flex flex-col gap-2">
               <label htmlFor="content" className="text-gray-500">
@@ -70,20 +92,28 @@ export default function CreatePost() {
               <textarea
                 name="content"
                 id="content"
+                value={content}
+                onChange={(e) => setContent(e.target.value)}
                 placeholder="문의 내용을 작성해 주세요"
-                className="w-full h-[180px] rounded-xl border border-gray-200 px-4 py-3 resize-none focus:outline-none focus:border-gray-500"
+                className={`w-full h-[180px] rounded-xl px-4 py-3 resize-none focus:outline-none ${showValidation && !content.trim() ? "border-1 border-[#e85c5c]" : "border border-gray-200 focus:border-gray-500"}`}
               />
-              <p className="text-xs text-[#e85c5c] px-1.5">
-                내용은 필수 입력 영역입니다.
-              </p>
-              {/* 🔥 에러 메시지 표시 위치 */}
+              {showValidation && !content.trim() && (
+                <p className="text-xs text-[#e85c5c] px-1.5">
+                  내용은 필수 입력 영역입니다.
+                </p>
+              )}
+
+              {/* 네트워크 오류 등 기타 에러 메세지 표시 */}
               {errorMessage && (
-                <p className="text-sm text-[#e85c5c]">{errorMessage}</p>
+                <p className="text-sm text-[#e85c5c] px-1.5 pt-1">
+                  {errorMessage}
+                </p>
               )}
             </div>
             <button
               type="submit"
               className="mt-2 w-full rounded-full bg-[#003458] py-3 text-white font-semibold disabled:bg-gray-300 cursor-pointer flex items-center justify-center gap-2"
+              disabled={showValidation && (!title.trim() || !content.trim())}
             >
               <Image
                 src="/icons/chatbubble.svg"
@@ -128,7 +158,10 @@ export default function CreatePost() {
                 </p>
               </div>
 
-              <button className="post-submit-btn font-semibold text-white border border-[#003458] bg-[#003458] rounded-b-[20px] p-3 w-full cursor-pointer">
+              <button
+                className="post-submit-btn font-semibold text-white border border-[#003458] bg-[#003458] rounded-b-[20px] p-3 w-full cursor-pointer"
+                onClick={closeSubmitModal}
+              >
                 확인
               </button>
             </div>

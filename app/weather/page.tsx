@@ -4,8 +4,29 @@ import Image from "next/image";
 import Header from "../components/common/Header";
 import Footer from "../components/common/Footer";
 import Navi from "../components/common/Navi";
-import type { LocationCoords } from "@/types/kma";
+
 import { useEffect, useState } from "react";
+
+import type {
+  LocationCoords,
+  Station,
+  StationXY,
+  KakaoCoord2RegionResponse,
+  KakaoSearchResponse,
+  KmaObservation,
+} from "@/types/kma";
+
+// function import
+import {
+  findNearestStationFast,
+  getCoordinates,
+  formatWeather,
+  extract3HourTemps,
+  getCurrentTime,
+  getWeatherIcon,
+  outdoorScore,
+  outdoorGrade,
+} from "@/lib/utils";
 
 const KAKAO_REST_API_KEY = "6bfd0836fd0a724e514a804ef6561357";
 
@@ -13,20 +34,6 @@ const KAKAO_REST_API_KEY = "6bfd0836fd0a724e514a804ef6561357";
 const KAKAO_REST_API_KEY =
   process.env.NEXT_PUBLIC_KAKAO_REST_API_KEY!;
 */
-/* ================= Kakao Types ================= */
-
-type KakaoRegion = {
-  region_type: "B" | "H";
-  region_1depth_name: string;
-  region_2depth_name: string;
-  region_3depth_name: string;
-  region_4depth_name: string;
-  code: string;
-};
-
-type KakaoCoord2RegionResponse = {
-  documents: KakaoRegion[];
-};
 
 /* ================= Utils ================= */
 
@@ -83,31 +90,25 @@ export async function getLegalDongName(
     .join(" ");
 }
 
-function getCoordinates(): Promise<LocationCoords> {
-  return new Promise((resolve, reject) => {
-    if (!navigator.geolocation) {
-      reject(new Error("Geolocation not supported"));
-      return;
-    }
+async function getWeatherData(stn: number): Promise<KmaObservation | null> {
+  try {
+    const tm = getCurrentTime();
 
-    navigator.geolocation.getCurrentPosition(
-      (position) => {
-        resolve({
-          lat: position.coords.latitude,
-          lon: position.coords.longitude,
-        });
-      },
-      (error) => reject(error),
-    );
-  });
+    const res = await fetch(`/api/weather?stn=${stn}&tm=${tm}`);
+    if (!res.ok) return null;
+
+    return (await res.json()) as KmaObservation;
+  } catch (e) {
+    console.error(e);
+    return null;
+  }
 }
-
-/* ================= Page ================= */
 
 export default function WeatherPage() {
   const [pos, setPos] = useState<LocationCoords | null>(null);
   const [dongName, setDongName] = useState<string | null>(null);
   const [dateTime, setDateTime] = useState<string | null>(null);
+  const [weather, setWeather] = useState<KmaObservation | null>(null);
 
   useEffect(() => {
     (async () => {
@@ -121,6 +122,9 @@ export default function WeatherPage() {
         //console.log("법정동:", dong);
         const dateTime = getCurrentTimeKoreanFormat();
         setDateTime(dateTime);
+        
+              const w = await getWeatherData(108);
+      setWeather(w);
       } catch (e) {
         console.error(e);
       }
@@ -158,10 +162,14 @@ export default function WeatherPage() {
               <span className="text-4xl leading-none block">☁️</span>
             </div>
             <div className="flex flex-col justify-center leading-none pl-1">
-              <div className="flex items-end text-3xl font-semibold">
-                18<span className="text-xl text-gray-500 ml-1">°C</span>
-              </div>
-              <div className="text-xs text-gray-500 -mt-0.5">체감 16°C</div>
+              {weather && (
+                <>
+                  <div className="flex items-end text-3xl font-semibold">
+                    {weather?.TA}
+                    <span className="text-xl text-gray-500 ml-1">°C</span>
+                  </div>
+                </>
+              )}              
             </div>
           </div>
 

@@ -90,16 +90,127 @@ export interface WeatherDataResponse {
   kma_sfctm2: WeatherData[];
 }
 
-export type Station = {
-  stn: number | null;
-  lat: number;
-  lon: number;
-  name: string | null;
-  address: string | null;
-};
 
 export interface LocationCoords {
   lat: number;
   lon: number;
 }
 
+export interface Station extends LocationCoords {
+  stn: number;
+  name: string;
+  address: string;
+};
+
+export interface LocationRow extends LocationCoords {
+  code: string;
+  sido: string;
+  dong: string;  
+};
+
+export interface RawForecastItem {
+  tmef: string; // YYYYMMDDHH
+  var: "TMP" | "POP";
+  value: string;
+}
+
+export interface HourlyForecast {
+  datetime: string; // YYYY-MM-DD HH:00
+  temperature?: number;
+  rainProbability?: number;
+}
+
+
+export interface ForecastItem {
+  baseDate: string;
+  baseTime: string;
+  category: string;
+  fcstDate: string;
+  fcstTime: string;
+  fcstValue: string;
+  nx: number;
+  ny: number;
+}
+
+export interface TempForecast {
+  datetime: Date;
+  temperature: number;
+}
+
+export interface StationXY extends LocationCoords{
+  grid_x: number;
+  grid_y: number;  
+};
+
+export type ForecastRow = {
+  REG_ID: string;
+  TM_FC: string; // YYYYMMDDHHmm
+  TM_EF: string; // YYYYMMDDHHmm
+  MOD: string;
+  NE: string;
+  STN: string;
+  W1: string;
+  T: string;
+  W2: string;
+  TA: string;
+  ST: string;
+  SKY: string;
+  PREP: string;
+  WF: string;
+};
+
+
+export type KakaoRegion = {
+  region_type: "B" | "H";
+  region_1depth_name: string; // 시/도
+  region_2depth_name: string; // 시/군/구
+  region_3depth_name: string; // 읍/면/동
+  region_4depth_name: string; // 리 (있을 경우)
+  code: string;
+};
+
+export type KakaoCoord2RegionResponse = {
+  documents: KakaoRegion[];
+};
+
+
+export type WeatherIconKey =
+  | "clear"
+  | "partly_cloudy"
+  | "mostly_cloudy"
+  | "cloudy"
+  | "rain"
+  | "snow"
+  | "sleet"
+  | "shower"
+  | "thunder"
+  | "fog"
+  | "drizzle"
+  | "unknown";
+
+
+export type WeatherInput = {
+  caTot: number; // CA(TOT)
+  ww: number; // WW
+};
+
+
+export interface KakaoAddressResult {
+  address_name: string;
+  x: string; // 경도 (Longitude)
+  y: string; // 위도 (Latitude)
+  place_name?: string;
+}
+
+export interface KakaoSearchResponse {
+  documents: KakaoAddressResult[];
+}
+
+export type KmaObservation = {
+  CA_TOT: number; // 전운량 (0~10)
+  WW: number;     // 기상현상 코드
+  TA: number;     // 기온 (°C)
+  HM: number;     // 상대습도 (%)
+  WS: number;     // 풍속 (m/s)
+  VS: number;     // 가시거리 (m)
+};

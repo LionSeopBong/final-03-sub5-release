@@ -155,19 +155,19 @@ export default function RecordPage() {
             <div className="flex-col border border-gray-200 rounded-lg px-6 py-3 whitespace-nowrap">
               <div className="text-sm text-gray-400 mb-1">거리</div>
               <div>
-                <span className="text-lg font-bold">{data[0].extra.distance}km</span>
+                <span className="text-lg font-bold">{todayRecord.extra.distance}km</span>
               </div>
             </div>
             <div className="flex-col border border-gray-200 rounded-lg px-6 py-3 whitespace-nowrap">
               <div className="text-sm text-gray-400 mb-1">시간</div>
               <div>
-                <span className="text-lg font-bold">{formatDuration(data[0].extra.duration)}</span>
+                <span className="text-lg font-bold">{todayRecord.extra.duration}</span>
               </div>
             </div>
             <div className="flex-col border border-gray-200 rounded-lg px-6 py-3 whitespace-nowrap">
               <div className="text-sm text-gray-400 mb-1">페이스</div>
               <div>
-                <span className="text-lg font-bold">{data[0].extra.pace} /km</span>
+                <span className="text-lg font-bold">{todayRecord.extra.pace} /km</span>
               </div>
             </div>
           </div>

@@ -2,7 +2,6 @@
 
 import Navi from "@/app/components/common/Navi";
 import ProfileButton from "@/app/profile/components/ProfileButton";
-import ProfileFooter from "@/app/profile/components/ProfileFooter";
 import ProfileHeader from "@/app/profile/components/ProfileHeader";
 import Image from "next/image";
 import React, { useRef, useState } from "react";
@@ -19,6 +18,11 @@ export default function ProfileEdit() {
       const imageUrl = URL.createObjectURL(file);
       setSelectedImage(imageUrl);
     }
+  };
+
+  const handleRemovePhoto = () => {
+    setSelectedImage(null);
+    setOpenPhotoSetter(false);
   };
 
   return (
@@ -140,7 +144,10 @@ export default function ProfileEdit() {
                 />
                 <span>갤러리에서 선택</span>
               </button>
-              <button className="modal-photo-remove flex items-center gap-3 border-b border-gray-200 px-7 py-3 w-full cursor-pointer">
+              <button
+                className="modal-photo-remove flex items-center gap-3 border-b border-gray-200 px-7 py-3 w-full cursor-pointer"
+                onClick={handleRemovePhoto}
+              >
                 <Image
                   src="/icons/edit-remove.svg"
                   alt="현재 사진 삭제"

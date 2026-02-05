@@ -4,13 +4,14 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
-import { useActionState, useEffect, useState } from "react";
+import { useActionState, useEffect, useRef, useState } from "react";
 
 import { login } from "@/actions/user";
 import Alert from "@/app/components/ui/Alert";
-import { validateLogin } from "@/app/lib/validation";
+
 import useAlert from "@/hooks/useAlert";
 import useUserStore from "@/zustand/user";
+import { validateLogin } from "@/app/lib/validation/login";
 import SocialLoginButtons from "@/app/auth/login/_components/SocialLoginButtons";
 
 export default function LoginForm() {
@@ -18,6 +19,8 @@ export default function LoginForm() {
   const router = useRouter();
   const setUser = useUserStore((state) => state.setUser);
 
+  // email ref : x 눌렀을 때 커서르 다시 이메일 두기 위해 사용.
+  const emailRef = useRef<HTMLInputElement | null>(null);
   // password 숨김
   const [showPassword, setShowPassword] = useState(false);
 
@@ -29,18 +32,15 @@ export default function LoginForm() {
   const { open, message, openAlert, closeAlert } = useAlert();
 
   useEffect(() => {
-    if (!userState) return;
-
-    if (userState.ok === 1) {
+    if (userState?.ok === 1) {
       setUser(userState.item);
-      alert(`${userState.item.name}님 로그인이 완료되었습니다.`);
+
       router.replace("/home");
       return;
-    }
-
-    if (userState.ok === 0) {
+    } else if (userState?.ok === 0) {
       openAlert(
-        "이메일 또는 비밀번호가 올바르지 않습니다.\n다시 확인해주세요.",
+        userState.message ??
+          "이메일 또는 비밀번호가 올바르지 않습니다.\n다시 확인해주세요.",
       );
     }
   }, [userState, router, setUser, openAlert]);
@@ -51,6 +51,7 @@ export default function LoginForm() {
 
     const error = validateLogin(emailTrim, passwordValue);
     if (error) {
+      e.preventDefault();
       openAlert(error);
       return;
     }
@@ -67,8 +68,9 @@ export default function LoginForm() {
         className="space-y-4"
       >
         {/* 이메일 */}
-        <div className="space-y-1">
+        <div className="relative space-y-1">
           <input
+            ref={emailRef}
             name="email"
             type="email"
             autoComplete="email"
@@ -80,6 +82,28 @@ export default function LoginForm() {
               "caret-primary focus:border-b-primary focus:outline-none focus:ring-0",
             ].join(" ")}
           />
+
+          <button
+            type="button"
+            aria-label="이메일 지우기"
+            className={[
+              "absolute right-0 top-1/2 -translate-y-1/2 p-2 transition-opacity",
+              email.length > 0
+                ? "opacity-100 pointer-events-auto"
+                : "opacity-0 pointer-events-none",
+            ].join(" ")}
+            onClick={() => {
+              setEmail("");
+              emailRef.current?.focus();
+            }}
+          >
+            <Image
+              src="/icons/close_circle.svg"
+              alt=""
+              width={20}
+              height={20}
+            />
+          </button>
         </div>
 
         {/* 비밀번호 */}

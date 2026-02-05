@@ -1,10 +1,16 @@
 // app/lib/recordsAPI.ts
 import fetchAPI from "@/app/lib/api";
-import type { RunningRecord, ApiResponse, ApiListResponse } from "@/app/lib/types";
+import type {
+  RunningRecord,
+  ApiResponse,
+  ApiListResponse,
+} from "@/app/lib/types";
 
 // 내 기록 목록 조회 (로그인 필요)
 export function getMyRecords(token: string) {
-  return fetchAPI(`/posts/users`, { token }) as Promise<ApiListResponse<RunningRecord>>;
+  return fetchAPI(`/posts/users`, { token }) as Promise<
+    ApiListResponse<RunningRecord>
+  >;
 }
 
 // 전체 기록 목록 조회

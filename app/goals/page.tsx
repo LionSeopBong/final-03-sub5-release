@@ -4,8 +4,16 @@ import Navi from "@/app/components/common/Navi";
 import GoalsActions from "@/app/goals/components/GoalsActions";
 import LevelHeader from "@/app/goals/components/LevelHeader";
 import RunningCard from "@/app/goals/components/RunningCard";
+import { LevelDummy } from "@/app/goals/config/levelConfig";
 
 export default function GoalsPage() {
+  const currentUserId = 2;
+
+  const leveling = LevelDummy.find((item) => {
+    if (item.userId === currentUserId) {
+      return true;
+    }
+  });
   return (
     <>
       <Header />
@@ -17,11 +25,11 @@ export default function GoalsPage() {
     md:max-w-[375px]   flex flex-col gap-4 px-4"
         >
           {/* 탭 LevelIcon 상단 */}
-          <LevelHeader />
+          <LevelHeader userLevel={leveling} />
           {/* 메인 중간 : 분석결과 카드 */}
-          <RunningCard />
+          <RunningCard userLevel={leveling} />
           {/* 버튼들 */}
-          <GoalsActions />
+          <GoalsActions userLevel={leveling} />
           {/* 네비게이션 */}
         </div>
       </main>

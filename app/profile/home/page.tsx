@@ -2,28 +2,20 @@
 
 import Navi from "@/app/components/common/Navi";
 import ProfileHeader from "@/app/profile/components/ProfileHeader";
-// import useUserStore from "@/zustand/user";
+import useUserStore from "@/zustand/user";
 import Image from "next/image";
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 export default function ProfileHome() {
-  // const { user, setUser } = useUserStore();
-  // const isLogin = !!user;
+  const { user, setUser } = useUserStore();
+  const [hydrated, setHydrated] = useState(false);
 
-  // ★★★★★★★★★★★★★★★★★ 개발용 로그인 모킹 (토큰을 강제로 하나 넣어줌 나중에 제거)
+  useEffect(() => {
+    setHydrated(true);
+  }, []);
 
-  const [isLogin, setIsLogin] = useState(() => {
-    if (typeof window !== "undefined") {
-      const token = localStorage.getItem("accessToken");
-      return !!token;
-    }
-    return false;
-  });
-
-  // 매번 로그인 필요시마다 입력해서 사용
-  // localStorage.setItem("accessToken", "mock-token");
-  // location.reload();
+  const isLogin = hydrated && !!user;
 
   const [isLogoutOpen, setIsLogOutOpen] = useState(false);
 
@@ -34,8 +26,8 @@ export default function ProfileHome() {
 
   // ■■■■■■■■■■■■■■■■■■■■ 로그아웃 처리 (임시)
   const handleLogout = () => {
+    setUser(null);
     localStorage.removeItem("accessToken");
-    setIsLogin(false);
     setIsLogOutOpen(false);
   };
 

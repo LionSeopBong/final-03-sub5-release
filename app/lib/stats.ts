@@ -2,22 +2,27 @@ import { RunningRecord } from "@/app/lib/types";
 
 // 주간 기록
 export function calculateWeeklyStats(records: RunningRecord[]) {
-  // 주 시작은 일요일
   const today = new Date();
+  const day = today.getDay(); // 0 = 일요일
+
   const startOfWeek = new Date(today);
-  startOfWeek.setDate(today.getDate() - today.getDate());
+  startOfWeek.setDate(today.getDate() - day);
   startOfWeek.setHours(0, 0, 0, 0);
-  //이번 주 기록만 필터링
-  const WeeklyRecords = records.filter((record) => {
-    const recorDate = new Date(record.extra.date);
-    return recorDate >= startOfWeek;
+
+  const endOfWeek = new Date(startOfWeek);
+  endOfWeek.setDate(startOfWeek.getDate() + 6);
+  endOfWeek.setHours(23, 59, 59, 999);
+
+  const weeklyRecords = records.filter((record) => {
+    const recordDate = new Date(record.extra.date);
+    return recordDate >= startOfWeek && recordDate <= endOfWeek;
   });
-  // 총거리
-  const totalDistance = WeeklyRecords.reduce((sum, record) => sum + (record.extra.distance || 0), 0);
-  // 총횟수
-  const weeklyRuns = WeeklyRecords.length;
-  // 평균 페이스
-  const averagePace = calculateAveragePace(WeeklyRecords);
+
+  const totalDistance = weeklyRecords.reduce((sum, record) => sum + (record.extra.distance || 0), 0);
+
+  const weeklyRuns = weeklyRecords.length;
+  const averagePace = calculateAveragePace(weeklyRecords);
+
   return {
     totalDistance: Math.round(totalDistance * 10) / 10,
     averagePace,

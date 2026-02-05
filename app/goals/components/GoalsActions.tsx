@@ -1,16 +1,26 @@
+"use client";
 import Link from "next/link";
-
-export default function GoalsActions() {
+import { LevelInfo } from "../types";
+import { useRouter } from "next/navigation";
+export default function GoalsActions({
+  userLevel,
+}: {
+  userLevel: LevelInfo | undefined;
+}) {
+  const router = useRouter();
+  const navigiation = () => {
+    router.push(`/goals/recommend?level=${userLevel?.level}`);
+  };
   return (
     <>
       {/* 버튼들 */}
       <div className="flex flex-col gap-3">
-        <Link
-          href="/goals/recommend"
+        <button
+          onClick={navigiation}
           className="bg-primary py-2 w-full rounded-lg text-center text-notselectbtn"
         >
-          초급 목표 추천 받기
-        </Link>
+          {userLevel?.level} 목표 추천 받기
+        </button>
         <Link
           href="/goals/my"
           className="bg-primary py-2 w-full rounded-lg text-center text-notselectbtn"

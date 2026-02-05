@@ -62,7 +62,7 @@ export default function ProfileMenu({ user }: ProfileMenuProps) {
 
           <ul className="py-1 text-sm text-gray-700">
             <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">
-              <Link href="/profile-main/profile-home">내 프로필</Link>
+              <Link href="/profile/home">내 프로필</Link>
             </li>
             <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">
               <Link href="/records">내 기록</Link>

@@ -10,7 +10,7 @@ import useStatsStore from "@/zustand/statsStore";
 import useUserStore from "@/zustand/user";
 import { toBeChecked } from "@testing-library/jest-dom/matchers";
 import Link from "next/link";
-import { useEffect, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 // 메인페이지
 export default function RecordPage() {
   const [data, setData] = useState<RunningRecord[]>([]);
@@ -99,6 +99,13 @@ export default function RecordPage() {
       console.error("삭제에러", error);
     }
   };
+  // 오늘 달린 기록 필터
+  const todayRecord = useMemo(() => {
+    const today = new Date().toISOString().split("T")[0];
+    return data.find((record) => record.extra?.date === today);
+  }, [data]);
+  // 차트 영역 1.
+
   return (
     <>
       <Header />
@@ -139,9 +146,10 @@ export default function RecordPage() {
         </Link>
       </div>
       {/* 러닝 요약 탭 */}
-      <div ref={dailyRef} className="px-4 scroll-mt-34">
-        <h2 className=" font-semibold text-xl my-3">오늘의 러닝 요약</h2>
-        {data.length > 0 ? (
+      {todayRecord && todayRecord.extra ? (
+        <div ref={dailyRef} className="px-4 scroll-mt-34">
+          <h2 className=" font-semibold text-xl my-3">오늘의 러닝 요약</h2>
+          {}
           <div className="flex gap-3 text-left overflow-x-auto scrollbar-hide">
             <div className="flex-col border border-gray-200 rounded-lg px-6 py-3 whitespace-nowrap">
               <div className="text-sm text-gray-400 mb-1">거리</div>
@@ -162,11 +170,18 @@ export default function RecordPage() {
               </div>
             </div>
           </div>
-        ) : (
-          <div className="text-center py-8 text-gray-400">기록이 없습니다</div>
-        )}
-      </div>
-      {/* 주간 러닝 거리 차트 */}
+          {/* <div className="text-center py-8 text-gray-400">기록이 없습니다</div> */}
+        </div>
+      ) : (
+        <div className="border border-gray-200 rounded-lg p-8 text-center">
+          <div className="text-gray-400 mb-2">📝</div>
+          <p className="text-gray-500 mb-3">오늘 기록이 없습니다</p>
+          <Link href="/records/new" className="inline-block text-sm bg-primary text-white px-5 py-2 rounded-lg">
+            기록 추가하기
+          </Link>
+        </div>
+      )}
+      ;{/* 주간 러닝 거리 차트 */}
       <div ref={weeklyRecordRef} className="bg-white scroll-mt-34 rounded-lg border border-gray-200 mx-4 my-3 p-5">
         <h2 className="text-lg font-semibold mb-2">주간 러닝 거리</h2>
         <p className="text-sm text-gray-500 mb-4">

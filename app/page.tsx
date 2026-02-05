@@ -5,7 +5,7 @@ export default function LandingPage() {
   return (
     <>
       <LandingContainer />
-      <Link href="/records/new">기록추가 페이지</Link>
+      {/* <Link href="/records/new">기록추가 페이지</Link>
       <div>
         <Link href="/records/detail">기록상세 페이지</Link>
       </div>
@@ -19,7 +19,7 @@ export default function LandingPage() {
       </div>
       <div>
         <Link href="/goals/">목표 페이지</Link>
-      </div>
+      </div> */}
     </>
   );
 }

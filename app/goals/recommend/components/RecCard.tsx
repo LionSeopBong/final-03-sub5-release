@@ -10,7 +10,7 @@ export default function RecCard({ level }: { level: leveltype }) {
   const filterGoals = goalData.filter((data) => data.level === level);
   const user = useUserStore((state) => state.user);
   const router = useRouter();
-  const AddGoal = async (goal) => {
+  const AddGoal = async (goal: RecommendGoal) => {
     if (!user) {
       alert("로그인이 필요합니다");
       return;

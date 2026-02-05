@@ -2,11 +2,10 @@
 import RecButton from "@/app/goals/recommend/components/RecButton";
 import RecCard from "@/app/goals/recommend/components/RecCard";
 import RecHeader from "@/app/goals/recommend/components/RecHeader";
-import { UserSearch } from "lucide-react";
-import Link from "next/link";
 import { useSearchParams } from "next/navigation";
+import { Suspense } from "react";
 
-export default function MyGoalsPage() {
+function RecommendContent() {
   const params = useSearchParams();
   const level = params.get("level");
 
@@ -15,8 +14,8 @@ export default function MyGoalsPage() {
 
   return (
     <div
-      className="flex flex-col items-center  mx-auto px-4 py-6 gap-4  min-w-[375px] 
-    max-w-[767px]      
+      className="flex flex-col items-center  mx-auto px-4 py-6 gap-4  min-w-[375px]
+    max-w-[767px]
     md:max-w-[375px]"
     >
       <RecHeader level={leveling} />
@@ -24,5 +23,13 @@ export default function MyGoalsPage() {
 
       <RecButton />
     </div>
+  );
+}
+
+export default function MyGoalsPage() {
+  return (
+    <Suspense fallback={<div>로딩중...</div>}>
+      <RecommendContent />
+    </Suspense>
   );
 }

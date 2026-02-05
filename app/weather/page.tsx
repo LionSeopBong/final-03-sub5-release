@@ -70,7 +70,6 @@ export async function getLegalDongName(
 async function getWeatherData(stn: number): Promise<KmaObservation | null> {
   try {
     const tm = getCurrentTime();
-    console.log(tm);
 
     const res = await fetch(`/api/weather?stn=${stn}&tm=${tm}`);
     if (!res.ok) return null;
@@ -84,7 +83,7 @@ async function getWeatherData(stn: number): Promise<KmaObservation | null> {
 async function getUltraViolet(stn: number): Promise<number | null> {
   try {
     const tm = getUVTime();
-    console.log(tm);
+    //console.log(tm);
 
     const res = await fetch(`/api/ultraviolet?stn=${stn}&tm=${tm}`);
     if (!res.ok) return null;
@@ -92,7 +91,7 @@ async function getUltraViolet(stn: number): Promise<number | null> {
     const data = (await res.json()) as { uv: number };
     return data.uv;
   } catch (e) {
-    console.error(e);
+    //console.error(e);
     return null;
   }
 }
@@ -130,9 +129,6 @@ export default function WeatherPage() {
         const uv = await getUltraViolet(108);
         setUV(uv);
 
-        if (uv !== null) {
-          console.log("자외선 지수:", uv);
-        }
 
         //TODO 러닝 최적도 분석 함수
         const obs: KmaObservation = {
@@ -147,7 +143,7 @@ export default function WeatherPage() {
         const score = outdoorScore(obs); // 75
         const grade = outdoorGrade(score); // "보통"
         setGrade(grade);
-        console.log(grade);
+        //console.log(grade);
       } catch (e) {
         console.error(e);
       }

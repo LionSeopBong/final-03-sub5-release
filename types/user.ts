@@ -29,3 +29,13 @@ export interface UserState {
   setUser: (user: User) => void;
   resetUser: () => void;
 }
+
+export interface UserInfoRes {
+  ok: 1;
+  item: User;
+}
+
+export interface ErrorRes {
+  ok: 0;
+  message: string;
+}

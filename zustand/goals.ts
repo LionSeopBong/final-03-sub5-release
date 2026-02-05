@@ -1,1 +1,1 @@
-const useGoalsStore = create < Goal;
+

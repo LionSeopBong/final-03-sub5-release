@@ -18,7 +18,6 @@ export default function GoalListPage() {
     const fetchGoals = async () => {
       if (user?.token) {
         const result = await getMyGoals(user.token.accessToken);
-        console.log("내 목표:", result); // 확인용
         setGoals(result.item); // API 응답 구조에 따라 다를 수 있음
       }
     };

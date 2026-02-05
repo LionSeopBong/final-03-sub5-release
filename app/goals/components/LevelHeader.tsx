@@ -9,10 +9,6 @@ export default function LevelHeader({
 }) {
   const [level, setLevel] = useState([]);
 
-  // const nowLevel = "초급";
-
-  console.log("==hi", userLevel);
-
   return (
     <>
       {/* 탭 LevelIcon 상단 */}

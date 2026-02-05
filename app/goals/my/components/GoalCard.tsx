@@ -1,10 +1,6 @@
 import { GoalResponse } from "../../types";
 
 export default function GoalCard({ goals }: { goals: GoalResponse[] }) {
-  console.log(
-    "모든 status:",
-    goals.map((g) => g.extra.status),
-  );
   return (
     <>
       <ul className="w-full flex flex-col gap-3 ">

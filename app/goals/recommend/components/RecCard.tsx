@@ -15,8 +15,7 @@ export default function RecCard({ level }: { level: leveltype }) {
       alert("로그인이 필요합니다");
       return;
     }
-    const result = await createGoal(goal, user.token!.accessToken);
-    console.log("응답:", result);
+    await createGoal(goal, user.token!.accessToken);
     router.push("/goals/my");
   };
 

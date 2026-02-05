@@ -3,11 +3,7 @@ import { RecFilter } from "@/app/goals/types/my";
 // import { useState } from "react";
 
 export default function GoalFilter({ filter, setFilter }: RecFilter) {
-  // const [useTap, setUseTap] = useState("전체");
-  console.log("현재 선택된 탭:", filter);
-
   const TapClick = (tab: string) => {
-    console.log("버튼 눌렀어요!");
     setFilter(tab);
   };
 

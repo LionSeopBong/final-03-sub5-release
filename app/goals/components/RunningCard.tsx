@@ -10,7 +10,6 @@ export default function RunningCard({
   userLevel: LevelInfo | undefined;
 }) {
   const { monthlyStats, setMonthlyStats } = useStatsStore();
-  console.log(monthlyStats);
 
   useEffect(() => {
     if (userLevel) {
@@ -28,7 +27,6 @@ export default function RunningCard({
 
   const status = getUserStatus(userLevel?.monthlyRuns ?? 0);
 
-  console.log("level:", level, "status:", status);
   return (
     <>
       {/* 메인 중간 : 분석결과 카드 */}

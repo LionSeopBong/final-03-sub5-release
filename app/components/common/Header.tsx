@@ -6,9 +6,6 @@ import Link from "next/link";
 import ProfileMenu from "./ProfileMenu";
 import useUserStore from "@/zustand/user";
 
-const API_URL = "https://fesp-api.koyeb.app/market";
-const CLIENT_ID = "febc15-final03-ecad";
-
 export default function Header() {
   const user = useUserStore((state) => state.user);
 

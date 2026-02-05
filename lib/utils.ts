@@ -136,10 +136,10 @@ function parseTm(tm: string): Date {
 }
 
 export async function fetch3DayForecast(regId: string): Promise<ForecastRow[]> {
-  const serviceKey = "0hdDcseqTPqXQ3LHqpz6Rg";
+  const serviceKey = process.env.KMA_API_KEY;
   const tmfc = getLatestTmFc();
 
-  const url = `http://localhost:3000/api/typ01/url/fct_afs_dl.php?reg=11B10101&tmfc=2026020406&disp=1&help=0&authKey=0hdDcseqTPqXQ3LHqpz6Rg`;
+  const url = `http://localhost:3000/api/typ01/url/fct_afs_dl.php?reg=11B10101&tmfc=2026020406&disp=1&help=0&authKey=${serviceKey}`;
 
   const res = await fetch(url);
 

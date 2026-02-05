@@ -3,6 +3,7 @@
 import Footer from "@/app/components/common/Footer";
 import Header from "@/app/components/common/Header";
 import Navi from "@/app/components/common/Navi";
+import { getMonthlyDistanceChartData, getWeeklyChartData } from "@/app/lib/chart";
 import { deleteRecord, getMyRecords } from "@/app/lib/recordsAPI";
 import { calculateMonthlyStats, calculateRecentPace, calculateWeeklyStats } from "@/app/lib/stats";
 import { RunningRecord } from "@/app/lib/types";
@@ -10,6 +11,8 @@ import useStatsStore from "@/zustand/statsStore";
 import useUserStore from "@/zustand/user";
 import Link from "next/link";
 import React, { useEffect, useMemo, useRef, useState } from "react";
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
+
 // 메인페이지
 export default function RecordPage() {
   const [data, setData] = useState<RunningRecord[]>([]);
@@ -104,8 +107,21 @@ export default function RecordPage() {
     return data.find((record) => record.extra?.date === today);
   }, [data]);
 
-  // 차트 영역 1.
+  // 주간 차트 영역
 
+  const sortedRecentRecords = useMemo(() => {
+    return [...data]
+      .filter((r) => r.extra?.date)
+      .sort((a, b) => {
+        return new Date(b.extra.date).getTime() - new Date(a.extra.date).getTime();
+      })
+      .slice(0, 5);
+  }, [data]);
+
+  const weeklyChartData = useMemo(() => getWeeklyChartData(data), [data]);
+
+  // 월간 차트
+  const monthlyChartData = useMemo(() => getMonthlyDistanceChartData(data), [data]);
   return (
     <>
       <Header />
@@ -188,8 +204,16 @@ export default function RecordPage() {
           {weeklyStats?.totalDistance} &#40;km&#41; {weeklyStats?.weeklyRuns} 회
         </p>
         {/* 차트 */}
-        <div className="h-48 bg-gray-100 rounded flex items-center justify-center">
-          <p className="text-gray-400">[차트 영역]</p>
+        <div className="h-48 rounded flex items-center justify-center">
+          <ResponsiveContainer width="100%" height={150}>
+            <BarChart data={weeklyChartData}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="day" />
+              <YAxis width={20} />
+              <Tooltip />
+              <Bar dataKey="distance" fill="#8884d8" />
+            </BarChart>
+          </ResponsiveContainer>
         </div>
       </div>
       {/* 월간 러닝 거리 */}
@@ -199,8 +223,16 @@ export default function RecordPage() {
           {monthlyStats?.totalDistance} &#40;km&#41; {monthlyStats?.monthlyRuns} 회
         </p>
         {/* 차트 영역 - 나중에 Recharts 들어갈 자리 */}
-        <div className="h-48 bg-gray-50 rounded-lg flex items-center justify-center border border-dashed border-gray-300">
-          <p className="text-gray-400 text-sm">[월간 차트]</p>
+        <div className="h-48 rounded flex items-center justify-center">
+          <ResponsiveContainer width="100%" height={170}>
+            <BarChart data={monthlyChartData}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="day" tick={{ fontSize: 10 }} />
+              <YAxis width={20} />
+              <Tooltip />
+              <Bar dataKey="distance" fill="#82ca9d" />
+            </BarChart>
+          </ResponsiveContainer>
         </div>
       </div>
       {/* 최근 기록 */}
@@ -211,7 +243,7 @@ export default function RecordPage() {
         {data.length > 0 ? (
           <div className="space-y-3 ">
             {/* 기록 아이템 *************************************************************** */}
-            {data.slice(0, 5).map((record) => (
+            {sortedRecentRecords.map((record) => (
               <div key={record._id} className="bg-white rounded-xl border border-gray-200 p-4">
                 {/* 날짜 */}
                 <div className="flex items-center justify-between mb-2">

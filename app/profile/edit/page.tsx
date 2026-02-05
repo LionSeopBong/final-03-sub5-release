@@ -2,7 +2,6 @@
 
 import Navi from "@/app/components/common/Navi";
 import ProfileButton from "@/app/profile/components/ProfileButton";
-import ProfileFooter from "@/app/profile/components/ProfileFooter";
 import ProfileHeader from "@/app/profile/components/ProfileHeader";
 import Image from "next/image";
 import React, { useRef, useState } from "react";

@@ -27,6 +27,7 @@ import {
   outdoorScore,
   outdoorGrade,
   getCurrentTimeKoreanFormat,
+  getUVTime,
 } from "@/lib/utils";
 
 export async function getLegalDongName(
@@ -69,6 +70,7 @@ export async function getLegalDongName(
 async function getWeatherData(stn: number): Promise<KmaObservation | null> {
   try {
     const tm = getCurrentTime();
+    console.log(tm);
 
     const res = await fetch(`/api/weather?stn=${stn}&tm=${tm}`);
     if (!res.ok) return null;
@@ -79,12 +81,30 @@ async function getWeatherData(stn: number): Promise<KmaObservation | null> {
     return null;
   }
 }
+async function getUltraViolet(stn: number): Promise<number | null> {
+  try {
+    const tm = getUVTime();
+    console.log(tm);
+
+    const res = await fetch(`/api/ultraviolet?stn=${stn}&tm=${tm}`);
+    if (!res.ok) return null;
+
+    const data = (await res.json()) as { uv: number };
+    return data.uv;
+  } catch (e) {
+    console.error(e);
+    return null;
+  }
+}
 
 export default function WeatherPage() {
   const [pos, setPos] = useState<LocationCoords | null>(null);
   const [dongName, setDongName] = useState<string | null>(null);
   const [dateTime, setDateTime] = useState<string | null>(null);
+  const [grade, setGrade] = useState<string | null>(null);
   const [weather, setWeather] = useState<KmaObservation | null>(null);
+  const [icon, setIcon] = useState<string | null>(null);
+  const [uv, setUV] = useState<number | null>(null);
 
   useEffect(() => {
     (async () => {
@@ -92,12 +112,42 @@ export default function WeatherPage() {
         const coords = await getCoordinates();
         setPos(coords);
 
-        const dong = await getLegalDongName(coords, process.env.NEXT_PUBLIC_KAKAO_REST_API_KEY!);
+        const dong = await getLegalDongName(
+          coords,
+          process.env.NEXT_PUBLIC_KAKAO_REST_API_KEY!,
+        );
         setDongName(dong);
         setDateTime(getCurrentTimeKoreanFormat());
 
         const w = await getWeatherData(108);
         setWeather(w);
+        //TODO 날씨 아이콘 구현
+        const icon = getWeatherIcon({
+          caTot: w?.CA_TOT ?? 0,
+          ww: w?.WW ?? 0,
+        });
+        //
+        const uv = await getUltraViolet(108);
+        setUV(uv);
+
+        if (uv !== null) {
+          console.log("자외선 지수:", uv);
+        }
+
+        //TODO 러닝 최적도 분석 함수
+        const obs: KmaObservation = {
+          CA_TOT: 8,
+          WW: 40,
+          TA: 5.7,
+          HM: 64.0,
+          WS: 1.2,
+          VS: 6740,
+        };
+
+        const score = outdoorScore(obs); // 75
+        const grade = outdoorGrade(score); // "보통"
+        setGrade(grade);
+        console.log(grade);
       } catch (e) {
         console.error(e);
       }
@@ -123,7 +173,7 @@ export default function WeatherPage() {
                 src="/icons/ep--location.svg"
                 width={24}
                 height={24}
-                alt="location"
+                alt="위치"
               />{" "}
               {dongName}
             </div>
@@ -132,7 +182,14 @@ export default function WeatherPage() {
 
           <div className="flex items-center gap-2">
             <div className="flex items-center justify-center w-10">
-              <span className="text-4xl leading-none block">☁️</span>
+              <span className="text-4xl leading-none block">
+                <Image
+                  src={`/icons/weather/${icon ?? "default"}.svg`}
+                  width={52}
+                  height={52}
+                  alt="날씨"
+                />
+              </span>
             </div>
             <div className="flex flex-col justify-center leading-none pl-1">
               {weather && (
@@ -157,8 +214,12 @@ export default function WeatherPage() {
                 />
               </div>
               <div className="text-left">
-                <div className="font-semibold">습도</div>
-                <div className="text-gray-500">65%</div>
+                {weather?.HM && (
+                  <>
+                    <div className="font-semibold">습도</div>
+                    <div className="text-gray-500">{weather?.HM}%</div>
+                  </>
+                )}
               </div>
             </div>
             <div className="bg-white rounded-xl flex items-center p-3 text-xs shadow gap-3 min-w-[70px]">
@@ -171,8 +232,12 @@ export default function WeatherPage() {
                 />
               </div>
               <div className="text-left">
-                <div className="font-semibold">풍속</div>
-                <div className="text-gray-500">3.2 m/s</div>
+                {weather?.WS && (
+                  <>
+                    <div className="font-semibold">풍속</div>
+                    <div className="text-gray-500">{weather?.WS} m/s</div>
+                  </>
+                )}
               </div>
             </div>
 
@@ -186,8 +251,12 @@ export default function WeatherPage() {
                 />
               </div>
               <div className="text-left">
-                <div className="text-[0.65rem] font-semibold">가시거리</div>
-                <div className="text-gray-500 ">10 Km</div>
+                {weather?.VS && (
+                  <>
+                    <div className="text-[0.65rem] font-semibold">가시거리</div>
+                    <div className="text-gray-500 ">{weather?.VS} m</div>
+                  </>
+                )}
               </div>
             </div>
 
@@ -201,8 +270,12 @@ export default function WeatherPage() {
                 />
               </div>
               <div className="text-left">
-                <div className="font-semibold">자외선</div>
-                <div className="text-gray-500">지수 5</div>
+                {uv && (
+                  <>
+                    <div className="font-semibold">자외선</div>
+                    <div className="text-gray-500">지수 {uv}</div>
+                  </>
+                )}
               </div>
             </div>
           </div>
@@ -226,11 +299,13 @@ export default function WeatherPage() {
                 width={24}
                 height={24}
                 className="w-6 h-6"
-                alt=""
+                alt="분석"
               />
             </div>
             <div>
-              <div className="font-semibold text-green-700">러닝하기 최적</div>
+              <div className="font-semibold text-green-700">
+                러닝하기 {grade}
+              </div>
               <div className="text-xs text-gray-600">날씨 조건 분석 완료</div>
             </div>
           </div>
@@ -238,7 +313,7 @@ export default function WeatherPage() {
           <div className="bg-gray-200 text-gray-700 text-xs font-semibold rounded-xl p-3">
             분석요인
             <br />
-            <span className="text-gray-500"> 적정 기온 </span>
+            <span className="text-gray-500">적정 기온</span>
           </div>
 
           <div className="bg-blue-50 text-blue-700 text-xs rounded-xl p-3">

@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import type { KmaObservation } from "@/types/kma";
+import { getCurrentTime } from "@/lib/utils";
 
 export async function GET(req: Request) {
   try {

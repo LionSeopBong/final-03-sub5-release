@@ -8,7 +8,6 @@ import { calculateMonthlyStats, calculateRecentPace, calculateWeeklyStats } from
 import { RunningRecord } from "@/app/lib/types";
 import useStatsStore from "@/zustand/statsStore";
 import useUserStore from "@/zustand/user";
-import { toBeChecked } from "@testing-library/jest-dom/matchers";
 import Link from "next/link";
 import React, { useEffect, useMemo, useRef, useState } from "react";
 // 메인페이지

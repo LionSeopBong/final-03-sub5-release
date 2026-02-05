@@ -1,10 +1,68 @@
 "use client";
 
+import { deleteRecord, getRecord } from "@/app/lib/recordsAPI";
+import { RunningRecord } from "@/app/lib/types";
+import useUserStore from "@/zustand/user";
 import { ArrowLeft } from "lucide-react";
-import { useRouter } from "next/navigation";
-
+import Link from "next/link";
+import { useParams, useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+// 상세페이지
 export default function DetailPage() {
   const router = useRouter();
+  const params = useParams();
+  const recordId = params._id as string;
+  const [record, setRecord] = useState<RunningRecord | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  const user = useUserStore((state) => state.user);
+  useEffect(() => {
+    const fetchRecord = async () => {
+      try {
+        const result = await getRecord(recordId);
+
+        if (result.ok) {
+          setRecord(result.item);
+        }
+
+        setLoading(false);
+      } catch (error) {
+        console.error("에러:", error);
+        setLoading(false);
+      }
+    };
+
+    fetchRecord();
+  }, [recordId]);
+
+  const handleDelete = async (id: string) => {
+    if (!confirm("정말 삭제하시겠습니까?")) {
+      return;
+    }
+    try {
+      const token = user?.token?.accessToken;
+
+      if (!token) {
+        alert("로그인이 필요합니다");
+        return;
+      }
+      const result = await deleteRecord(id, token);
+      if (result.ok) {
+        // 삭제 후 통계 데이타도 적용된 데이터로 랜더링 되도록
+        alert("삭제 완료!");
+        router.push("/records");
+        router.refresh();
+      } else {
+        alert("삭제 실패");
+      }
+    } catch (error) {
+      console.error("삭제 에러:", error);
+      alert("에러 발생");
+    }
+  };
+
+  if (loading) return <div>로딩 중...</div>;
+  if (!record) return <div>기록을 찾을 수 없습니다</div>;
   return (
     <>
       <header className="flex justify-between items-center px-6 py-4 ">
@@ -18,10 +76,10 @@ export default function DetailPage() {
       <div className="bg-white border rounded-lg px-3 py-3 mx-3 border-gray-200">
         {/* 러닝 뱃지 */}
         <div className="flex justify-center mb-1.5">
-          <div className="bg-primary text-white text-lg font-semibold px-8 py-2 rounded-lg">러닝</div>
+          <div className="bg-primary text-white text-lg font-semibold px-8 py-2 rounded-lg">{record.extra.exerciseType}</div>
         </div>
         {/* 날짜 */}
-        <p className="text-center text-sm mb-1 font-semibold py-1.5 border-b border-gray-200">2026년 01월 22일 목요일</p>
+        <p className="text-center text-sm mb-1 font-semibold py-1.5 border-b border-gray-200">{record.extra.date}</p>
         {/* 거리 */}
         <div className="flex justify-between items-center text-lg font-semibold py-3 px-3 border-b border-gray-200">
           <div className="flex">
@@ -40,7 +98,7 @@ export default function DetailPage() {
             </svg>
             <span className="mx-1">거리</span>
           </div>
-          <p>5.km</p>
+          <p>{record.extra.distance} km</p>
         </div>
         {/* 시간 */}
         <div className="flex justify-between items-center text-lg font-semibold py-3 px-3 border-b border-gray-200">
@@ -55,7 +113,7 @@ export default function DetailPage() {
             </svg>
             <span className="mx-1">시간</span>
           </div>
-          <p>32분 10초</p>
+          <p>{record.extra.duration}</p>
         </div>
         {/* 페이스 */}
         <div className="flex justify-between items-center text-lg font-semibold py-3 px-3 border-b border-gray-200">
@@ -65,7 +123,7 @@ export default function DetailPage() {
             </svg>
             <span className="mx-1">페이스</span>
           </div>
-          <p>6:11 /km</p>
+          <p>{record.extra.pace} /km</p>
         </div>
       </div>
       {/* 러닝뱃지 선택사항 */}
@@ -85,7 +143,9 @@ export default function DetailPage() {
             </svg>
             <span className="mx-1">장소</span>
           </div>
-          <p>한강공원</p>
+          <p>
+            <p className={`${record.extra.location ? "" : "text-gray-400"}`}>{record.extra.location || "미입력"} </p>
+          </p>
         </div>
         {/* 칼로리 */}
         <div className="flex justify-between items-center text-lg font-semibold py-3 px-3 border-b border-gray-200">
@@ -95,7 +155,9 @@ export default function DetailPage() {
             </svg>
             <span className="mx-1">칼로리</span>
           </div>
-          <p>364 kcal</p>
+          <p className="flex p-1">
+            <p className={`${record.extra.calories ? "px-1" : "text-gray-400 px-1"}`}>{record.extra.calories || "미입력"}</p>kcal
+          </p>
         </div>
       </div>
       {/* 메모 */}
@@ -110,17 +172,17 @@ export default function DetailPage() {
             </svg>
             <span className="mx-1 font-semibold text-lg">메모</span>
           </div>
-          <textarea
-            name="memo"
-            id="memo"
-            rows={3}
-            placeholder="오늘의 컨디션이 좋았다."
-            className="w-full text-xs border font-bold border-gray-200 px-2 py-2 rounded-md my-1"
-          />
+          <div className={`${record.content ? "" : "text-gray-400"} w-full text-xs border font-bold border-gray-200 px-2 py-2 rounded-md my-1`}>
+            {record.content || "미입력"}
+          </div>
         </div>
         <div className="flex gap-3 mx-4 my-6">
-          <button className="flex-1 bg-primary text-white py-4 rounded-xl font-semibold">수정</button>
-          <button className="flex-1 bg-primary text-white py-4 rounded-xl font-semibold">삭제</button>
+          <Link href={`/records/${recordId}/edit`} className="flex-1 bg-primary text-center text-white py-4 rounded-xl font-semibold">
+            수정
+          </Link>
+          <button className="flex-1 bg-primary text-white py-4 rounded-xl font-semibold" onClick={() => handleDelete(recordId)}>
+            삭제
+          </button>
         </div>
       </div>
     </>

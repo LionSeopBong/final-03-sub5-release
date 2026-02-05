@@ -3,7 +3,7 @@ import { addRecord } from "@/app/action/records";
 import useUserStore from "@/zustand/user";
 import { ArrowLeft } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useActionState, useEffect, useState } from "react";
+import { memo, useActionState, useEffect, useState } from "react";
 
 export default function AddRecordForm() {
   const [state, formAction, isPending] = useActionState(addRecord, null);
@@ -16,6 +16,7 @@ export default function AddRecordForm() {
   const [sec, setSec] = useState("");
   const [distance, setDistance] = useState("");
   const [pace, setPace] = useState("");
+  const [memo, setMemo] = useState("");
 
   useEffect(() => {
     const h = parseInt(hour) || 0;
@@ -217,6 +218,10 @@ export default function AddRecordForm() {
             name="memo"
             id="memo"
             rows={3}
+            value={memo}
+            onChange={(e) => {
+              setMemo(e.target.value);
+            }}
             placeholder="예:오늘의 컨디션은 어땠나요?"
             className="w-full text-xs border font-bold border-gray-200 px-2 py-2 rounded-md my-1"
           />

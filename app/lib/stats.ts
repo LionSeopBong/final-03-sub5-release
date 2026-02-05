@@ -71,3 +71,26 @@ function calculateAveragePace(records: RunningRecord[]): string {
 
   return `${avgMin}:${avgSec.toString().padStart(2, "0")}`;
 }
+
+export function calculateRecentPace(records: RunningRecord[], count: number = 2): string {
+  if (records.length === 0) return "0:00";
+
+  const sortedRecords = [...records].sort((a, b) => {
+    return new Date(b.extra.date).getTime() - new Date(a.extra.date).getTime();
+  });
+
+  const recentRecords = sortedRecords.slice(0, Math.min(count, sortedRecords.length));
+  if (recentRecords.length === 0) return "0:00";
+  // 평균 페이스 계산
+  const totalSeconds = recentRecords.reduce((sum, record) => {
+    const pace = record.extra.pace;
+    if (!pace) return sum;
+
+    const [min, sec] = pace.split(":").map(Number);
+    return sum + (min * 60 + sec);
+  }, 0);
+  const avgSeconds = totalSeconds / recentRecords.length;
+  const avgMin = Math.floor(avgSeconds / 60);
+  const avgSec = Math.round(avgSeconds % 60);
+  return `${avgMin}:${avgSec.toString().padStart(2, "0")}`;
+}

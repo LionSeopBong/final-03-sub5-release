@@ -148,7 +148,7 @@ export async function fetch3DayForecast(regId: string): Promise<ForecastRow[]> {
   }
 
   const text = await res.text();
-  console.log(text);
+  //console.log(text);
 
   // 공백 기반 파싱 (DFS 텍스트 응답)
   const lines = text

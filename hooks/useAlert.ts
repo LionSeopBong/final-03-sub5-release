@@ -2,16 +2,46 @@
 
 import { useCallback, useState } from "react";
 
-export default function useAlert() {
-  const [open, setOpen] = useState(false);
-  const [message, setMessage] = useState("");
+type AlertState = {
+  open: boolean;
+  message: string;
+  onConfirm?: () => void;
+  showCancel?: boolean;
+};
 
-  const openAlert = useCallback((msg: string) => {
-    setMessage(msg);
-    setOpen(true);
+export default function useAlert() {
+  const [state, setState] = useState<AlertState>({
+    open: false,
+    message: "",
+  });
+
+  // 일반 알림(Alert)
+  const openAlert = useCallback((message: string) => {
+    setState({
+      open: true,
+      message,
+    });
   }, []);
 
-  const closeAlert = useCallback(() => setOpen(false), []);
+  // confirm 알림
+  const openConfirm = useCallback(
+    (message: string, onConfirm: () => void, showCancel = true) => {
+      setState({
+        open: true,
+        message,
+        onConfirm,
+        showCancel,
+      });
+    },
+    [],
+  );
 
-  return { open, message, openAlert, closeAlert };
+  const closeAlert = useCallback(() => {
+    setState({
+      open: false,
+      message: "",
+    });
+  }, []);
+
+  return { ...state, openAlert, openConfirm, closeAlert };
 }

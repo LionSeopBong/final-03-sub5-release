@@ -1,4 +1,4 @@
-import ProfileFooter from "@/app/profile/components/ProfileFooter";
+"use client";
 import ProfileHeader from "@/app/profile/components/ProfileHeader";
 import Image from "next/image";
 import { useState } from "react";

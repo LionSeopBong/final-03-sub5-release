@@ -214,3 +214,9 @@ export type KmaObservation = {
   WS: number;     // 풍속 (m/s)
   VS: number;     // 가시거리 (m)
 };
+
+
+export type TempItem = {
+  datetime: Date;
+  temperature: number;
+};

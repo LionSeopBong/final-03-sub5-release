@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 
 import { useRouter } from "next/navigation";
+import Fetch3hTemp from "./dongne";
 
 export default function ForcastPage() {
   const router = useRouter();
@@ -34,7 +35,7 @@ export default function ForcastPage() {
                 className="w-full rounded-full px-5 py-3 pr-12 shadow-sm border text-sm focus:outline-none"
               />
               <span className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400">
-                <img src="/icon/search--local.svg" />
+                <img src="/icons/search--local.svg" />
               </span>
             </div>
 
@@ -234,117 +235,7 @@ export default function ForcastPage() {
               </div>
             </div>
             {/* 시간별 예보 */}
-            <div className="bg-white rounded-xl p-4 shadow mb-6">
-              <p className="text-sm text-gray-400 mb-3">시간별 예보</p>
-
-              <div className="overflow-x-auto pb-2">
-                <div className="min-w-[700px] text-[10px] text-center border-collapse">
-                  <div className="grid grid-cols-[60px_repeat(11,1fr)] border-b border-t border-gray-100 bg-gray-50/50">
-                    <div className="py-2 font-medium border-r border-gray-100 bg-gray-50">
-                      시각
-                    </div>
-                    <div className="py-2 border-r border-gray-100">12시</div>
-                    <div className="py-2 border-r border-gray-100">15시</div>
-                    <div className="py-2 border-r border-gray-100">18시</div>
-                    <div className="py-2 border-r border-gray-100 font-bold text-blue-600 bg-blue-50/50">
-                      21시
-                    </div>
-                    <div className="py-2 border-r border-gray-100">0시</div>
-                    <div className="py-2 border-r border-gray-100">03시</div>
-                    <div className="py-2 border-r border-gray-100">06시</div>
-                    <div className="py-2 border-r border-gray-100">09시</div>
-                    <div className="py-2 border-r border-gray-100">12시</div>
-                    <div className="py-2 border-r border-gray-100">15시</div>
-                    <div className="py-2">18시</div>
-                  </div>
-
-                  <div className="grid grid-cols-[60px_repeat(11,1fr)] border-b border-gray-100">
-                    <div className="py-3 bg-gray-50 font-medium border-r border-gray-100 flex items-center justify-center">
-                      날씨
-                    </div>
-                    <div className="py-3 text-lg">☀️</div>
-                    <div className="py-3 text-lg">☀️</div>
-                    <div className="py-3 text-lg">☀️</div>
-                    <div className="py-3 text-lg bg-blue-50/30">🌙</div>
-                    <div className="py-3 text-lg">🌙</div>
-                    <div className="py-3 text-lg">🌙</div>
-                    <div className="py-3 text-lg">🌙</div>
-                    <div className="py-3 text-lg">☀️</div>
-                    <div className="py-3 text-lg">☀️</div>
-                    <div className="py-3 text-lg">☀️</div>
-                    <div className="py-3 text-lg">☀️</div>
-                  </div>
-
-                  <div className="grid grid-cols-[60px_1fr] relative h-24 border-b border-gray-100">
-                    <div className="bg-gray-50 font-medium border-r border-gray-100 flex items-center justify-center">
-                      기온
-                    </div>
-                    <div className="relative w-full h-full">
-                      <div className="absolute inset-0 grid grid-cols-11 items-start pt-2 z-10">
-                        <span>-9°</span>
-                        <span>-7°</span>
-                        <span>-9°</span>
-                        <span className="font-bold text-blue-600">-11°</span>
-                        <span>-13°</span>
-                        <span>-14°</span>
-                        <span>-14°</span>
-                        <span>-14°</span>
-                        <span>-9°</span>
-                        <span>-7°</span>
-                        <span>-9°</span>
-                      </div>
-                      <svg
-                        className="absolute bottom-4 left-0 w-full h-12 overflow-visible"
-                        preserveAspectRatio="none"
-                      >
-                        <polyline
-                          fill="none"
-                          stroke="#3b82f6"
-                          stroke-width="1.5"
-                          points="30,30 90,10 150,30 210,50 270,70 330,80 390,80 450,80 510,30 570,10 630,30"
-                          vector-effect="non-scaling-stroke"
-                        />
-                        <circle cx="210" cy="50" r="3" fill="#3b82f6" />
-                      </svg>
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-[60px_repeat(11,1fr)] border-b border-gray-100 text-gray-500">
-                    <div className="py-2 bg-gray-50 font-medium border-r border-gray-100">
-                      체감온도
-                    </div>
-                    <div className="py-2">-13°</div>
-                    <div className="py-2">-12°</div>
-                    <div className="py-2">-14°</div>
-                    <div className="py-2 bg-blue-50/30 font-semibold">-16°</div>
-                    <div className="py-2">-19°</div>
-                    <div className="py-2">-20°</div>
-                    <div className="py-2">-20°</div>
-                    <div className="py-2">-20°</div>
-                    <div className="py-2">-15°</div>
-                    <div className="py-2">-13°</div>
-                    <div className="py-2">-14°</div>
-                  </div>
-
-                  <div className="grid grid-cols-[60px_repeat(11,1fr)] border-b border-gray-100 text-gray-500">
-                    <div className="py-2 bg-gray-50 font-medium border-r border-gray-100">
-                      강수확률
-                    </div>
-                    <div className="py-2">10%</div>
-                    <div className="py-2">10%</div>
-                    <div className="py-2">0%</div>
-                    <div className="py-2 bg-blue-50/30">0%</div>
-                    <div className="py-2">0%</div>
-                    <div className="py-2">0%</div>
-                    <div className="py-2">0%</div>
-                    <div className="py-2">0%</div>
-                    <div className="py-2">0%</div>
-                    <div className="py-2">0%</div>
-                    <div className="py-2">10%</div>
-                  </div>
-                </div>
-              </div>
-            </div>
+            <Fetch3hTemp />
             {/*{/* 시간별 예보 끝*/}
           </div>
         </div>

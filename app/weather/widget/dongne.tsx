@@ -43,19 +43,20 @@ export default function Fetch3hTemp() {
             <div className="py-2 font-medium border-r border-gray-100 bg-gray-50">
               시각
             </div>
-            <div className="py-2 border-r border-gray-100">12시</div>
-            <div className="py-2 border-r border-gray-100">15시</div>
-            <div className="py-2 border-r border-gray-100">18시</div>
-            <div className="py-2 border-r border-gray-100 font-bold text-blue-600 bg-blue-50/50">
-              21시
-            </div>
-            <div className="py-2 border-r border-gray-100">0시</div>
-            <div className="py-2 border-r border-gray-100">03시</div>
-            <div className="py-2 border-r border-gray-100">06시</div>
-            <div className="py-2 border-r border-gray-100">09시</div>
-            <div className="py-2 border-r border-gray-100">12시</div>
-            <div className="py-2 border-r border-gray-100">15시</div>
-            <div className="py-2">18시</div>
+            {temps.map((t, i) => {
+              const hour = t.datetime.getHours();
+              const isNow = i === 0; // 기준 시각 강조(선택)
+              return (
+                <div
+                  key={i}
+                  className={`py-2 border-r border-gray-100 ${
+                    isNow ? "font-bold text-blue-600 bg-blue-50/50" : ""
+                  }`}
+                >
+                  {hour}시
+                </div>
+              );
+            })}
           </div>
 
           <div className="grid grid-cols-[60px_repeat(11,1fr)] border-b border-gray-100">

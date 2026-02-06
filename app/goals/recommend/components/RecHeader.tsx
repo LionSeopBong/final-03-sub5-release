@@ -1,7 +1,9 @@
-import { LevelInfo, leveltype } from "@/app/goals/types";
+import useGoalsStore from "@/zustand/goals";
 import Link from "next/link";
 
-export default function RecHeader({ level }: { level: leveltype }) {
+export default function RecHeader() {
+  const level = useGoalsStore((state) => state.level);
+
   return (
     <>
       <div className="relative flex items-center w-full h-10">
@@ -31,7 +33,7 @@ export default function RecHeader({ level }: { level: leveltype }) {
             </g>
           </svg>
         </Link>
-        {/* ===== 초급 카드들 ===== */}
+        {/* 초급카드들 */}
 
         <section className="absolute left-1/2 -translate-x-1/2 font-bold text-2xl whitespace-nowrap">
           {level}

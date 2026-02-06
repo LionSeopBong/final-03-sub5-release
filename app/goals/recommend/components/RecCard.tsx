@@ -1,12 +1,14 @@
 "use client";
-import { leveltype, RecommendGoal } from "@/app/goals/types";
+import { RecommendGoal } from "@/app/goals/types";
 import { goalData } from "@/app/goals/types/recommend";
 import { createGoal } from "@/app/lib/goalsAPI";
+import useGoalsStore from "@/zustand/goals";
 import useUserStore from "@/zustand/user";
 
 import { useRouter } from "next/navigation";
 
-export default function RecCard({ level }: { level: leveltype }) {
+export default function RecCard() {
+  const level = useGoalsStore((state) => state.level);
   const filterGoals = goalData.filter((data) => data.level === level);
   const user = useUserStore((state) => state.user);
   const router = useRouter();

@@ -1,6 +1,7 @@
-import { GoalResponse } from "@/app/goals/types";
+import useGoalsStore from "@/zustand/goals";
 
-export default function GoalStats({ goals }: { goals: GoalResponse[] }) {
+export default function GoalStats() {
+  const goals = useGoalsStore((state) => state.goals);
   const 완료 = goals.filter((g) => g.extra.status === "완료").length;
   const 진행중 = goals.filter((g) => g.extra.status === "진행중").length;
   const 미완료 = goals.filter((g) => g.extra.status === "미완료").length;

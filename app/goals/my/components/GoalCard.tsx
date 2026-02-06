@@ -1,10 +1,16 @@
+import useGoalsStore from "@/zustand/goals";
 import { GoalResponse } from "../../types";
 
-export default function GoalCard({ goals }: { goals: GoalResponse[] }) {
+export default function GoalCard() {
+  const goals = useGoalsStore((state) => state.goals);
+  const filter = useGoalsStore((state) => state.filter);
+  const filteredGoals =
+    filter === "전체" ? goals : goals.filter((g) => g.extra.status === filter);
+
   return (
     <>
       <ul className="w-full flex flex-col gap-3 ">
-        {goals.map((goal) => {
+        {filteredGoals.map((goal) => {
           const status = goal.extra.status;
 
           {

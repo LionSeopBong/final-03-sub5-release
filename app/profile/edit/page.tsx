@@ -10,6 +10,7 @@ export default function ProfileEdit() {
   const [openPhotoSetter, setOpenPhotoSetter] = useState(false);
   const [openGalleryModal, setOpenGalleryModal] = useState(false);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const [gender, setGender] = useState("male");
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -63,7 +64,7 @@ export default function ProfileEdit() {
             <input
               type="text"
               placeholder="닉네임을 입력하세요"
-              className="border border-[--border-medium] p-2 rounded-[6px]"
+              className="border border-[#d3d3d3] p-2 rounded-[6px]"
             />
           </div>
 
@@ -71,21 +72,38 @@ export default function ProfileEdit() {
           <div className="input-radio flex flex-col m-4 gap-1.5">
             <h3 className="font-semibold">성별</h3>
             <div className="radio-pair flex items-center justify-center gap-4">
-              <label className="flex items-center justify-center bg-[--bg-tertiary] w-full py-3 cursor-pointer gap-4 rounded-lg">
+              <label className="flex items-center justify-center bg-[#f4f4f4] w-full py-3 cursor-pointer gap-4 rounded-lg">
                 <input
                   type="radio"
                   name="gender"
                   className="hidden"
-                  defaultChecked
+                  value="male"
+                  checked={gender === "male"}
+                  onChange={(e) => setGender(e.target.value)}
                 />
-                <span className="w-4 h-4 rounded border border-[--border-medium] flex items-center justify-center">
-                  <span className="w-2 h-2 rounded-full bg-black"></span>
+                <span className="w-4 h-4 rounded border border-[#d3d3d3] flex items-center justify-center">
+                  {gender === "male" && (
+                    <span className="w-2 h-2 rounded-full bg-black"></span>
+                  )}
                 </span>
                 <span>남성</span>
               </label>
-              <label className="flex items-center justify-center bg-[--bg-tertiary] w-full py-3 cursor-pointer gap-4 rounded-lg">
-                <input type="radio" name="gender" className="hidden" />
-                <span className="w-4 h-4 rounded border border-[--border-medium] flex items-center justify-center"></span>
+              <label className="flex items-center justify-center bg-[#f4f4f4] w-full py-3 cursor-pointer gap-4 rounded-lg">
+                <input
+                  type="radio"
+                  name="gender"
+                  className="hidden"
+                  value="female"
+                  checked={gender === "female"}
+                  onChange={(e) => setGender(e.target.value)}
+                />
+
+                <span className="w-4 h-4 rounded border border-[#d3d3d3] flex items-center justify-center">
+                  {gender === "female" && (
+                    <span className="w-2 h-2 rounded-full bg-black"></span>
+                  )}
+                </span>
+
                 <span>여성</span>
               </label>
             </div>
@@ -96,7 +114,7 @@ export default function ProfileEdit() {
             <label className="font-semibold">생년월일</label>
             <input
               type="date"
-              className="border border-[--border-medium] p-2 rounded-[6px]"
+              className="border border-[#d3d3d3] p-2 rounded-[6px]"
             />
           </div>
 

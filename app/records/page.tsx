@@ -9,6 +9,7 @@ import { calculateMonthlyStats, calculateRecentPace, calculateWeeklyStats } from
 import { RunningRecord } from "@/app/lib/types";
 import useStatsStore from "@/zustand/statsStore";
 import useUserStore from "@/zustand/user";
+import { Section } from "lucide-react";
 import Link from "next/link";
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
@@ -16,7 +17,7 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContaine
 // 메인페이지
 export default function RecordPage() {
   const [data, setData] = useState<RunningRecord[]>([]);
-
+  const [acticeSection, setActiceSection] = useState<"home" | "daily" | "stats" | "recent" | "monthRecord" | "weeklyRecord">("home");
   // 페이지 위치 autoScrolling
   // const homeRef = useRef<HTMLDivElement>(null);
   const dailyRef = useRef<HTMLDivElement>(null);
@@ -54,8 +55,9 @@ export default function RecordPage() {
     };
     fetchData();
   }, [user, setWeeklyStats, setMonthlyStats, setRecentPace]);
-
+  // 스크롤 위치 이벤트
   const scrollToSection = (sectionName: "home" | "daily" | "stats" | "recent" | "monthRecord" | "weeklyRecord") => {
+    setActiceSection(sectionName);
     if (sectionName === "home") {
       window.scrollTo({ top: 0, behavior: "smooth" });
       return;
@@ -70,6 +72,33 @@ export default function RecordPage() {
     };
     sections[sectionName]?.current?.scrollIntoView({ behavior: "smooth" });
   };
+  //스크롤 위치 판별
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            const sectionName = entry.target.getAttribute("data-section");
+            if (sectionName) {
+              setActiceSection(sectionName as typeof acticeSection);
+            }
+          }
+        });
+      },
+      {
+        threshold: 0.5,
+        rootMargin: "-100px 0px -50% 0px",
+      },
+    );
+    const sections = [dailyRef.current, weeklyRecordRef.current, monthRecordRef.current, recentRef.current, statsRef.current];
+    sections.forEach((section) => {
+      if (section) {
+        observer.observe(section);
+      }
+    });
+    return () => observer.disconnect();
+  }, []);
+  // 페이스 계산
   const formatDuration = (duration: string) => {
     const [hour, minutes, seconds] = duration.split(":");
     return `${parseInt(minutes)}분 ${parseInt(seconds)}초`;
@@ -106,9 +135,7 @@ export default function RecordPage() {
     const today = new Date().toISOString().split("T")[0];
     return data.find((record) => record.extra?.date === today);
   }, [data]);
-
-  // 주간 차트 영역
-
+  // 최근 기록 5개만 요약
   const sortedRecentRecords = useMemo(() => {
     return [...data]
       .filter((r) => r.extra?.date)
@@ -117,11 +144,14 @@ export default function RecordPage() {
       })
       .slice(0, 5);
   }, [data]);
-
+  // 주간 차트
   const weeklyChartData = useMemo(() => getWeeklyChartData(data), [data]);
-
   // 월간 차트
   const monthlyChartData = useMemo(() => getMonthlyDistanceChartData(data), [data]);
+
+  const notYetEvent = () => {
+    alert("미구현!!!");
+  };
   return (
     <>
       <Header />
@@ -132,38 +162,60 @@ export default function RecordPage() {
         </div>
 
         {/* 네비탭 */}
-        <nav className=" flex px-6 py-4 gap-3 overflow-x-auto scrollbar-hide">
-          <button onClick={() => scrollToSection("home")} className="bg-primary text-sm text-white px-9 py-2 rounded-lg whitespace-nowrap">
+        <nav data-section="daily" className=" flex px-6 py-4 gap-3 overflow-x-auto scrollbar-hide">
+          <button
+            onClick={() => scrollToSection("home")}
+            className={`${acticeSection === "home" ? "bg-primary text-white" : "border-gray-200"} border text-sm  px-9 py-2 rounded-lg whitespace-nowrap`}
+          >
             홈
           </button>
-          <button onClick={() => scrollToSection("daily")} className="text-sm border-gray-200 border px-9 py-2 rounded-lg whitespace-nowrap">
+          <button
+            onClick={() => scrollToSection("daily")}
+            className={`text-sm ${acticeSection === "daily" ? "bg-primary text-white" : "border-gray-200"} border px-9 py-2 rounded-lg whitespace-nowrap`}
+          >
             오늘의 기록
           </button>
-          <button onClick={() => scrollToSection("weeklyRecord")} className="text-sm border-gray-200 border px-9 py-2 rounded-lg whitespace-nowrap">
+          <button
+            onClick={() => scrollToSection("weeklyRecord")}
+            className={`text-sm ${acticeSection === "weeklyRecord" ? "bg-primary text-white" : "border-gray-200"} border px-9 py-2 rounded-lg whitespace-nowrap`}
+          >
             주간 러닝 거리
           </button>
-          <button onClick={() => scrollToSection("monthRecord")} className="text-sm border-gray-200 border px-9 py-2 rounded-lg whitespace-nowrap">
+          <button
+            onClick={() => scrollToSection("monthRecord")}
+            className={`text-sm ${acticeSection === "monthRecord" ? "bg-primary text-white" : "border-gray-200"} border px-9 py-2 rounded-lg whitespace-nowrap`}
+          >
             월간 러닝 거리
           </button>
-          <button onClick={() => scrollToSection("recent")} className="text-sm border-gray-200 border px-9 py-2 rounded-lg whitespace-nowrap">
+          <button
+            onClick={() => scrollToSection("recent")}
+            className={`text-sm ${acticeSection === "recent" ? "bg-primary text-white" : "border-gray-200"} border px-9 py-2 rounded-lg whitespace-nowrap`}
+          >
             최근 기록
           </button>
-          <button onClick={() => scrollToSection("stats")} className="text-sm border-gray-200 border px-9 py-2 rounded-lg whitespace-nowrap">
+          <button
+            onClick={() => scrollToSection("stats")}
+            className={`text-sm ${acticeSection === "stats" ? "bg-primary text-white" : "border-gray-200"} border px-9 py-2 rounded-lg whitespace-nowrap`}
+          >
             통계
           </button>
         </nav>
       </div>
       {/* 데이터 작업 버튼 탭 */}
       <div className="flex gap-3 justify-center py-4">
-        <button className="bg-primary text-sm text-white px-5 py-2 rounded-lg">전체 기록보기</button>
-        <button className="text-sm border-gray-200 border px-5 py-2 rounded-lg">내보내기</button>
+        <Link href="/records/all" className="bg-primary text-sm text-white px-5 py-2 rounded-lg">
+          전체 기록보기
+        </Link>
+        <button className="text-sm border-gray-200 border px-5 py-2 rounded-lg" onClick={notYetEvent}>
+          내보내기
+        </button>
         <Link href="/records/new" className="text-sm border-gray-200 border px-5 py-2 rounded-lg">
           기록추가
         </Link>
       </div>
       {/* 러닝 요약 탭 */}
       {todayRecord && todayRecord.extra ? (
-        <div ref={dailyRef} className="px-4 scroll-mt-34">
+        <div ref={dailyRef} data-section="daily" className="px-4 scroll-mt-34">
           <h2 className=" font-semibold text-xl my-3">오늘의 러닝 요약</h2>
           {}
           <div className="flex gap-3 text-left overflow-x-auto scrollbar-hide">
@@ -198,7 +250,7 @@ export default function RecordPage() {
         </div>
       )}
       ;{/* 주간 러닝 거리 차트 */}
-      <div ref={weeklyRecordRef} className="bg-white scroll-mt-34 rounded-lg border border-gray-200 mx-4 my-3 p-5">
+      <div ref={weeklyRecordRef} data-section="weeklyRecord" className="bg-white scroll-mt-34 rounded-lg border border-gray-200 mx-4 my-3 p-5">
         <h2 className="text-lg font-semibold mb-2">주간 러닝 거리</h2>
         <p className="text-sm text-gray-500 mb-4">
           {weeklyStats?.totalDistance} &#40;km&#41; {weeklyStats?.weeklyRuns} 회
@@ -217,7 +269,7 @@ export default function RecordPage() {
         </div>
       </div>
       {/* 월간 러닝 거리 */}
-      <div ref={monthRecordRef} className="bg-white scroll-mt-34 rounded-lg border border-gray-200 mx-4 my-3 p-5">
+      <div ref={monthRecordRef} data-section="monthRecord" className="bg-white scroll-mt-34 rounded-lg border border-gray-200 mx-4 my-3 p-5">
         <h2 className="text-lg font-semibold mb-2">월간 러닝 거리</h2>
         <p className="text-sm text-gray-500 mb-4">
           {monthlyStats?.totalDistance} &#40;km&#41; {monthlyStats?.monthlyRuns} 회
@@ -236,7 +288,7 @@ export default function RecordPage() {
         </div>
       </div>
       {/* 최근 기록 */}
-      <div ref={recentRef} className="bg-white rounded-lg border border-gray-200 mx-4 my-3 p-5">
+      <div ref={recentRef} data-section="recent" className="bg-white rounded-lg border border-gray-200 mx-4 my-3 p-5">
         <h2 className="text-lg font-semibold mt-4">최근 기록</h2>
         <p className="text-gray-500 text-sm pb-3">최근 활동 내역을 확인 하세요</p>
         {/* 기록 리스트 */}
@@ -296,7 +348,7 @@ export default function RecordPage() {
         )}
       </div>
       {/* 평균 페이스 통계 */}
-      <div ref={statsRef} className="px-4 py-3">
+      <div ref={statsRef} data-section="stats" className="px-4 py-3">
         <h2 className="font-semibold text-xl my-3"> 평균 페이스 통계</h2>
         {/* 2개 컬럼*/}
         <div className="flex justify-center gap-4">

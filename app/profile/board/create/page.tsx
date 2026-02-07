@@ -1,7 +1,6 @@
 "use client";
 
 import Navi from "@/app/components/common/Navi";
-// import fetchAPI from "@/app/lib/api";
 import ProfileHeader from "@/app/profile/components/ProfileHeader";
 import Image from "next/image";
 import { useState } from "react";

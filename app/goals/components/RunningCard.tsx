@@ -4,13 +4,10 @@ import useStatsStore from "@/zustand/statsStore";
 import { calculateLevel, getUserStatus } from "../utils/LevelCalculator";
 import { LevelInfo } from "../types";
 import { useEffect } from "react";
-export default function RunningCard({
-  userLevel,
-}: {
-  userLevel: LevelInfo | undefined;
-}) {
+import useGoalsStore from "@/zustand/goals";
+export default function RunningCard() {
   const { monthlyStats, setMonthlyStats } = useStatsStore();
-
+  const userLevel = useGoalsStore((state) => state.userLevel);
   useEffect(() => {
     if (userLevel) {
       setMonthlyStats({

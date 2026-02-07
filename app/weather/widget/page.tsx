@@ -4,10 +4,80 @@ import Image from "next/image";
 import Link from "next/link";
 
 import { useRouter } from "next/navigation";
-import Fetch3hTemp from "./dongne";
+import { useEffect, useState } from "react";
 
-export default function ForcastPage() {
+import Fetch3Hours from "./dongne";
+import { ForecastRow } from "@/types/kma";
+import { formatLabel, formatDate } from "@/lib/utils";
+
+export async function fetch3DayForecastClient(
+  regId: string,
+): Promise<ForecastRow[]> {
+  const res = await fetch(`/api/forecast/3day?regId=${regId}`);
+
+  if (!res.ok) {
+    throw new Error(`API error: ${res.status}`);
+  }
+
+  return res.json();
+}
+
+export default function ForecastPage() {
   const router = useRouter();
+  const [data, setData] = useState<ForecastRow[]>([]);
+  const [error, setError] = useState<string | null>(null);
+
+  // 오늘 포함 +0 ~ +2일 (총 3일)
+  const today = new Date();
+
+  const days = Array.from({ length: 3 }, (_, i) => {
+    const d = new Date(today);
+    d.setDate(today.getDate() + i);
+
+    return {
+      date: formatDate(d), // YYYYMMDD
+      label: formatLabel(d), // 7일(금)
+    };
+  });
+
+  useEffect(() => {
+    fetch3DayForecastClient("11B10101")
+      .then((rows) => setData(rows))
+      .catch((err) => {
+        console.error(err);
+        setError(err.message);
+      });
+  }, []);
+
+  if (error) return <p>에러 발생: {error}</p>;
+
+  const todayStr = formatDate(today);
+
+  const dayForecasts = days.map((d) => {
+    const isToday = d.date === todayStr;
+
+    const am = isToday
+      ? null
+      : (data.find((r) => r.TM_EF.startsWith(d.date + "00")) ?? null);
+
+    const match = (r: ForecastRow, date: string, hour: "00" | "12") => {
+      console.log(r.TM_EF);
+      return r.TM_EF.slice(0, 8) === date && r.TM_EF.slice(8, 10) === hour;
+    };
+
+    const pm = data.find((r) => match(r, d.date, "12"));
+
+    return {
+      dateLabel: d.label,
+      am: am
+        ? { temp: Number(am.TA), wf: am.WF || "-" }
+        : { temp: null, wf: "-" },
+      pm: pm
+        ? { temp: Number(pm.TA), wf: pm.WF || "-" }
+        : { temp: null, wf: "-" },
+    };
+  });
+
   return (
     <main className="min-h-screen bg-white ">
       <div className="mx-auto w-full max-w-md px-5 pb-10">
@@ -47,31 +117,36 @@ export default function ForcastPage() {
 
               <div className="overflow-x-auto pb-2">
                 <div className="min-w-[600px] border-collapse text-[10px] text-center">
-                  <div className="grid grid-cols-[60px_repeat(8,1fr)] border-b border-t border-gray-100 items-stretch">
-                    <div className="flex items-center justify-center bg-gray-50 font-medium border-r border-gray-100">
+                  <div className="grid grid-cols-[60px_repeat(8,1fr)] border-b border-t border-gray-100">
+                    <div className="flex items-center justify-center bg-gray-50 font-medium border-r">
                       날짜
-                    </div>
-                    <div className="py-2 bg-blue-50 border-x border-blue-200">
-                      <p className="font-bold">21일(수)</p>
-                      <p className="text-blue-500 text-[9px]">오늘</p>
-                    </div>
-                    <div className="py-2 border-r border-gray-100">
-                      22일(목)
-                      <p className="text-gray-400 text-[9px]">내일</p>
-                    </div>
-                    <div className="py-2 border-r border-gray-100">
-                      23일(금)
-                      <p className="text-gray-400 text-[9px]">모레</p>
-                    </div>
-                    <div className="py-2 border-r border-gray-100 text-blue-500">
-                      24일(토)
-                    </div>
-                    <div className="py-2 border-r border-gray-100 text-red-500">
-                      25일(일)
-                    </div>
-                    <div className="py-2 border-r border-gray-100">
-                      26일(월)
-                    </div>
+                    </div>{" "}
+                    {dayForecasts.map((d, i) => {
+                      const subLabel =
+                        i === 0
+                          ? "오늘"
+                          : i === 1
+                            ? "내일"
+                            : i === 2
+                              ? "모레"
+                              : null;
+
+                      return (
+                        <div
+                          key={i}
+                          className={`py-1 border-r border-gray-100 flex flex-col items-center justify-center ${
+                            i === 0 ? "bg-blue-50 font-bold" : ""
+                          }`}
+                        >
+                          <span>{d.dateLabel}</span>
+                          {subLabel && (
+                            <span className="text-[9px] text-blue-500 mt-0.5">
+                              {subLabel}
+                            </span>
+                          )}
+                        </div>
+                      );
+                    })}
                     <div className="py-2 border-r border-gray-100">
                       27일(화)
                     </div>
@@ -160,18 +235,21 @@ export default function ForcastPage() {
                     <div className="py-2 bg-gray-50 font-medium border-r border-gray-100">
                       기온
                     </div>
-                    <div className="grid grid-cols-2 bg-blue-50 border-x border-blue-200 px-1">
-                      <span className="text-blue-500">-14°</span>
-                      <span className="text-red-500">-5°</span>
-                    </div>
-                    <div className="grid grid-cols-2 border-r border-gray-100 px-1">
-                      <span className="text-blue-500">-14°</span>
-                      <span className="text-red-500">-5°</span>
-                    </div>
-                    <div className="grid grid-cols-2 border-r border-gray-100 px-1">
-                      <span className="text-blue-500">-11°</span>
-                      <span className="text-red-500">-2°</span>
-                    </div>
+
+                    {dayForecasts.map((d, i) => (
+                      <div
+                        key={i}
+                        className="grid grid-cols-2 border-r border-gray-100 px-1"
+                      >
+                        <span className="text-blue-500">
+                          {d.am.temp !== null ? `${d.am.temp}°` : "-"}
+                        </span>
+                        <span className="text-red-500">
+                          {d.pm.temp !== null ? `${d.pm.temp}°` : "-"}
+                        </span>
+                      </div>
+                    ))}
+                    {/* 나머지 하드코딩 */}
                     <div className="grid grid-cols-2 border-r border-gray-100 px-1">
                       <span className="text-blue-500">-10°</span>
                       <span className="text-red-500">-2°</span>
@@ -235,7 +313,8 @@ export default function ForcastPage() {
               </div>
             </div>
             {/* 시간별 예보 */}
-            <Fetch3hTemp />
+
+            <Fetch3Hours />
             {/*{/* 시간별 예보 끝*/}
           </div>
         </div>

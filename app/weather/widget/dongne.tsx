@@ -8,10 +8,9 @@ const CELL_WIDTH = 60;
 const SVG_HEIGHT = 48;
 const SVG_PADDING = 6;
 
-export default function Fetch3hTemp() {
+export default function Fetch3Hours() {
   const [hours3, setHours3] = useState<Hours3Forecast[]>([]);
-  const [error, setError] = useState<string | null>(null);
-
+  
   useEffect(() => {
     async function fetchWeather() {
       try {
@@ -21,15 +20,10 @@ export default function Fetch3hTemp() {
         );
         const data = await res.json();
 
-        if (data.error) {
-          setError(data.error);
-          return;
-        }
-
         const items = data.response.body.items.item;
         setHours3(extractHour3(items, new Date()));
       } catch (err: any) {
-        setError(err.message);
+        throw err.message;
       }
     }
 
@@ -47,21 +41,17 @@ export default function Fetch3hTemp() {
   const contentWidth = colCount * CELL_WIDTH;
   const svgWidth = contentWidth;
 
-  const getX = (index: number) =>
-    index * CELL_WIDTH + CELL_WIDTH / 2;
+  const getX = (index: number) => index * CELL_WIDTH + CELL_WIDTH / 2;
 
   const getY = (temp: number) => {
     if (maxTemp === minTemp) return SVG_HEIGHT / 2;
     return (
       SVG_PADDING +
-      ((maxTemp - temp) / (maxTemp - minTemp)) *
-        (SVG_HEIGHT - SVG_PADDING * 2)
+      ((maxTemp - temp) / (maxTemp - minTemp)) * (SVG_HEIGHT - SVG_PADDING * 2)
     );
   };
 
-  const points = temps
-    .map((temp, i) => `${getX(i)},${getY(temp)}`)
-    .join(" ");
+  const points = temps.map((temp, i) => `${getX(i)},${getY(temp)}`).join(" ");
 
   /* ====================================================== */
 
@@ -103,7 +93,7 @@ export default function Fetch3hTemp() {
             </div>
             {hours3.map((t, i) => (
               <div key={i} className="py-3 text-lg">
-                {skyToEmoji(t.sky)}
+                {skyToEmoji(t.sky, t.datetime)}
               </div>
             ))}
           </div>

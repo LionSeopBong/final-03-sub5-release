@@ -420,7 +420,29 @@ export function extractHour3(
     .sort((a, b) => a.datetime.getTime() - b.datetime.getTime());
 }
 
-export function skyToEmoji(sky?: number): string {
+export function skyToEmoji(
+  sky?: number,
+  datetime?: Date,
+): string {
+  const hour = datetime?.getHours();
+  const isNight = hour !== undefined && (hour >= 18 || hour < 6);
+
+  if (isNight) {
+    switch (sky) {
+      case 1:
+        return "🌙";   // 맑은 밤
+      case 2:
+        return "🌙☁️"; // 구름조금 밤
+      case 3:
+        return "☁️🌙"; // 구름많음 밤
+      case 4:
+        return "☁️";   // 흐린 밤
+      default:
+        return "🌙";
+    }
+  }
+
+  // 🌞 주간
   switch (sky) {
     case 1:
       return "☀️"; // 맑음
@@ -433,4 +455,18 @@ export function skyToEmoji(sky?: number): string {
     default:
       return "❓";
   }
+}
+
+
+export function formatDate(date: Date) {
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, "0");
+  const d = String(date.getDate()).padStart(2, "0");
+  return `${y}${m}${d}`;
+}
+
+export function formatLabel(date: Date) {
+  const day = date.getDate();
+  const weekday = ["일", "월", "화", "수", "목", "금", "토"][date.getDay()];
+  return `${day}일(${weekday})`;
 }

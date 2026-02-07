@@ -8,7 +8,7 @@ import { memo, useActionState, useEffect, useState } from "react";
 export default function AddRecordForm() {
   const [state, formAction, isPending] = useActionState(addRecord, null);
   const router = useRouter();
-
+  const [data, setData] = useState(""); // 버튼 활성화, 비활성화 여부
   const user = useUserStore((state) => state.user);
 
   const [hour, setHour] = useState("");
@@ -51,7 +51,8 @@ export default function AddRecordForm() {
       router.refresh();
     }
   }, [state, router]);
-
+  // 필수 요소 미입력 시 버튼 비활성화
+  const isFormValid = data && (hour || min || sec) && distance && parseFloat(distance) > 0 && pace;
   return (
     <>
       {/* 헤더 */}
@@ -71,14 +72,21 @@ export default function AddRecordForm() {
           {/* 날짜 입력 */}
           <div className="flex flex-col gap-2">
             <label className="text-s font-bold" htmlFor="date">
-              날짜
+              *날짜
             </label>
-            <input type="date" id="date" name="date" className=" text-xs py-2 px-3 border rounded-lg border-gray-200 focus:outline-none focus:border-primary" />
+            <input
+              type="date"
+              id="date"
+              name="date"
+              value={data}
+              onChange={(e) => setData(e.target.value)}
+              className="text-xs py-2 px-3 border rounded-lg border-gray-200 focus:outline-none focus:border-primary"
+            />
           </div>
 
           {/* 운동시간 입력 */}
           <div className="flex flex-col gap-2">
-            <label className="text-s font-bold">운동시간</label>
+            <label className="text-s font-bold">*운동시간</label>
             <div className="flex justify-center text-xs py-2 border text-center rounded-lg border-gray-200">
               <input
                 type="number"
@@ -118,7 +126,7 @@ export default function AddRecordForm() {
           {/* 거리 */}
           <div className="flex flex-col gap-2">
             <label className="text-s font-bold" htmlFor="distance">
-              거리 (km)
+              *거리 (km)
             </label>
             <input
               type="number"
@@ -226,9 +234,14 @@ export default function AddRecordForm() {
             className="w-full text-xs border font-bold border-gray-200 px-2 py-2 rounded-md my-1"
           />
         </div>
-        <button type="submit" disabled={isPending} className="w-full bg-primary text-white rounded-md p-4 font-bold my-3">
+        <button
+          type="submit"
+          disabled={isPending || !isFormValid}
+          className={`w-full ${!isFormValid ? "bg-gray-400" : "bg-primary"}  text-white rounded-md p-4 font-bold my-3`}
+        >
           {isPending ? "저장중" : "기록저장"}
         </button>
+
         {state?.success && <div className="text-green-500">저장 완료! 이동 중...</div>}
         {state?.error && <div className="text-red-500 text-sm mb-3">{state.error}</div>}
       </form>

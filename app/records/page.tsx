@@ -135,9 +135,7 @@ export default function RecordPage() {
     const today = new Date().toISOString().split("T")[0];
     return data.find((record) => record.extra?.date === today);
   }, [data]);
-
-  // 주간 차트 영역
-
+  // 최근 기록 5개만 요약
   const sortedRecentRecords = useMemo(() => {
     return [...data]
       .filter((r) => r.extra?.date)
@@ -146,11 +144,14 @@ export default function RecordPage() {
       })
       .slice(0, 5);
   }, [data]);
-
+  // 주간 차트
   const weeklyChartData = useMemo(() => getWeeklyChartData(data), [data]);
-
   // 월간 차트
   const monthlyChartData = useMemo(() => getMonthlyDistanceChartData(data), [data]);
+
+  const notYetEvent = () => {
+    alert("미구현!!!");
+  };
   return (
     <>
       <Header />
@@ -202,8 +203,12 @@ export default function RecordPage() {
       </div>
       {/* 데이터 작업 버튼 탭 */}
       <div className="flex gap-3 justify-center py-4">
-        <button className="bg-primary text-sm text-white px-5 py-2 rounded-lg">전체 기록보기</button>
-        <button className="text-sm border-gray-200 border px-5 py-2 rounded-lg">내보내기</button>
+        <Link href="/records/all" className="bg-primary text-sm text-white px-5 py-2 rounded-lg">
+          전체 기록보기
+        </Link>
+        <button className="text-sm border-gray-200 border px-5 py-2 rounded-lg" onClick={notYetEvent}>
+          내보내기
+        </button>
         <Link href="/records/new" className="text-sm border-gray-200 border px-5 py-2 rounded-lg">
           기록추가
         </Link>

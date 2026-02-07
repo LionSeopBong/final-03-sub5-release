@@ -1,13 +1,11 @@
 "use client";
 import Link from "next/link";
-import { LevelInfo } from "../types";
 import { useRouter } from "next/navigation";
-export default function GoalsActions({
-  userLevel,
-}: {
-  userLevel: LevelInfo | undefined;
-}) {
+import useGoalsStore from "@/zustand/goals";
+export default function GoalsActions() {
   const router = useRouter();
+  const userLevel = useGoalsStore((state) => state.userLevel);
+
   const navigiation = () => {
     router.push(`/goals/recommend?level=${userLevel?.level}`);
   };

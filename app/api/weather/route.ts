@@ -1,12 +1,19 @@
 import { NextResponse } from "next/server";
 import type { KmaObservation } from "@/types/kma";
-import { getCurrentTime } from "@/lib/utils";
+
+import fs from "fs";
+import path from "path";
 
 export async function GET(req: Request) {
   try {
     const { searchParams } = new URL(req.url);
     const stn = searchParams.get("stn");
     const tm = searchParams.get("tm");
+    /* 필요하면 읽어들임
+     * const filePath = path.join(process.cwd(), "data", "stn.json");
+     * const jsonData = fs.readFileSync(filePath, "utf8");
+     * const data = JSON.parse(jsonData);
+     */
 
     if (!stn || !tm) {
       return NextResponse.json(

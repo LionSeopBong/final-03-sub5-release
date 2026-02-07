@@ -1,8 +1,10 @@
 "use client";
-import { RecFilter } from "@/app/goals/types/my";
+
+import useGoalsStore from "@/zustand/goals";
 // import { useState } from "react";
 
-export default function GoalFilter({ filter, setFilter }: RecFilter) {
+export default function GoalFilter() {
+  const { filter, setFilter } = useGoalsStore();
   const TapClick = (tab: string) => {
     setFilter(tab);
   };

@@ -1,19 +1,18 @@
 "use client";
 
-import Link from "next/link";
 import Modal from "../components/Modal";
 import GoalStats from "@/app/goals/my/components/GoalStats";
 import GoalFilter from "@/app/goals/my/components/GoalFilter";
 import GoalCard from "@/app/goals/my/components/GoalCard";
 import GoalHeader from "@/app/goals/my/components/GoalHeader";
-import { useEffect, useState } from "react"; // 추가!
+import { useEffect } from "react"; // 추가!
 import { getMyGoals } from "@/app/lib/goalsAPI"; // 추가!
 import useUserStore from "@/zustand/user"; // 추가!
-import { GoalResponse, MyGoal } from "@/app/goals/types";
+
+import useGoalsStore from "@/zustand/goals";
 export default function GoalListPage() {
   const user = useUserStore((state) => state.user);
-  const [goals, setGoals] = useState<GoalResponse[]>([]);
-  const [filter, setFilter] = useState("전체");
+  const { goals, setGoals, filter, setFilter } = useGoalsStore();
   useEffect(() => {
     const fetchGoals = async () => {
       if (user?.token) {
@@ -38,15 +37,9 @@ export default function GoalListPage() {
           {/* 중급: 🌿중급 총 5개 */}
           {/* 고급: 🌳고급 총 7개 */}
           {/* 통계를 가로로 배치 */}
-          <GoalStats goals={goals} />
-          <GoalFilter filter={filter} setFilter={setFilter} />
-          <GoalCard
-            goals={
-              filter === "전체"
-                ? goals
-                : goals.filter((result) => result.extra.status === filter)
-            }
-          />
+          <GoalStats />
+          <GoalFilter />
+          <GoalCard />
         </div>
         <Modal />
       </main>

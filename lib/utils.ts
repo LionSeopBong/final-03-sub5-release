@@ -119,22 +119,6 @@ function getLatestTmFc(): string {
   return `${y}${m}${d}${fcHour}00`;
 }
 
-/** KST 기준 현재 시각 */
-function nowKST(): Date {
-  const now = new Date();
-  return new Date(now.getTime() + 9 * 60 * 60 * 1000);
-}
-
-/** YYYYMMDDHHmm → Date */
-function parseTm(tm: string): Date {
-  const y = Number(tm.slice(0, 4));
-  const m = Number(tm.slice(4, 6)) - 1;
-  const d = Number(tm.slice(6, 8));
-  const h = Number(tm.slice(8, 10));
-  const min = Number(tm.slice(10, 12));
-  return new Date(Date.UTC(y, m, d, h, min));
-}
-
 export async function fetch3DayForecast(regId: string): Promise<ForecastRow[]> {
   const serviceKey = process.env.KMA_API_KEY;
   const tmfc = getLatestTmFc();
@@ -148,7 +132,7 @@ export async function fetch3DayForecast(regId: string): Promise<ForecastRow[]> {
   }
 
   const text = await res.text();
-  console.log(text);
+  //console.log(text);
 
   // 공백 기반 파싱 (DFS 텍스트 응답)
   const lines = text
@@ -278,14 +262,13 @@ export function findLatLon(
   return row ? { lat: row.lat, lon: row.lon } : null;
 }
 
-
 export function getCurrentTime() {
   const now = new Date();
   const yyyy = now.getFullYear();
   const mm = String(now.getMonth() + 1).padStart(2, "0");
   const dd = String(now.getDate()).padStart(2, "0");
   const hh = String(now.getHours()).padStart(2, "0");
-  
+
   return `${yyyy}${mm}${dd}${hh}00`;
 }
 
@@ -342,7 +325,6 @@ export function outdoorGrade(score: number): "좋음" | "보통" | "나쁨" {
   return "나쁨";
 }
 
-
 export function getCurrentTimeKoreanFormat(): string {
   const now = new Date();
 
@@ -359,7 +341,6 @@ export function getCurrentTimeKoreanFormat(): string {
   return `${month}월 ${day}일 ${period} ${hours}:${minutes}`;
 }
 
-
 export function getUVTime(): string {
   const now = new Date();
 
@@ -370,4 +351,20 @@ export function getUVTime(): string {
 
   // ⚠️ 분은 반드시 00
   return `${yyyy}${mm}${dd}${hh}00`;
+}
+
+/** KST 기준 현재 시각 */
+export function nowKST(): Date {
+  const now = new Date();
+  return new Date(now.getTime() + 9 * 60 * 60 * 1000);
+}
+
+/** YYYYMMDDHHmm → Date */
+export function parseTm(tm: string): Date {
+  const y = Number(tm.slice(0, 4));
+  const m = Number(tm.slice(4, 6)) - 1;
+  const d = Number(tm.slice(6, 8));
+  const h = Number(tm.slice(8, 10));
+  const min = Number(tm.slice(10, 12));
+  return new Date(Date.UTC(y, m, d, h, min));
 }

@@ -28,6 +28,7 @@ import {
 import UVCard from "./UVCard";
 import { getRunningTip } from "@/lib/runningTips";
 import { getAnalysisFactors } from "@/lib/runningAnalysis";
+import RunningAnalysisCard from "./RunningAnalysisCard";
 
 export async function getLegalDongName(
   pos: LocationCoords,
@@ -250,61 +251,7 @@ export default function WeatherPage() {
       </div>
 
       {/*-- 러닝 최적도 분석 -->*/}
-      <div className="min-w-[375px] items-stretch p-4">
-        <div className="p-4 bg-white border border-gray-200 rounded-xl shadow-sm ">
-          <div className="flex items-center gap-2">
-            <Image src="/icons/cbi--bulb.svg" width={24} height={24} alt="" />
-            <h2>러닝 최적도 분석</h2>
-          </div>
-
-          <p className="text-xs text-gray-500">현재 날씨 기준 러닝 가이드</p>
-
-          <div className="flex items-center gap-3 p-3">
-            <div className="flex items-center justify-center w-10 h-10 bg-green-100 rounded-full">
-              <Image
-                src="/icons/picon--rise.svg"
-                width={24}
-                height={24}
-                className="w-6 h-6"
-                alt="분석"
-              />
-            </div>
-            <div>
-              <div className="font-semibold text-green-700">
-                러닝하기 {grade}
-              </div>
-              <div className="text-xs text-gray-600">날씨 조건 분석 완료</div>
-            </div>
-          </div>
-          {weather && (
-            <div className="bg-gray-200 text-gray-700 text-xs font-semibold rounded-xl p-3">
-              분석요인
-              <br />
-              <ul className="mt-1 space-y-0.5 text-gray-500 font-normal">
-                {getAnalysisFactors(weather).length === 0 ? (
-                  <li>모든 조건이 양호합니다</li>
-                ) : (
-                  getAnalysisFactors(weather).map((f, i) => (
-                    <li key={i}>
-                      • {f.label}{" "}
-                      <span className="text-gray-400">(-{f.penalty})</span>
-                    </li>
-                  ))
-                )}
-              </ul>
-            </div>
-          )}
-          {weather && (
-            <div className="bg-blue-50 text-blue-700 text-xs rounded-xl p-3">
-              러닝 팁
-              <br />
-              <span className="text-gray-900">
-                {getRunningTip(score, weather)}
-              </span>
-            </div>
-          )}
-        </div>
-      </div>
+      <RunningAnalysisCard weather={weather} />
       <Footer />
       <Navi />
     </>

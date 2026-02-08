@@ -7,8 +7,16 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 import Fetch3Hours from "./dongne";
-import { ForecastRow } from "@/types/kma";
-import { formatLabel, formatDate } from "@/lib/utils";
+import { ForecastRow, RegIdRow } from "@/types/kma";
+import { formatLabel, formatDate, findNearestRegionFast } from "@/lib/utils";
+import { KakaoPlace } from "@/types/kakao";
+import SearchLocationBar from "./components/searchLocationBar";
+
+function distanceSq(lat1: number, lon1: number, lat2: number, lon2: number) {
+  const dLat = lat1 - lat2;
+  const dLon = lon1 - lon2;
+  return dLat * dLat + dLon * dLon;
+}
 
 export async function fetch3DayForecastClient(
   regId: string,
@@ -26,6 +34,18 @@ export default function ForecastPage() {
   const router = useRouter();
   const [data, setData] = useState<ForecastRow[]>([]);
   const [error, setError] = useState<string | null>(null);
+  const [selectedPlace, setSelectedPlace] = useState<string>("역삼동");
+  const [regidRows, setRegidRows] = useState<RegIdRow[]>([]);
+
+  useEffect(() => {
+    fetch("/api/regid")
+      .then((res) => res.json())
+      .then((rows: RegIdRow[]) => {
+        setRegidRows(rows);
+        //console.log("regidRows fetched:", rows); // ✅ fetch 직후
+      })
+      .catch(console.error);
+  }, []);
 
   // 오늘 포함 +0 ~ +2일 (총 3일)
   const today = new Date();
@@ -41,12 +61,16 @@ export default function ForecastPage() {
   });
 
   useEffect(() => {
+    // 1. 기본 예보
     fetch3DayForecastClient("11B10101")
       .then((rows) => setData(rows))
-      .catch((err) => {
-        console.error(err);
-        setError(err.message);
-      });
+      .catch((err) => setError(err.message));
+
+    // 2. regid.json 로드
+    fetch("/api/regid")
+      .then((res) => res.json())
+      .then((rows: RegIdRow[]) => setRegidRows(rows))
+      .catch(console.error);
   }, []);
 
   if (error) return <p>에러 발생: {error}</p>;
@@ -61,7 +85,7 @@ export default function ForecastPage() {
       : (data.find((r) => r.TM_EF.startsWith(d.date + "00")) ?? null);
 
     const match = (r: ForecastRow, date: string, hour: "00" | "12") => {
-      console.log(r.TM_EF);
+      //console.log(r.TM_EF);
       return r.TM_EF.slice(0, 8) === date && r.TM_EF.slice(8, 10) === hour;
     };
 
@@ -98,19 +122,24 @@ export default function ForecastPage() {
         <div className="bg-gray-50 flex justify-center py-8">
           <div className="w-full max-w-md px-4">
             {/* 검색바 */}
-            <div className="relative mb-4">
-              <input
-                type="text"
-                placeholder="위치를 검색하세요"
-                className="w-full rounded-full px-5 py-3 pr-12 shadow-sm border text-sm focus:outline-none"
-              />
-              <span className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400">
-                <img src="/icons/search--local.svg" />
-              </span>
-            </div>
-
-            {/* 위치 */}
-            <p className="text-red-400 font-semibold mb-4">역삼동</p>
+            <SearchLocationBar
+              onSelect={async (place) => {
+                setSelectedPlace(place.place_name);
+                try {
+                  console.log(place.x, place.y);
+                  const regId = findNearestRegionFast(
+                    { lat: Number(place.y), lon: Number(place.x) },
+                    regidRows,
+                  );
+                  console.log("regId: ", regId);
+                  //const rows = await fetch3DayForecastClient(regId);
+                  //setData(rows);
+                } catch (err: any) {
+                  console.error(err);
+                  setError(err.message);
+                }
+              }}
+            />
             {/* 일별 예보 */}
             <div className="bg-white rounded-xl p-4 shadow mb-6">
               <p className="text-sm text-gray-400 mb-3">일별 예보</p>

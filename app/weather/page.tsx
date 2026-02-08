@@ -4,33 +4,28 @@ import Image from "next/image";
 import Header from "../components/common/Header";
 import Footer from "../components/common/Footer";
 import Navi from "../components/common/Navi";
-import fs from "fs";
-import path from "path";
 
 import { useEffect, useState } from "react";
 
 import type {
   LocationCoords,
-  Station,
-  StationXY,
   KakaoCoord2RegionResponse,
-  KakaoSearchResponse,
   KmaObservation,
 } from "@/types/kma";
 
 // function import
 import {
-  findNearestStationFast,
   getCoordinates,
-  formatWeather,
-  extract3HourTemps,
   getCurrentTime,
   getWeatherIcon,
   outdoorScore,
   outdoorGrade,
   getCurrentTimeKoreanFormat,
   getUVTime,
+  skyToEmoji,
+  getSKY,
 } from "@/lib/utils";
+import UVCard from "./UVCard";
 
 export async function getLegalDongName(
   pos: LocationCoords,
@@ -84,21 +79,6 @@ async function getWeatherData(
     return null;
   }
 }
-async function getUltraViolet(stn: number): Promise<number | null> {
-  try {
-    const tm = getUVTime();
-    //console.log(tm);
-
-    const res = await fetch(`/api/ultraviolet?stn=${stn}&tm=${tm}`);
-    if (!res.ok) return null;
-
-    const data = (await res.json()) as { uv: number };
-    return data.uv;
-  } catch (e) {
-    //console.error(e);
-    return null;
-  }
-}
 
 export default function WeatherPage() {
   const [pos, setPos] = useState<LocationCoords | null>(null);
@@ -107,7 +87,7 @@ export default function WeatherPage() {
   const [grade, setGrade] = useState<string | null>(null);
   const [weather, setWeather] = useState<KmaObservation | null>(null);
   const [icon, setIcon] = useState<string | null>(null);
-  const [uv, setUV] = useState<number | null>(null);
+  const [sky, setSky] = useState<number | null>(null);
 
   useEffect(() => {
     (async () => {
@@ -126,13 +106,17 @@ export default function WeatherPage() {
         const w = await getWeatherData(coords);
         setWeather(w);
         //TODO 날씨 아이콘 구현
+        /*
         const icon = getWeatherIcon({
           caTot: w?.CA_TOT ?? 0,
           ww: w?.WW ?? 0,
         });
-        //
-        const uv = await getUltraViolet(108);
-        setUV(uv);
+        */
+        const skyValue = getSKY({
+          caTot: w?.CA_TOT ?? 0,
+          ww: w?.WW ?? 0,
+        });
+        setSky(skyValue);
 
         //TODO 러닝 최적도 분석 함수
         const obs: KmaObservation = {
@@ -182,13 +166,8 @@ export default function WeatherPage() {
 
           <div className="flex items-center gap-2">
             <div className="flex items-center justify-center w-10">
-              <span className="text-4xl leading-none block">
-                <Image
-                  src={`/icons/weather/${icon ?? "default"}.svg`}
-                  width={52}
-                  height={52}
-                  alt="날씨"
-                />
+              <span className="text-3xl leading-none block">
+                {skyToEmoji(sky ?? undefined, new Date())}
               </span>
             </div>
             <div className="flex flex-col justify-center leading-none pl-1">
@@ -261,25 +240,7 @@ export default function WeatherPage() {
                 )}
               </div>
             </div>
-
-            <div className="bg-white rounded-xl flex items-center p-3 text-xs shadow gap-3 min-w-[70px]">
-              <div className="text-lg rounded-md bg-[#FFEDD4]">
-                <Image
-                  src="/icons/ultraviolet-outline.svg"
-                  width={24}
-                  height={24}
-                  alt="자외선"
-                />
-              </div>
-              <div className="text-left">
-                {uv && (
-                  <>
-                    <div className="font-semibold text-[0.65rem]">자외선</div>
-                    <div className="text-gray-500 text-xs">{uv}</div>
-                  </>
-                )}
-              </div>
-            </div>
+            <UVCard pos={pos} />
           </div>
         </div>
       </div>

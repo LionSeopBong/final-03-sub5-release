@@ -4,34 +4,17 @@ import type { KmaObservation } from "@/types/kma";
 import fs from "fs";
 import path from "path";
 
-import type {
-  LocationCoords,
-  Station,
-  StationXY,
-  KakaoCoord2RegionResponse,
-  KakaoSearchResponse,
-} from "@/types/kma";
+import type { Station } from "@/types/kma";
 
 // function import
-import {
-  findNearestStationFast,
-  getCoordinates,
-  formatWeather,
-  extract3HourTemps,
-  getCurrentTime,
-  getWeatherIcon,
-  outdoorScore,
-  outdoorGrade,
-  getCurrentTimeKoreanFormat,
-  getUVTime,
-} from "@/lib/utils";
+import { findNearestStationFast } from "@/lib/utils";
 
 export async function GET(req: Request) {
   try {
     const { searchParams } = new URL(req.url);
 
     const tm = Number(searchParams.get("tm"));
-    const lat = Number(searchParams.get("lat"));    
+    const lat = Number(searchParams.get("lat"));
     const lon = Number(searchParams.get("lon"));
 
     if (Number.isNaN(lat) || Number.isNaN(lon)) {
@@ -44,7 +27,7 @@ export async function GET(req: Request) {
 
     const nearest = findNearestStationFast({ lat, lon }, stations);
     const stn = nearest.stn;
-    console.log("stn: ", stn);
+    //console.log("stn: ", stn);
     const res = await fetch(
       `https://apihub.kma.go.kr/api/typ01/url/kma_sfctm2.php?stn=${stn}&tm=${tm}&authKey=${process.env.KMA_API_KEY}`,
       { cache: "no-store" },

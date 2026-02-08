@@ -14,9 +14,7 @@ export async function GET(request: Request) {
   );
 
   const params = {
-    serviceKey: process.env.DATA_PORTAL_KMA!,
-    pageNo: "1",
-    numOfRows: "300",
+    serviceKey: process.env.DATA_PORTAL_KMA!,    
     dataType: "JSON",
     base_date,
     base_time,

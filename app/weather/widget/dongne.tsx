@@ -10,7 +10,7 @@ const SVG_PADDING = 6;
 
 export default function Fetch3Hours() {
   const [hours3, setHours3] = useState<Hours3Forecast[]>([]);
-  
+
   useEffect(() => {
     async function fetchWeather() {
       try {
@@ -19,7 +19,7 @@ export default function Fetch3Hours() {
           `/api/forecast/hours?nx=63&ny=124&base_date=${today}&base_time=0500`,
         );
         const data = await res.json();
-
+        // TODO 예보값이 없을 때는 전일 자료를 그대로 씀
         const items = data.response.body.items.item;
         setHours3(extractHour3(items, new Date()));
       } catch (err: any) {

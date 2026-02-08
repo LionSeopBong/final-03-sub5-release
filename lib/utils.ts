@@ -10,6 +10,7 @@ import type {
   WeatherInput,
   KmaObservation,
   Hours3Forecast,
+  RegIdRow,
 } from "@/types/kma";
 
 export function validateLatLon(lat: number, lon: number) {
@@ -255,6 +256,34 @@ export function getWeatherIcon({ caTot, ww }: WeatherInput): WeatherIconKey {
   return skyIconFromCA(caTot);
 }
 
+/**
+ * SKY 코드 반환
+ * 1: 맑음
+ * 2: 구름조금
+ * 3: 구름많음
+ * 4: 흐림
+ */
+export function getSKY({ caTot, ww }: WeatherInput): number {
+  // 강수·현상 우선 처리 (비/눈/소나기 등 → 흐림)
+  if (ww !== undefined) {
+    // KMA WW 코드에서 강수/현상 범주
+    // (비, 눈, 진눈개비, 소나기, 뇌우 등)
+    if (
+      (ww >= 20 && ww <= 99) // 관측 가능한 기상현상 전반
+    ) {
+      return 4;
+    }
+  }
+
+  // 전운량 기준 처리
+  if (caTot === undefined) return 1;
+
+  if (caTot <= 2) return 1;      // 맑음
+  if (caTot <= 5) return 2;      // 구름조금
+  if (caTot <= 8) return 3;      // 구름많음
+  return 4;                      // 흐림
+}
+
 export function outdoorScore(obs: KmaObservation): number {
   let score = 100;
 
@@ -442,29 +471,37 @@ export function formatLabel(date: Date) {
   return `${day}일(${weekday})`;
 }
 
-const DEG2RAD = Math.PI / 180;
 
 function fastDistance(a: LocationCoords, b: LocationCoords): number {
-  // 평균 위도를 라디안으로 변환
-  const latAvgRad = (a.lat + b.lat) * 0.5 * DEG2RAD;
-
-  // degree 차이를 radian으로 변환
-  const dLon = (b.lon - a.lon) * DEG2RAD;
-  const dLat = (b.lat - a.lat) * DEG2RAD;
-
-  // equirectangular approximation
-  const x = dLon * Math.cos(latAvgRad);
-  const y = dLat;
-
-  const dist2 = x * x + y * y;
-
-  return dist2;
+  const latRad = ((a.lat + b.lat) * 0.5 * Math.PI) / 180;
+  const x = (b.lon - a.lon) * Math.cos(latRad);
+  const y = b.lat - a.lat;
+  return x * x + y * y;
 }
 
 export function findNearestStationFast(
   pos: LocationCoords,
   stations: Station[],
 ): Station {
+  let nearest = stations[0];
+  let minDist = Infinity;
+
+  for (const s of stations) {
+    const d = fastDistance(pos, { lat: s.lat, lon: s.lon });
+   
+    if (d < minDist) {
+      minDist = d;
+      nearest = s;
+    }
+  }
+
+  return nearest;
+}
+
+export function findNearestRegionFast(
+  pos: LocationCoords,
+  stations: RegIdRow[],
+): RegIdRow {
   let nearest = stations[0];
   let minDist = Infinity;
 

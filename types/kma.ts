@@ -234,3 +234,10 @@ export interface AnalysisFactor {
   label: string;
   penalty: number;
 }
+
+export type MidHalfDay = {
+  date: string;       // YYYYMMDD
+  hour: "00" | "12";  // 오전 / 오후
+  sky: string;        // WB01, WB03
+  st: number;         // RN_ST
+};

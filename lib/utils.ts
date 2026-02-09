@@ -96,55 +96,6 @@ function getLatestTmFc(): string {
   return `${y}${m}${d}${fcHour}00`;
 }
 
-export async function fetch3DayForecast(regId: string): Promise<ForecastRow[]> {
-  const serviceKey = process.env.KMA_API_KEY;
-  const tmfc = getLatestTmFc();
-
-  const url = `http://localhost:3000/api/typ01/url/fct_afs_dl.php?reg=11B10101&tmfc=2026020406&disp=1&help=0&authKey=${serviceKey}`;
-
-  const res = await fetch(url);
-
-  if (!res.ok) {
-    throw new Error(`API error: ${res.status}`);
-  }
-
-  const text = await res.text();
-  //console.log(text);
-
-  // 공백 기반 파싱 (DFS 텍스트 응답)
-  const lines = text
-    .split("\n")
-    .map((l) => l.trim())
-    .filter((l) => l && !l.startsWith("#"));
-
-  const rows: ForecastRow[] = lines.map((line) => {
-    const cols = line.split(",");
-    return {
-      REG_ID: cols[0],
-      TM_FC: cols[1],
-      TM_EF: cols[2],
-      MOD: cols[3],
-      NE: cols[4],
-      STN: cols[5],
-      W1: cols[9],
-      T: cols[10],
-      W2: cols[11],
-      TA: cols[12],
-      ST: cols[13],
-      SKY: cols[14],
-      PREP: cols[15],
-      WF: cols.slice(16).join(" "),
-    };
-  });
-
-  const now = nowKST();
-  const end = new Date(now.getTime() + 3 * 24 * 60 * 60 * 1000);
-
-  return rows.filter((r) => {
-    const ef = parseTm(r.TM_EF);
-    return ef >= now && ef <= end;
-  });
-}
 
 export function skyIconFromCA(caTot: number): WeatherIconKey {
   if (caTot <= 2) return "clear";

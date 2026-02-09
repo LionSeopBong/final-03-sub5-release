@@ -17,12 +17,12 @@ export default function GoalCard() {
       ? goals
       : goals.filter((goals) => goals.extra.status === filter);
 
-  const handleStatusChange = async (goalId: number, newStatus: string) => {
+  const handleStatusChange = async (goal: GoalResponse, newStatus: string) => {
     if (!user?.token) {
       return;
     }
     // 1. 서버에 상태 변경 요청
-    await updateGoal(goalId, newStatus, user.token.accessToken);
+    await updateGoal(goal._id, goal.extra, newStatus, user.token.accessToken);
 
     // 2. 목록 다시 불러오기
     const result = await getMyGoals(user.token.accessToken);
@@ -96,7 +96,7 @@ export default function GoalCard() {
                 </div>
                 <div className="flex flex-row gap-4 ">
                   <button
-                    onClick={() => handleStatusChange(goal._id, "완료")}
+                    onClick={() => handleStatusChange(goal, "완료")}
                     className="flex-1 bg-primary py-2 w-full
                                 rounded-lg text-center  font-semibold
                                       text-notselectbtn"
@@ -104,7 +104,7 @@ export default function GoalCard() {
                     완료
                   </button>
                   <button
-                    onClick={() => handleStatusChange(goal._id, "미완료")}
+                    onClick={() => handleStatusChange(goal, "미완료")}
                     className="flex-1 bg-primary py-2 w-full
   rounded-lg text-center font-semibold
   text-notselectbtn"
@@ -137,7 +137,7 @@ export default function GoalCard() {
                 </div>
                 <div>
                   <button
-                    onClick={() => handleStatusChange(goal._id, "진행중")}
+                    onClick={() => handleStatusChange(goal, "진행중")}
                     className="flex-1 bg-primary py-2 w-full
   rounded-lg text-center text-notselectbtn"
                   >
@@ -181,7 +181,7 @@ export default function GoalCard() {
                     삭제
                   </button>
                   <button
-                    onClick={() => handleStatusChange(goal._id, "미완료")}
+                    onClick={() => handleStatusChange(goal, "미완료")}
                     className="flex-1 bg-gray-custom py-2
   w-full rounded-lg text-center
   font-semibold text-primary-dark"

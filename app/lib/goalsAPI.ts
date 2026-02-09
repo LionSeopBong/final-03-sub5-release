@@ -39,13 +39,11 @@ export function getMyGoals(token: string) {
   return fetchAPI(`/posts/users?type=goal`, { token });
 }
 //updateGoal - 목표 상태 변경
-export function updateGoal(_id: number, status: string, token: string) {
+export function updateGoal(_id: number, currentExtra: Record<string, any>, status: string, token: string) {
   return fetchAPI(`/posts/${_id}`, {
     method: "PATCH",
     body: {
-      extra: {
-        status: status,
-      },
+      extra: { ...currentExtra, status },
     },
     token,
   });

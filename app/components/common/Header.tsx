@@ -31,8 +31,8 @@ export default function Header() {
             <Image
               src="/icons/arcticons--weather.svg"
               alt="날씨"
-              width={24}
-              height={24}
+              width={32}
+              height={32}
               priority
             />
           </Link>

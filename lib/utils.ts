@@ -96,7 +96,6 @@ function getLatestTmFc(): string {
   return `${y}${m}${d}${fcHour}00`;
 }
 
-
 export function skyIconFromCA(caTot: number): WeatherIconKey {
   if (caTot <= 2) return "clear";
   if (caTot <= 5) return "partly_cloudy";
@@ -383,15 +382,15 @@ export function skyToEmoji(sky?: number, datetime?: Date): string {
   if (isNight) {
     switch (sky) {
       case 1:
-        return "🌙"; // 맑은 밤
+        return "🌕"; // 맑은 밤
       case 2:
-        return "🌙☁️"; // 구름조금 밤
+        return "🌙"; // 구름조금 밤
       case 3:
-        return "☁️🌙"; // 구름많음 밤
+        return "🌒"; // 구름많음 밤
       case 4:
         return "☁️"; // 흐린 밤
       default:
-        return "🌙";
+        return "❓";
     }
   }
 
@@ -412,13 +411,21 @@ export function skyToEmoji(sky?: number, datetime?: Date): string {
 
 export function skyToSimpleEmoji(sky: string | null | undefined): string {
   switch (sky) {
-    case "DB01": // 맑음
+    case "DB01":
       return "☀️";
-    case "DB02": // 구름조금
+    case "WB01": // 맑음
+      return "☀️";
+    case "DB02":
       return "🌤️";
-    case "DB03": // 구름많음
+    case "WB02": // 구름조금
+      return "🌤️";
+    case "DB03":
       return "⛅";
-    case "DB04": // 흐림
+    case "WB03": // 구름많음
+      return "⛅";
+    case "DB04":
+      return "☁️";
+    case "WB04": // 흐림
       return "☁️";
     default:
       return "-";

@@ -3,7 +3,6 @@
 import Image from "next/image";
 import Link from "next/link";
 
-import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 import Fetch3Hours from "./dongne";
@@ -14,7 +13,14 @@ import {
   findNearestRegionFast,
   skyToSimpleEmoji,
 } from "@/lib/utils";
-import { KakaoPlace } from "@/types/kakao";
+
+import {
+  saveTodayHalfDayCache,
+  loadTodayHalfDayCache,
+  isValidTemp,
+} from "@/lib/localWeather";
+import type { HalfDayForecast, TodayHalfDayCache } from "@/lib/localWeather";
+
 import SearchLocationBar from "./components/searchLocationBar";
 import ShortTermColumns from "./ShortTermColumns";
 
@@ -47,7 +53,6 @@ export async function fetchMidForecastClient(
 }
 
 export default function ForecastPage() {
-  const router = useRouter();
   const [data, setData] = useState<ForecastRow[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [selectedPlace, setSelectedPlace] = useState<string>("역삼동");
@@ -107,18 +112,36 @@ export default function ForecastPage() {
       .catch(console.error);
   }, []);
 
-  // 오늘 포함 +0 ~ +2일 (총 3일)
-  const today = new Date();
+  // 오늘 포함 +0 ~ +3일 (총 4일)
+  // 1️⃣ KST 기준 오늘 날짜
+  const now = new Date();
+  const kst = new Date(now.getTime() + 9 * 60 * 60 * 1000);
 
-  const days = Array.from({ length: 4 }, (_, i) => {
-    const d = new Date(today);
-    d.setDate(today.getDate() + i);
+  const todayString =
+    kst.getFullYear().toString() +
+    String(kst.getMonth() + 1).padStart(2, "0") +
+    String(kst.getDate()).padStart(2, "0");
 
-    return {
-      date: formatDate(d), // YYYYMMDD
-      label: formatLabel(d), // 7일(금)
-    };
-  });
+  // 2️⃣ 날짜(YYYYMMDD) 기준으로만 필터
+  const days = Array.from(
+    new Set(
+      data
+        .filter((r) => r.TM_EF.slice(0, 8) >= todayString)
+        .map((r) => r.TM_EF.slice(0, 8)),
+    ),
+  )
+    .sort()
+    .slice(0, 4)
+    .map((date) => {
+      const d = new Date(
+        `${date.slice(0, 4)}-${date.slice(4, 6)}-${date.slice(6, 8)}`,
+      );
+
+      return {
+        date,
+        label: formatLabel(d),
+      };
+    });
 
   useEffect(() => {
     // 1. 기본 예보
@@ -147,70 +170,96 @@ export default function ForecastPage() {
 
   if (error) return <p>에러 발생: {error}</p>;
 
-  const todayStr = formatDate(today);
+  const todayStr = formatDate(new Date());
+
+  const todayCache = loadTodayHalfDayCache();
+
   const dayForecasts = days.map((d) => {
     const isToday = d.date === todayStr;
 
-    const match = (r: ForecastRow, date: string, hour: "00" | "12") => {
-      return r.TM_EF.slice(0, 8) === date && r.TM_EF.slice(8, 10) === hour;
-    };
-
-    // 오늘은 오전(00) 데이터가 없을 수 있음
-    const amRow = isToday
-      ? null
-      : (data.find((r) => match(r, d.date, "00")) ?? null);
+    const match = (r: ForecastRow, date: string, hour: "00" | "12") =>
+      r.TM_EF.slice(0, 8) === date && r.TM_EF.slice(8, 10) === hour;
+    const amRow = data.find((r) => match(r, d.date, "00")) ?? null;
 
     const pmRow = data.find((r) => match(r, d.date, "12")) ?? null;
 
+    const normalizeTemp = (v: number | null) => (isValidTemp(v) ? v : null);
+
+    let am: HalfDayForecast = {
+      temp: normalizeTemp(amRow ? Number(amRow.TA) : null),
+      sky: amRow?.SKY ?? null,
+      st: amRow?.ST !== undefined ? Number(amRow.ST) : null,
+    };
+
+    let pm: HalfDayForecast = {
+      temp: normalizeTemp(pmRow ? Number(pmRow.TA) : null),
+      sky: pmRow?.SKY ?? null,
+      st: pmRow?.ST !== undefined ? Number(pmRow.ST) : null,
+    };
+
+    // ✅ 오늘 데이터 fallback 처리
+    if (isToday && todayCache?.date === todayStr) {
+      if (!isValidTemp(am.temp)) {
+        am = todayCache.am ?? am;
+      }
+      if (!isValidTemp(pm.temp)) {
+        pm = todayCache.pm ?? pm;
+      }
+    }
+
+    // ✅ 오늘 데이터가 정상일 경우 캐시 저장
+    if (isToday) {
+      const nextCache: TodayHalfDayCache = {
+        date: todayStr,
+        am: null,
+        pm: null,
+      };
+
+      // 오전
+      if (isValidTemp(am.temp)) {
+        nextCache.am = am;
+      } else if (todayCache?.am && isValidTemp(todayCache.am.temp)) {
+        nextCache.am = todayCache.am;
+      }
+
+      // 오후
+      if (isValidTemp(pm.temp)) {
+        nextCache.pm = pm;
+      } else if (todayCache?.pm && isValidTemp(todayCache.pm.temp)) {
+        nextCache.pm = todayCache.pm;
+      }
+
+      saveTodayHalfDayCache(nextCache);
+    }
+
     return {
       dateLabel: d.label,
-
-      am: amRow
-        ? {
-            temp: Number(amRow.TA),
-            sky: amRow.SKY ?? null, // DB01 ~ DB04
-            st: amRow.ST !== undefined ? Number(amRow.ST) : null, // 강수확률
-          }
-        : {
-            temp: null,
-            sky: null,
-            st: null,
-          },
-
-      pm: pmRow
-        ? {
-            temp: Number(pmRow.TA),
-            sky: pmRow.SKY ?? null, // DB01 ~ DB04
-            st: pmRow.ST !== undefined ? Number(pmRow.ST) : null, // 강수확률
-          }
-        : {
-            temp: null,
-            sky: null,
-            st: null,
-          },
+      am,
+      pm,
     };
   });
 
   console.log(dayForecasts);
+
   return (
     <main className="min-h-screen bg-white ">
       <div className="mx-auto w-full max-w-md px-5 pb-10">
-        {/* 뒤로가기 bar */}
-        <div className="h-12 flex items-center">
-          <Link href="/weather" className="p-2 -ml-2">
-            {/* 뒤로가기 icon */}
-            <Image
-              src="/icons/arrow_back.svg"
-              alt="뒤로가기"
-              width={24}
-              height={24}
-              priority
-            />
-          </Link>
-        </div>
-
-        <div className="bg-gray-50 flex justify-center py-8">
+        <div className="bg-gray-50 flex justify-center py-4">
           <div className="w-full max-w-md px-4">
+            {/* 뒤로가기 bar */}
+            <div className="h-12 flex items-center">
+              <Link href="/weather" className="p-2 -ml-2">
+                {/* 뒤로가기 icon */}
+                <Image
+                  src="/icons/arrow_back.svg"
+                  alt="뒤로가기"
+                  width={24}
+                  height={24}
+                  priority
+                />
+              </Link>
+            </div>
+
             {/* 검색바 */}
             <SearchLocationBar
               onSelect={async (place) => {
@@ -303,23 +352,15 @@ export default function ForecastPage() {
                       기온
                     </div>
                     <ShortTermColumns dayForecasts={dayForecasts} type="temp" />
-                    {/* 나머지 하드코딩 */}
-                    <div className="grid grid-cols-2 border-r border-gray-100 px-1">
-                      <span className="text-blue-500">-10°</span>
-                      <span className="text-red-500">-2°</span>
-                    </div>
-                    <div className="grid grid-cols-2 border-r border-gray-100 px-1">
-                      <span className="text-blue-500">-10°</span>
-                      <span className="text-red-500">-2°</span>
-                    </div>
-                    <div className="grid grid-cols-2 border-r border-gray-100 px-1">
-                      <span className="text-blue-500">-8°</span>
-                      <span className="text-red-500">-1°</span>
-                    </div>
-                    <div className="grid grid-cols-2 border-r border-gray-100 px-1">
-                      <span className="text-blue-500">-8°</span>
-                      <span className="text-red-500">0°</span>
-                    </div>
+                    {midDayForecasts.map((d, i) => (
+                      <div
+                        key={i}
+                        className="grid grid-cols-2 border-r border-gray-100"
+                      >
+                        <span>{d.am.st !== null ? `${d.am.st}%` : "-"}</span>
+                        <span>{d.pm.st !== null ? `${d.pm.st}%` : "-"}</span>
+                      </div>
+                    ))}
                   </div>
 
                   <div className="grid grid-cols-[60px_repeat(8,1fr)]">
@@ -340,9 +381,10 @@ export default function ForecastPage() {
                 </div>
               </div>
             </div>
-            {/* 시간별 예보 */}
+            {/* 시간별 예보 
 
             <Fetch3Hours />
+            */}
             {/*{/* 시간별 예보 끝*/}
           </div>
         </div>

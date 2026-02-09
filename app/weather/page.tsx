@@ -6,6 +6,7 @@ import Footer from "../components/common/Footer";
 import Navi from "../components/common/Navi";
 
 import { useEffect, useState } from "react";
+import { saveCurrentWeather, loadCurrentWeather } from "@/lib/localWeather";
 
 import type {
   LocationCoords,
@@ -30,6 +31,8 @@ import { getRunningTip } from "@/lib/runningTips";
 import { getAnalysisFactors } from "@/lib/runningAnalysis";
 import RunningAnalysisCard from "./RunningAnalysisCard";
 import WeatherInfoCard from "./WeatherInfoCard";
+import { useRouter } from "next/navigation";
+
 
 export async function getLegalDongName(
   pos: LocationCoords,
@@ -85,6 +88,7 @@ async function getWeatherData(
 }
 
 export default function WeatherPage() {
+    const router = useRouter();
   const [pos, setPos] = useState<LocationCoords | null>(null);
   const [dongName, setDongName] = useState<string | null>(null);
   const [dateTime, setDateTime] = useState<string | null>(null);
@@ -143,18 +147,107 @@ export default function WeatherPage() {
       }
     })();
   }, []);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const coords = await getCoordinates();
+        setPos(coords);
+
+        const dong = await getLegalDongName(
+          coords,
+          process.env.NEXT_PUBLIC_KAKAO_REST_API_KEY!,
+        );
+        setDongName(dong);
+        setDateTime(getCurrentTimeKoreanFormat());
+
+        const w = await getWeatherData(coords);
+
+        if (w) {
+          // 1️⃣ API 성공 → 상태 업데이트 + 로컬스토리지 저장
+          setWeather(w);
+          saveCurrentWeather(w);
+
+          const skyValue = getSKY({
+            caTot: w.CA_TOT,
+            ww: w.WW,
+          });
+          setSky(skyValue);
+        } else {
+          // 2️⃣ API 실패 → 로컬스토리지 fallback
+          const cached = loadCurrentWeather();
+          if (cached) {
+            setWeather(cached.data);
+
+            const skyValue = getSKY({
+              caTot: cached.data.CA_TOT,
+              ww: cached.data.WW,
+            });
+            setSky(skyValue);
+          }
+        }
+
+        const obs: KmaObservation = {
+          CA_TOT: 8,
+          WW: 40,
+          TA: 5.7,
+          HM: 64.0,
+          WS: 1.2,
+          VS: 6740,
+        };
+
+        const score = outdoorScore(obs);
+        setScore(score);
+        setGrade(outdoorGrade(score));
+      } catch (e) {
+        console.error(e);
+      }
+    })();
+  }, []);
+
   return (
     <>
       <Header />
       {/*<!-- 날씨 페이지-->*/}
 
       <div className="min-w-[375px] items-stretch space-y-6 pl-4 pr-4 pb-0 pt-16">
-        <div className="flex-1 flex flex-col">
-          <h1 className="text-xl font-bold">실시간 날씨</h1>
-          <p className="text-sm text-gray-500">
-            현재 위치의 날씨와 러닝 최적도를 확인하세요
-          </p>
-        </div>
+      <div className="flex items-start justify-between">
+  {/* 왼쪽: 제목 + 설명 */}
+  <div className="flex flex-col">
+    <h1 className="text-xl font-bold">실시간 날씨</h1>
+    <p className="text-sm text-gray-500">
+      현재 위치의 날씨와 러닝 최적도를 확인하세요
+    </p>
+  </div>
+
+  {/* 오른쪽 끝: 예보 보기 버튼 */}
+  <button
+    type="button"
+    aria-label="예보 보기"
+    className="
+      flex items-center cursor-pointer
+      px-3 py-1.5
+      text-sm font-medium
+      rounded-full
+      bg-white
+      border border-gray-200
+      text-gray-700
+      shadow-sm
+      hover:bg-gray-50
+      active:scale-95
+      transition
+      whitespace-nowrap
+      mt-1
+    "
+    onClick={() => {
+      router.push("/weather/widget");
+    }}
+  >
+    예보 보기
+  </button>
+</div>
+
+
         {/*<!-- 날씨 카드 -->*/}
         <div className="bg-sky-50 border border-gray-200 rounded-xl p-5 shadow-sm space-y-6">
           <div className="flex items-center justify-between">

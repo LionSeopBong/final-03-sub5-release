@@ -25,19 +25,19 @@ export default function ProfileRecord() {
   const [isHeightSheetOpen, setIsHeightSheetOpen] = useState(false);
   const [isWeightSheetOpen, setIsWeightSheetOpen] = useState(false);
   const [selectedHeight, setSelectedHeight] = useState(
-    user?.extra?.heightCm || 183,
+    user?.extra?.height || 183,
   );
   const [selectedWeight, setSelectedWeight] = useState(
-    user?.extra?.weightKg || 80,
+    user?.extra?.weight || 80,
   );
-  const [tempHeight, setTempHeight] = useState(user?.extra?.heightCm || 183); // 바텀시트에서 임시 선택
-  const [tempWeight, setTempWeight] = useState(user?.extra?.weightKg || 80);
+  const [tempHeight, setTempHeight] = useState(user?.extra?.height || 183); // 바텀시트에서 임시 선택
+  const [tempWeight, setTempWeight] = useState(user?.extra?.weight || 80);
 
   const handleHeightConfirm = () => {
     setSelectedHeight(tempHeight); // 임시값 확정
 
     if (user) {
-      setUser({ ...user, extra: { ...user.extra, heightCm: tempHeight } });
+      setUser({ ...user, extra: { ...user.extra, height: tempHeight } });
     }
     setIsHeightSheetOpen(false);
   };
@@ -46,7 +46,7 @@ export default function ProfileRecord() {
     setSelectedWeight(tempWeight); // 임시값 확정
 
     if (user) {
-      setUser({ ...user, extra: { ...user.extra, weightKg: tempWeight } });
+      setUser({ ...user, extra: { ...user.extra, weight: tempWeight } });
     }
     setIsWeightSheetOpen(false);
   };

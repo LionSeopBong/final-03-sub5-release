@@ -49,7 +49,7 @@ export default function NoticePost({
 
   return (
     <>
-      <ProfileHeader />
+      <ProfileHeader title="공지사항" />
 
       {/* ---------------------------- 공지 상세 ---------------------------- */}
       <main className="p-4 flex flex-col gap-4 min-h-[calc(100vh-120px)]">

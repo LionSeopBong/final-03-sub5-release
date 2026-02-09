@@ -33,7 +33,7 @@ export default function ProfileHome() {
 
   return (
     <>
-      <ProfileHeader />
+      <ProfileHeader title="프로필 홈" />
 
       {/* 로그아웃 상태 : 로그인 유도 화면 */}
       {!isLogin && (
@@ -69,12 +69,12 @@ export default function ProfileHome() {
           {/* 닉네임 + 수정 버튼 : area-profile */}
           <div className="area-profile p-4 m-2 flex items-center relative gap-8 pt-16">
             <Image
-              src="/icons/profile-main.svg"
+              src={user?.profileImage || "/icons/profile-main.svg"}
               alt="프로필 이미지"
               width={30}
               height={30}
             />
-            <h3 className="font-semibold">닉네임</h3>
+            <h3 className="font-semibold">{user?.name || "닉네임"}</h3>
             <Link href="/profile/edit" className="ml-auto inline-flex">
               <button className="profile-edit ml-auto border border-gray-200 px-4 py-2 rounded-[30px] cursor-pointer">
                 수정

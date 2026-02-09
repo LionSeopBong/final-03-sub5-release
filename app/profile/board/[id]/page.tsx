@@ -65,7 +65,7 @@ export default function PostDetailPage({
 
   return (
     <>
-      <ProfileHeader />
+      <ProfileHeader title="게시글 상세" />
 
       {/* ---------------------------- 게시글 상세 ---------------------------- */}
       <main className="p-4 pb-24 flex flex-col gap-4 min-h-[calc(100vh-120px)]">

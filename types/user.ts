@@ -6,6 +6,7 @@ export interface User {
   password: string;
   name: string;
   image?: string;
+  profileImage?: string | null;
   token?: {
     accessToken: string;
     refreshToken: string;

@@ -115,7 +115,7 @@ export default function InquiryListPage() {
 
   return (
     <>
-      <ProfileHeader />
+      <ProfileHeader title="문의 게시판" />
 
       <main className="pb-16 px-5">
         {/* ●●●●● 공지글 */}

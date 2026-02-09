@@ -35,6 +35,10 @@ export default function ProfileEdit() {
     if (file) {
       const imageUrl = URL.createObjectURL(file); // 미리보기 URL 생성
       setSelectedImage(imageUrl); // state 업데이트
+
+      // 파일 선택 후 모달 닫기
+      setOpenPhotoSetter(false);
+      setOpenGalleryModal(false);
     }
   };
 
@@ -291,15 +295,10 @@ export default function ProfileEdit() {
                   type="button"
                   className="w-1/2 border border-[#003458] rounded-[5px] py-3 bg-[#003458] text-white cursor-pointer"
                   onClick={() => {
-                    if (selectedImage) {
-                      setOpenPhotoSetter(false);
-                      setOpenGalleryModal(false);
-                    } else {
-                      fileInputRef.current?.click();
-                    }
+                    fileInputRef.current?.click();
                   }}
                 >
-                  선택
+                  {selectedImage ? "변경" : "선택"}
                 </button>
               </div>
             </div>

@@ -1,10 +1,14 @@
+"use client";
+
 import Navi from "@/app/components/common/Navi";
 import ListItem from "@/app/profile/board/inquiry-board/ListItem";
 import NoticeItem from "@/app/profile/board/inquiry-board/NoticeItem";
+import Pagination from "@/app/profile/components/Pagination";
 import ProfileHeader from "@/app/profile/components/ProfileHeader";
 import { NoticeListItem, PostListItem } from "@/types/post";
 import Image from "next/image";
 import Link from "next/link";
+import { useState } from "react";
 
 export default function InquiryListPage() {
   const notices: NoticeListItem[] = [
@@ -113,6 +117,8 @@ export default function InquiryListPage() {
     },
   ];
 
+  const [currentPage, setCurrentPage] = useState(1);
+
   return (
     <>
       <ProfileHeader title="문의 게시판" />
@@ -160,34 +166,11 @@ export default function InquiryListPage() {
         </div>
 
         {/* Pagination */}
-        <div className="mb-16 flex items-center justify-center gap-4">
-          <button className="p-4 cursor-pointer">
-            <Image
-              src="/icons/pagination-l.svg"
-              alt="이전 페이지 목록 버튼"
-              width={16}
-              height={16}
-            />
-          </button>
-          <button
-            aria-current="page"
-            className="font-semibold text-[#003458] cursor-pointer p-1"
-          >
-            1
-          </button>
-          <button className="cursor-pointer p-1">2</button>
-          <button className="cursor-pointer p-1">3</button>
-          <button className="cursor-pointer p-1">4</button>
-          <button className="cursor-pointer p-1">5</button>
-          <button className="p-4 cursor-pointer">
-            <Image
-              src="/icons/pagination-r.svg"
-              alt="다음 페이지 목록 버튼"
-              width={16}
-              height={16}
-            />
-          </button>
-        </div>
+        <Pagination
+          currentPage={currentPage}
+          totalPages={10}
+          onPageChange={setCurrentPage}
+        />
       </main>
 
       <Navi />

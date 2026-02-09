@@ -1,14 +1,8 @@
 "use client";
-import { LevelInfo } from "@/app/goals/types";
-import { useState } from "react";
+import useGoalsStore from "@/zustand/goals";
 
-export default function LevelHeader({
-  userLevel,
-}: {
-  userLevel: LevelInfo | undefined;
-}) {
-  const [level, setLevel] = useState([]);
-
+export default function LevelHeader() {
+  const userLevel = useGoalsStore((state) => state.userLevel);
   return (
     <>
       {/* 탭 LevelIcon 상단 */}

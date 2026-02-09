@@ -97,16 +97,16 @@ export default function GoalCard() {
                 <div className="flex flex-row gap-4 ">
                   <button
                     onClick={() => handleStatusChange(goal._id, "완료")}
-                    className="flex-1 bg-primary py-2 w-full 
-                                rounded-lg text-center  font-semibold      
+                    className="flex-1 bg-primary py-2 w-full
+                                rounded-lg text-center  font-semibold
                                       text-notselectbtn"
                   >
                     완료
                   </button>
                   <button
                     onClick={() => handleStatusChange(goal._id, "미완료")}
-                    className="flex-1 bg-primary py-2 w-full 
-  rounded-lg text-center font-semibold       
+                    className="flex-1 bg-primary py-2 w-full
+  rounded-lg text-center font-semibold
   text-notselectbtn"
                   >
                     취소
@@ -138,7 +138,7 @@ export default function GoalCard() {
                 <div>
                   <button
                     onClick={() => handleStatusChange(goal._id, "진행중")}
-                    className="flex-1 bg-primary py-2 w-full 
+                    className="flex-1 bg-primary py-2 w-full
   rounded-lg text-center text-notselectbtn"
                   >
                     러닝 시작
@@ -182,7 +182,7 @@ export default function GoalCard() {
                   </button>
                   <button
                     onClick={() => handleStatusChange(goal._id, "미완료")}
-                    className="flex-1 bg-gray-custom py-2    
+                    className="flex-1 bg-gray-custom py-2
   w-full rounded-lg text-center
   font-semibold text-primary-dark"
                   >

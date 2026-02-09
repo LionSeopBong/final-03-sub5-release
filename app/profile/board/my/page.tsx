@@ -1,8 +1,13 @@
-import ProfileFooter from "@/app/profile/components/ProfileFooter";
+"use client";
+
+import Navi from "@/app/components/common/Navi";
 import ProfileHeader from "@/app/profile/components/ProfileHeader";
+import useUserStore from "@/zustand/user";
 import Link from "next/link";
 
 export default function MyBoard() {
+  const user = useUserStore((state) => state.user);
+
   const nickname = "런데이러너";
   const posts = [
     { id: 1, title: "문의글입니다.", date: "2026-01-29", commentCount: 0 },
@@ -14,7 +19,7 @@ export default function MyBoard() {
 
   return (
     <>
-      <ProfileHeader />
+      <ProfileHeader title="나의 게시글" />
 
       <div className="flex justify-end mx-5 my-6">
         <Link
@@ -27,7 +32,7 @@ export default function MyBoard() {
 
       <section className="rounded-lg bg-gray-100 border border-gray-100 px-3 py-6 mx-5 my-9 text-center">
         <span className="border-b border-gray-400 px-3 py-0.5 mx-0.5">
-          {nickname}
+          {user?.name || "닉네임"}
         </span>
         님의 작성 게시글 내역입니다.
       </section>
@@ -48,7 +53,7 @@ export default function MyBoard() {
         </ul>
       </main>
 
-      <ProfileFooter />
+      <Navi />
     </>
   );
 }

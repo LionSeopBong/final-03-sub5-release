@@ -1,7 +1,6 @@
 "use client";
 
 import Navi from "@/app/components/common/Navi";
-// import fetchAPI from "@/app/lib/api";
 import ProfileHeader from "@/app/profile/components/ProfileHeader";
 import Image from "next/image";
 import { useState } from "react";
@@ -59,7 +58,7 @@ export default function CreatePost() {
 
   return (
     <>
-      <ProfileHeader />
+      <ProfileHeader title="문의글 작성" />
       <main className="pb-16">
         <div className="inquiry-wrapper m-4 px-4 py-6 flex flex-col gap-4 border border-gray-200 rounded-xl">
           <form onSubmit={PostSubmit} className="flex flex-col gap-4">

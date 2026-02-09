@@ -37,7 +37,9 @@ export default function Alert({
       <button
         aria-label="닫기"
         className="absolute inset-0 bg-black/40"
-        onClick={onClose}
+        onClick={() => {
+          if (!isConfirm) onClose(); // confirm일 땐 바깥 클릭 막기
+        }}
         type="button"
       />
 
@@ -62,8 +64,8 @@ export default function Alert({
           <button
             type="button"
             onClick={() => {
-              if (isConfirm) onConfirm();
-              else onClose();
+              onClose(); // 먼저 닫고
+              if (isConfirm) onConfirm(); // 그 다음 실행
             }}
             className="flex-1 rounded-2xl bg-primary py-3 text-sm font-semibold text-white"
           >

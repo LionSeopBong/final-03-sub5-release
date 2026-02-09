@@ -10,7 +10,7 @@ export default function GoalStats() {
   return (
     <>
       <div
-        className="bg-white border      
+        className="bg-white border
   border-gray-200 rounded-xl p-6"
       >
         {/* 통계를 가로로 배치 */}
@@ -20,7 +20,7 @@ export default function GoalStats() {
         >
           <div>
             <dd
-              className="text-2xl        
+              className="text-2xl
   font-bold text-gray-700 mb-2"
             >
               {완료}
@@ -33,12 +33,12 @@ export default function GoalStats() {
             </dt>
           </div>
           <div
-            className="h-16 w-px        
+            className="h-16 w-px
   bg-gray-200"
           ></div>
           <div>
             <dd
-              className="text-2xl        
+              className="text-2xl
   font-bold text-gray-700 mb-2"
             >
               {진행중}
@@ -51,12 +51,12 @@ export default function GoalStats() {
             </dt>
           </div>
           <div
-            className="h-16 w-px        
+            className="h-16 w-px
   bg-gray-200"
           ></div>
           <div>
             <dd
-              className="text-2xl        
+              className="text-2xl
   font-bold text-gray-700 mb-2"
             >
               {미완료}

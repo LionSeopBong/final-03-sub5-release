@@ -8,7 +8,12 @@ import { useEffect, useState } from "react";
 
 import Fetch3Hours from "./dongne";
 import { ForecastRow, RegIdRow } from "@/types/kma";
-import { formatLabel, formatDate, findNearestRegionFast } from "@/lib/utils";
+import {
+  formatLabel,
+  formatDate,
+  findNearestRegionFast,
+  skyToSimpleEmoji,
+} from "@/lib/utils";
 import { KakaoPlace } from "@/types/kakao";
 import SearchLocationBar from "./components/searchLocationBar";
 
@@ -62,6 +67,7 @@ export default function ForecastPage() {
 
   useEffect(() => {
     // 1. 기본 예보
+    // TODO 하드코딩 된 regID 제거
     fetch3DayForecastClient("11B10101")
       .then((rows) => setData(rows))
       .catch((err) => setError(err.message));
@@ -76,32 +82,50 @@ export default function ForecastPage() {
   if (error) return <p>에러 발생: {error}</p>;
 
   const todayStr = formatDate(today);
-
   const dayForecasts = days.map((d) => {
     const isToday = d.date === todayStr;
 
-    const am = isToday
-      ? null
-      : (data.find((r) => r.TM_EF.startsWith(d.date + "00")) ?? null);
-
     const match = (r: ForecastRow, date: string, hour: "00" | "12") => {
-      //console.log(r.TM_EF);
       return r.TM_EF.slice(0, 8) === date && r.TM_EF.slice(8, 10) === hour;
     };
 
-    const pm = data.find((r) => match(r, d.date, "12"));
+    // 오늘은 오전(00) 데이터가 없을 수 있음
+    const amRow = isToday
+      ? null
+      : (data.find((r) => match(r, d.date, "00")) ?? null);
+
+    const pmRow = data.find((r) => match(r, d.date, "12")) ?? null;
 
     return {
       dateLabel: d.label,
-      am: am
-        ? { temp: Number(am.TA), wf: am.WF || "-" }
-        : { temp: null, wf: "-" },
-      pm: pm
-        ? { temp: Number(pm.TA), wf: pm.WF || "-" }
-        : { temp: null, wf: "-" },
+
+      am: amRow
+        ? {
+            temp: Number(amRow.TA),
+            sky: amRow.SKY ?? null, // DB01 ~ DB04
+            st: amRow.ST !== undefined ? Number(amRow.ST) : null, // 강수확률
+          }
+        : {
+            temp: null,
+            sky: null,
+            st: null,
+          },
+
+      pm: pmRow
+        ? {
+            temp: Number(pmRow.TA),
+            sky: pmRow.SKY ?? null, // DB01 ~ DB04
+            st: pmRow.ST !== undefined ? Number(pmRow.ST) : null, // 강수확률
+          }
+        : {
+            temp: null,
+            sky: null,
+            st: null,
+          },
     };
   });
 
+  console.log(dayForecasts);
   return (
     <main className="min-h-screen bg-white ">
       <div className="mx-auto w-full max-w-md px-5 pb-10">
@@ -126,12 +150,12 @@ export default function ForecastPage() {
               onSelect={async (place) => {
                 setSelectedPlace(place.place_name);
                 try {
-                  console.log(place.x, place.y);
+                  //console.log(place.x, place.y);
                   const regId = findNearestRegionFast(
                     { lat: Number(place.y), lon: Number(place.x) },
                     regidRows,
                   );
-                  console.log("regId: ", regId);
+                  //console.log("regId: ", regId);
                   //const rows = await fetch3DayForecastClient(regId);
                   //setData(rows);
                 } catch (err: any) {
@@ -147,7 +171,7 @@ export default function ForecastPage() {
               <div className="overflow-x-auto pb-2">
                 <div className="min-w-[600px] border-collapse text-[10px] text-center">
                   <div className="grid grid-cols-[60px_repeat(8,1fr)] border-b border-t border-gray-100">
-                    <div className="flex items-center justify-center bg-gray-50 font-medium border-r">
+                    <div className="flex items-center justify-center bg-gray-50 font-medium ">
                       날짜
                     </div>{" "}
                     {dayForecasts.map((d, i) => {
@@ -163,8 +187,8 @@ export default function ForecastPage() {
                       return (
                         <div
                           key={i}
-                          className={`py-1 border-r border-gray-100 flex flex-col items-center justify-center ${
-                            i === 0 ? "bg-blue-50 font-bold" : ""
+                          className={`py-1 border-r border-l flex flex-col items-center justify-center 
+                              ${i === 0 ? "bg-blue-50 border-blue-200 font-bold" : "border-gray-100"}
                           }`}
                         >
                           <span>{d.dateLabel}</span>
@@ -226,18 +250,23 @@ export default function ForecastPage() {
                     <div className="py-2 bg-gray-50 font-medium border-r border-gray-100">
                       날씨
                     </div>
-                    <div className="grid grid-cols-2 bg-blue-50 border-x border-blue-200">
-                      <span>-</span>
-                      <span>☀️</span>
-                    </div>
-                    <div className="grid grid-cols-2 border-r border-gray-100">
-                      <span>☀️</span>
-                      <span>☀️</span>
-                    </div>
-                    <div className="grid grid-cols-2 border-r border-gray-100">
-                      <span>☀️</span>
-                      <span>🌤️</span>
-                    </div>
+                    {dayForecasts.map((d, i) => (
+                      <div
+                        key={i}
+                        className={`grid grid-cols-2 border-r border-l ${
+                          i === 0
+                            ? "bg-blue-50 border-blue-200"
+                            : "border-gray-100"
+                        }`}
+                      >
+                        <span>
+                          {d.am.sky ? skyToSimpleEmoji(d.am.sky) : "-"}
+                        </span>
+                        <span>
+                          {d.pm.sky ? skyToSimpleEmoji(d.pm.sky) : "-"}
+                        </span>
+                      </div>
+                    ))}
                     <div className="grid grid-cols-2 border-r border-gray-100">
                       <span>☀️</span>
                       <span>☀️</span>
@@ -268,7 +297,10 @@ export default function ForecastPage() {
                     {dayForecasts.map((d, i) => (
                       <div
                         key={i}
-                        className="grid grid-cols-2 border-r border-gray-100 px-1"
+                        className={`grid grid-cols-2 border-r border-l px-1 ${
+  i === 0 ? "bg-blue-50 border-blue-200" : "border-gray-100"
+}`}
+
                       >
                         <span className="text-blue-500">
                           {d.am.temp !== null ? `${d.am.temp}°` : "-"}
@@ -305,18 +337,18 @@ export default function ForecastPage() {
                     <div className="py-2 bg-gray-50 font-medium border-r border-gray-100">
                       강수확률
                     </div>
-                    <div className="grid grid-cols-2 bg-blue-50 border-x border-blue-200">
-                      <span>-</span>
-                      <span>0%</span>
-                    </div>
-                    <div className="grid grid-cols-2 border-r border-gray-100">
-                      <span>0%</span>
-                      <span>0%</span>
-                    </div>
-                    <div className="grid grid-cols-2 border-r border-gray-100">
-                      <span>10%</span>
-                      <span>10%</span>
-                    </div>
+                    {dayForecasts.map((d, i) => (
+                      <div
+                        key={i}
+                        className={`grid grid-cols-2 border-r border-l px-1 ${
+  i === 0 ? "bg-blue-50 border-blue-200" : "border-gray-100"
+}`}
+
+                      >
+                        <span>{d.am.st !== null ? `${d.am.st}%` : "-"}</span>
+                        <span>{d.pm.st !== null ? `${d.pm.st}%` : "-"}</span>
+                      </div>
+                    ))}
                     <div className="grid grid-cols-2 border-r border-gray-100">
                       <span>0%</span>
                       <span>0%</span>

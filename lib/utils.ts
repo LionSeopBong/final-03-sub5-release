@@ -459,6 +459,21 @@ export function skyToEmoji(sky?: number, datetime?: Date): string {
   }
 }
 
+export function skyToSimpleEmoji(sky: string | null | undefined): string {
+  switch (sky) {
+    case "DB01": // 맑음
+      return "☀️";
+    case "DB02": // 구름조금
+      return "🌤️";
+    case "DB03": // 구름많음
+      return "⛅";
+    case "DB04": // 흐림
+      return "☁️";
+    default:
+      return "-";
+  }
+}
+
 export function formatDate(date: Date) {
   const y = date.getFullYear();
   const m = String(date.getMonth() + 1).padStart(2, "0");

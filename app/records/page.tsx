@@ -165,37 +165,37 @@ export default function RecordPage() {
         <nav data-section="daily" className=" flex px-6 py-4 gap-3 overflow-x-auto scrollbar-hide">
           <button
             onClick={() => scrollToSection("home")}
-            className={`${acticeSection === "home" ? "bg-primary text-white" : "border-gray-200"} border text-sm  px-9 py-2 rounded-lg whitespace-nowrap`}
+            className={`${acticeSection === "home" ? "bg-primary text-white" : "border-gray-200"} border text-sm active:border-blue-500  px-9 py-2 rounded-lg whitespace-nowrap`}
           >
             홈
           </button>
           <button
             onClick={() => scrollToSection("daily")}
-            className={`text-sm ${acticeSection === "daily" ? "bg-primary text-white" : "border-gray-200"} border px-9 py-2 rounded-lg whitespace-nowrap`}
+            className={`text-sm ${acticeSection === "daily" ? "bg-primary text-white" : "border-gray-200"} border px-9 active:border-blue-500 py-2 rounded-lg whitespace-nowrap`}
           >
             오늘의 기록
           </button>
           <button
             onClick={() => scrollToSection("weeklyRecord")}
-            className={`text-sm ${acticeSection === "weeklyRecord" ? "bg-primary text-white" : "border-gray-200"} border px-9 py-2 rounded-lg whitespace-nowrap`}
+            className={`text-sm ${acticeSection === "weeklyRecord" ? "bg-primary text-white" : "border-gray-200"} border px-9 py-2 rounded-lg active:border-blue-500 whitespace-nowrap`}
           >
             주간 러닝 거리
           </button>
           <button
             onClick={() => scrollToSection("monthRecord")}
-            className={`text-sm ${acticeSection === "monthRecord" ? "bg-primary text-white" : "border-gray-200"} border px-9 py-2 rounded-lg whitespace-nowrap`}
+            className={`text-sm ${acticeSection === "monthRecord" ? "bg-primary text-white" : "border-gray-200"} border px-9 py-2 rounded-lg active:border-blue-500 whitespace-nowrap`}
           >
             월간 러닝 거리
           </button>
           <button
             onClick={() => scrollToSection("recent")}
-            className={`text-sm ${acticeSection === "recent" ? "bg-primary text-white" : "border-gray-200"} border px-9 py-2 rounded-lg whitespace-nowrap`}
+            className={`text-sm ${acticeSection === "recent" ? "bg-primary text-white" : "border-gray-200"} border px-9 py-2 rounded-lg active:border-blue-500 whitespace-nowrap`}
           >
             최근 기록
           </button>
           <button
             onClick={() => scrollToSection("stats")}
-            className={`text-sm ${acticeSection === "stats" ? "bg-primary text-white" : "border-gray-200"} border px-9 py-2 rounded-lg whitespace-nowrap`}
+            className={`text-sm ${acticeSection === "stats" ? "bg-primary text-white" : "border-gray-200"} border px-9 py-2 rounded-lg active:border-blue-500 whitespace-nowrap`}
           >
             통계
           </button>
@@ -203,13 +203,13 @@ export default function RecordPage() {
       </div>
       {/* 데이터 작업 버튼 탭 */}
       <div className="flex gap-3 justify-center py-4">
-        <Link href="/records/all" className="bg-primary text-sm text-white px-5 py-2 rounded-lg">
+        <Link href="/records/all" className="bg-primary text-sm text-white px-5 py-2 active:border-blue-500 rounded-lg">
           전체 기록보기
         </Link>
-        <button className="text-sm border-gray-200 border px-5 py-2 rounded-lg" onClick={notYetEvent}>
+        <button className="text-sm border-gray-200 border px-5 py-2 rounded-lg active:border-blue-500" onClick={notYetEvent}>
           내보내기
         </button>
-        <Link href="/records/new" className="text-sm border-gray-200 border px-5 py-2 rounded-lg">
+        <Link href="/records/new" className="text-sm border-gray-200 border px-5 py-2 rounded-lg active:border-blue-500">
           기록추가
         </Link>
       </div>
@@ -244,7 +244,7 @@ export default function RecordPage() {
         <div className="border border-gray-200 rounded-lg p-8 text-center">
           <div className="text-gray-400 mb-2">📝</div>
           <p className="text-gray-500 mb-3">오늘 기록이 없습니다</p>
-          <Link href="/records/new" className="inline-block text-sm bg-primary text-white px-5 py-2 rounded-lg">
+          <Link href="/records/new" className="inline-block text-sm bg-primary active:border-blue-500 text-white px-5 py-2 rounded-lg">
             기록 추가하기
           </Link>
         </div>

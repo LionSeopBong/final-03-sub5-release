@@ -1,5 +1,51 @@
-import ProfileFooter from "@/app/profile/components/ProfileFooter";
+"use client";
+
+import Navi from "@/app/components/common/Navi";
 import ProfileHeader from "@/app/profile/components/ProfileHeader";
+import { Notice } from "@/types/post";
+import { use, useState } from "react";
+
+export default function NoticePost({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  const { id } = use(params);
+
+  // const notice = await fetchNotice(id)
+  const notices: Notice[] = [
+    {
+      _id: 1,
+      type: "notice",
+      title: "사이트 이용 관련 공지",
+      content:
+        "문의 접수 후 처리는 영업일 기준 1~2일이 소요됩니다. 고객센터 운영시간 내에는 02-000-0000으로 전화 상담도 가능합니다.",
+      createdAt: "2026-01-21",
+    },
+    {
+      _id: 2,
+      type: "notice",
+      title: "영업 시간 관련 공지",
+      content:
+        "런데이 서비스를 이용해주셔서 감사합니다. 원활한 서비스 이용을 위해 앱을 최신 버전으로 업데이트해주시기 바랍니다.",
+      createdAt: "2026-01-18",
+    },
+  ];
+  const notice = notices.find((n) => n._id === Number(id)) || notices[0];
+
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false); // 삭제 모달
+  const [isEditing, setIsEditing] = useState(false); // 편집 모드
+  const [title, setTitle] = useState(notice.title); // 편집할 제목
+  const [content, setContent] = useState(notice.content); // 편집할 내용
+
+  const isAdmin = true; // ★★★★★★★★ 임시 관리자 변수
+
+  const openDeleteModal = () => {
+    setIsDeleteModalOpen(true);
+  };
+  const closeDeleteModal = () => {
+    setIsDeleteModalOpen(false);
+  };
 
   return (
     <>

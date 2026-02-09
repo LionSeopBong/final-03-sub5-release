@@ -27,6 +27,9 @@ export function createGoal(goal: GoalItem, token: string) {
         status: "미완료",
         subtitle: goal.subtitle,
         description: goal.description,
+        goalType: goal.goalType,
+        targetPace: goal.targetPace,
+        targetDistance: goal.targetDistance,
       },
     },
     token,
@@ -36,21 +39,18 @@ export function getMyGoals(token: string) {
   return fetchAPI(`/posts/users?type=goal`, { token });
 }
 //updateGoal - 목표 상태 변경
-// export function updateGoal(_id: number, data: ,token:string ) {
-//   return (
-//     fetchAPI(`/posts/{_id}`),
-//     {
-//       method: "PATCH",
-//       body: data,
-//     }
-//   );
-// }
-// //deleteGoal - 목표 삭제
-// export function deleteGoal() {
-//   return (
-//     fetchAPI(`/posts/{_id}`),
-//     {
-//       method: "Delete",
-//     }
-//   );
-// }
+export function updateGoal(_id: number, status: string, token: string) {
+  return fetchAPI(`/posts/${_id}`, {
+    method: "PATCH",
+    body: {
+      extra: {
+        status: status,
+      },
+    },
+    token,
+  });
+}
+//deleteGoal - 목표 삭제
+export function deleteGoal(_id: number, token: string) {
+  return fetchAPI(`/posts/${_id}`, { method: "DELETE", token });
+}

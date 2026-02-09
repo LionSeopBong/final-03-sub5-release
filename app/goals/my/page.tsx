@@ -1,19 +1,23 @@
 "use client";
 
-import Link from "next/link";
 import Modal from "../components/Modal";
 import GoalStats from "@/app/goals/my/components/GoalStats";
 import GoalFilter from "@/app/goals/my/components/GoalFilter";
 import GoalCard from "@/app/goals/my/components/GoalCard";
 import GoalHeader from "@/app/goals/my/components/GoalHeader";
-import { useEffect, useState } from "react"; // 추가!
+import { useEffect } from "react"; // 추가!
 import { getMyGoals } from "@/app/lib/goalsAPI"; // 추가!
 import useUserStore from "@/zustand/user"; // 추가!
-import { GoalResponse, MyGoal } from "@/app/goals/types";
+
+import useGoalsStore from "@/zustand/goals";
 export default function GoalListPage() {
   const user = useUserStore((state) => state.user);
-  const [goals, setGoals] = useState<GoalResponse[]>([]);
-  const [filter, setFilter] = useState("전체");
+  const setGoals = useGoalsStore((state) => state.setGoals);
+
+  const goals = useGoalsStore((state) => state.goals);
+  const begLevel = goals.filter((goal) => goal.extra.level === "초급").length;
+  const intLevel = goals.filter((goal) => goal.extra.level === "중급").length;
+  const advLevel = goals.filter((goal) => goal.extra.level === "고급").length;
   useEffect(() => {
     const fetchGoals = async () => {
       if (user?.token) {
@@ -34,19 +38,13 @@ export default function GoalListPage() {
             flex flex-col gap-4 px-4"
         >
           <GoalHeader />
-          <section className="">🌱초급 총 3개</section>
-          {/* 중급: 🌿중급 총 5개 */}
-          {/* 고급: 🌳고급 총 7개 */}
-          {/* 통계를 가로로 배치 */}
-          <GoalStats goals={goals} />
-          <GoalFilter filter={filter} setFilter={setFilter} />
-          <GoalCard
-            goals={
-              filter === "전체"
-                ? goals
-                : goals.filter((result) => result.extra.status === filter)
-            }
-          />
+          {begLevel > 0 && <section>🌱초급 총 {begLevel}개</section>}
+          {intLevel > 0 && <section>🌿중급 총 {intLevel}개</section>}
+          {advLevel > 0 && <section>🌳고급 총 {advLevel}개</section>}
+          {/* 통계를 가로로 배치*/}
+          <GoalStats />
+          <GoalFilter />
+          <GoalCard />
         </div>
         <Modal />
       </main>

@@ -1,10 +1,72 @@
+"use client";
 import { GoalResponse } from "../../types";
+import type { RunningRecord } from "@/app/lib/types";
+import useUserStore from "@/zustand/user";
+import { deleteGoal, getMyGoals, updateGoal } from "@/app/lib/goalsAPI";
+import useGoalsStore from "@/zustand/goals";
+import { useEffect, useState } from "react";
+import { getMyRecords } from "@/app/lib/recordsAPI";
+export default function GoalCard() {
+  const goals = useGoalsStore((state) => state.goals);
+  const setGoals = useGoalsStore((state) => state.setGoals);
+  const filter = useGoalsStore((state) => state.filter);
+  const user = useUserStore((state) => state.user);
 
-export default function GoalCard({ goals }: { goals: GoalResponse[] }) {
+  const filteredGoals =
+    filter === "전체"
+      ? goals
+      : goals.filter((goals) => goals.extra.status === filter);
+
+  const handleStatusChange = async (goalId: number, newStatus: string) => {
+    if (!user?.token) {
+      return;
+    }
+    // 1. 서버에 상태 변경 요청
+    await updateGoal(goalId, newStatus, user.token.accessToken);
+
+    // 2. 목록 다시 불러오기
+    const result = await getMyGoals(user.token.accessToken);
+    setGoals(result.item);
+  };
+
+  const handleDelete = async (goalId: number) => {
+    const deleteOk = window.confirm("정말 삭제하시겠습니까?");
+    if (!user?.token) {
+      return;
+    }
+    if (deleteOk) {
+      window.alert("삭제되었습니다.");
+      try {
+        // 3. deleteGoal 실행 (인자: goalId, accessToken)
+        await deleteGoal(goalId, user.token.accessToken);
+        // 4. 삭제 후 목록 갱신
+        const updatedGoals = await getMyGoals(user.token.accessToken);
+        setGoals(updatedGoals.item);
+      } catch (error) {
+        console.error("삭제 중 오류 발생:", error);
+        window.alert("삭제에 실패했습니다.");
+      }
+    }
+  };
+  const [records, setRecords] = useState<RunningRecord[]>([]);
+  useEffect(() => {
+    const fetchRecords = async () => {
+      if (user?.token) {
+        const result = await getMyRecords(user.token.accessToken);
+        setRecords(result.item.filter((item) => item.type === "record"));
+
+        setRecords(result.item.filter((r) => r.type === "record"));
+        console.log(result.item.filter((r) => r.type === "record"));
+      }
+    };
+
+    fetchRecords();
+  }, [user]);
+
   return (
     <>
       <ul className="w-full flex flex-col gap-3 ">
-        {goals.map((goal) => {
+        {filteredGoals.map((goal) => {
           const status = goal.extra.status;
 
           {
@@ -33,10 +95,20 @@ export default function GoalCard({ goals }: { goals: GoalResponse[] }) {
                   />
                 </div>
                 <div className="flex flex-row gap-4 ">
-                  <button className="flex-1 bg-primary py-2 w-full rounded-lg text-center  font-semibold text-notselectbtn">
+                  <button
+                    onClick={() => handleStatusChange(goal._id, "완료")}
+                    className="flex-1 bg-primary py-2 w-full 
+                                rounded-lg text-center  font-semibold      
+                                      text-notselectbtn"
+                  >
                     완료
                   </button>
-                  <button className="flex-1 bg-primary py-2 w-full rounded-lg text-center font-semibold  text-notselectbtn">
+                  <button
+                    onClick={() => handleStatusChange(goal._id, "미완료")}
+                    className="flex-1 bg-primary py-2 w-full 
+  rounded-lg text-center font-semibold       
+  text-notselectbtn"
+                  >
                     취소
                   </button>
                 </div>
@@ -64,7 +136,11 @@ export default function GoalCard({ goals }: { goals: GoalResponse[] }) {
                   <p>현재 진행 없음 </p>
                 </div>
                 <div>
-                  <button className="flex-1 bg-primary py-2 w-full rounded-lg text-center text-notselectbtn">
+                  <button
+                    onClick={() => handleStatusChange(goal._id, "진행중")}
+                    className="flex-1 bg-primary py-2 w-full 
+  rounded-lg text-center text-notselectbtn"
+                  >
                     러닝 시작
                   </button>
                 </div>
@@ -98,10 +174,18 @@ export default function GoalCard({ goals }: { goals: GoalResponse[] }) {
                   />
                 </div>
                 <div className="flex flex-row gap-4  ">
-                  <button className="flex-1 bg-primary py-2 w-full rounded-lg  font-semibold text-center text-notselectbtn">
+                  <button
+                    onClick={() => handleDelete(goal._id)}
+                    className="flex-1 bg-primary py-2 w-full rounded-lg  font-semibold text-center text-notselectbtn"
+                  >
                     삭제
                   </button>
-                  <button className="flex-1 bg-gray-custom py-2 w-full rounded-lg text-center  font-semibold text-primary-dark">
+                  <button
+                    onClick={() => handleStatusChange(goal._id, "미완료")}
+                    className="flex-1 bg-gray-custom py-2    
+  w-full rounded-lg text-center
+  font-semibold text-primary-dark"
+                  >
                     재도전
                   </button>
                 </div>

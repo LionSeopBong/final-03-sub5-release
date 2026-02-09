@@ -3,7 +3,6 @@
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 
-import SignupFooter from "@/app/auth/signup/SignupFooter";
 import SignupForm from "@/app/auth/signup/SignupForm";
 
 export default function SignupPage() {

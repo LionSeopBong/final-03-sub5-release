@@ -1,15 +1,37 @@
 "use client";
 
-import CheckIcon from "@/app/auth/terms/components/CheckIcon";
 import TermsDialog, { TermKey } from "@/app/components/ui/TermsDialog";
+import CheckIcon from "@/app/onboarding/terms/CheckIcon";
 import { useTerms } from "@/hooks/useTerms";
+import { useOnboardingStore } from "@/zustand/onboardingStore";
 
 import Image from "next/image";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
 
 export default function TermsPage() {
   const router = useRouter();
+  const social = useSearchParams();
+  const from = social.get("from");
+
+  const handleNext = () => {
+    const onboarding = useOnboardingStore.getState();
+
+    // ✅ 소셜이면 oauth로 고정 + userId는 SocialCallbackPage에서 이미 세팅됨
+    if (from === "oauth") {
+      onboarding.setMode("oauth"); // 안전장치(있어도 됨)
+      router.replace("/onboarding/profile");
+      return;
+    }
+
+    // ✅ 이메일이면 email로 고정 + 소셜 흔적 제거
+    onboarding.setMode("email");
+
+    // userId가 남아있으면 PATCH로 오해할 수 있어서 지우는 게 안전
+    // (현재 setUserId가 number만 받아서 임시로 any 처리)
+    onboarding.setUserId(undefined);
+    router.replace("/auth/signup");
+  };
 
   const [detailOpen, setDetailOpen] = useState(false);
   const [detailKey, setDetailKey] = useState<TermKey | null>(null);
@@ -171,7 +193,7 @@ export default function TermsPage() {
           <button
             type="button"
             disabled={!isRequiredAllChecked}
-            onClick={() => router.push("/auth/signup")}
+            onClick={handleNext}
             className="h-14 w-full rounded-2xl bg-primary text-base font-semibold text-white disabled:opacity-50"
           >
             동의하고 시작하기

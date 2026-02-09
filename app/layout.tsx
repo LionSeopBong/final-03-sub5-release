@@ -1,3 +1,4 @@
+import Providers from "@/app/providers";
 import "./globals.css";
 
 export default function RootLayout({
@@ -7,7 +8,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ko">
-      <body className="font-pretendard">{children}</body>
+      <body className="font-pretendard">
+        <Providers>{children}</Providers>
+      </body>
     </html>
   );
 }

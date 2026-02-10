@@ -31,7 +31,7 @@ export default function MyBoard() {
         return;
       }
 
-      const result = await fetchAPI("/posts/users", {
+      const result = await fetchAPI("/posts/users?type=qna", {
         method: "GET",
         token: token,
       });
@@ -90,7 +90,9 @@ export default function MyBoard() {
               </li>
             ))
           ) : (
-            <p className="text-center font-semibold m-20">불러오는 중...</p>
+            <p className="w-full text-center  border border-gray-200 rounded-[20px] px-12 py-8 text-gray-500 font-semibold">
+              불러오는 중...
+            </p>
           )}
         </ul>
       </main>

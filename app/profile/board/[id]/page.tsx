@@ -28,6 +28,10 @@ export default function PostDetailPage({
   const [title, setTitle] = useState(""); // 편집할 제목
   const [content, setContent] = useState(""); // 편집할 내용
 
+  // 댓글 관리 ★★★★★★★★★★★★★★★★★★★★★★★★★★
+  const [replyContent, setReplyContent] = useState(""); // 댓글 내용
+  const [replyRefresh, setReplyRefresh] = useState(0); // 댓글 목록 새로 고침
+
   // 권한 체크
   const isAdmin = user?.role === "admin" || false;
   const isAuthor = post?.user._id === user?._id || false;
@@ -41,6 +45,7 @@ export default function PostDetailPage({
   };
   const closeReplyModal = () => {
     setIsReplyModalOpen(false);
+    setReplyContent("");
   };
   const openDeleteModal = () => {
     setIsDeleteModalOpen(true);
@@ -63,6 +68,11 @@ export default function PostDetailPage({
       });
 
       if (result.ok === 1) {
+        if (result.item.type !== "qna") {
+          alert("잘못된 접근입니다.");
+          router.back();
+          return;
+        }
         setPost(result.item);
         setTitle(result.item.title);
         setContent(result.item.content);
@@ -109,18 +119,40 @@ export default function PostDetailPage({
 
     if (result.ok === 1) {
       alert("삭제되었습니다.");
-      router.push("/profile/my");
+      router.back();
     } else {
       alert("삭제 실패: " + result.message);
     }
     closeDeleteModal();
   };
 
+  // 댓글 작성
+  const handleReplySubmit = async () => {
+    if (!token || !replyContent.trim()) {
+      alert("답변 내용을 입력해주세요.");
+      return;
+    }
+
+    const result = await fetchAPI(`/posts/${postId}/replies`, {
+      method: "POST",
+      token: token,
+      body: { content: replyContent },
+    });
+
+    if (result.ok === 1) {
+      alert("답변이 등록되었습니다.");
+      setReplyContent("");
+      closeReplyModal();
+      setReplyRefresh((prev) => prev + 1); // ← 댓글 목록 새로고침
+    } else {
+      alert("답변 등록 실패: " + result.message);
+    }
+  };
+
   // 로딩 중 처리
   if (isLoading) {
     return (
       <>
-        {" "}
         <ProfileHeader title="게시글 상세" />
         <div className="flex items-center justify-center min-h-[400px]">
           <p className="border border-gray-200 rounded-[20px] px-20 py-10 text-gray-500 font-semibold">
@@ -209,7 +241,7 @@ export default function PostDetailPage({
             </button>
           )}
         </div>
-        <CommentList postId={postId} />
+        <CommentList postId={postId} key={replyRefresh} />
 
         {/* ●●●●● 답변하기 모달창 */}
         {isReplyModalOpen && (
@@ -233,10 +265,12 @@ export default function PostDetailPage({
                   <textarea
                     placeholder="이곳에 답변 내용을 작성해 주세요."
                     maxLength={500}
+                    value={replyContent}
+                    onChange={(e) => setReplyContent(e.target.value)}
                     className="w-full h-[100px] border border-gray-200 rounded-sm p-2 resize-none leading-relaxed"
                   ></textarea>
                   <span className="absolute bottom-2 right-4 text-sm text-gray-400">
-                    0 / 500
+                    {replyContent.length}/500
                   </span>
                 </div>
 
@@ -244,6 +278,7 @@ export default function PostDetailPage({
                   <button
                     type="button"
                     className="w-1/2 border border-[#003458] rounded-[5px] py-2 bg-[#003458] text-white cursor-pointer"
+                    onClick={handleReplySubmit}
                   >
                     등록
                   </button>

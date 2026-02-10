@@ -35,9 +35,12 @@ export default function InquiryListPage() {
     const fetchPosts = async () => {
       setIsloading(true);
 
-      const result = await fetchAPI(`/posts?page=${currentPage}&limit=10`, {
-        method: "GET",
-      });
+      const result = await fetchAPI(
+        `/posts?type=qna&page=${currentPage}&limit=10`,
+        {
+          method: "GET",
+        },
+      );
 
       if (result.ok === 1) {
         setPosts(result.item || []);
@@ -66,9 +69,8 @@ export default function InquiryListPage() {
         {/* ●●●●● 게시글 리스트 */}
         {isLoading ? (
           <div className="flex items-center justify-center mt-4 mb-8">
-            {" "}
             {/* div로 감싸서 중앙 정렬 */}
-            <p className="border border-gray-200 rounded-[20px] px-12 py-8 text-gray-500 font-semibold">
+            <p className="w-full text-center  border border-gray-200 rounded-[20px] px-12 py-8 text-gray-500 font-semibold">
               불러오는 중...
             </p>
           </div>
@@ -79,9 +81,11 @@ export default function InquiryListPage() {
             ))}
           </ul>
         ) : (
-          <p className="border border-gray-200 rounded-[20px] px-12 py-8 text-gray-500 font-semibold">
-            게시글이 없습니다.
-          </p>
+          <div className="flex items-center justify-center mt-4 mb-8">
+            <p className="w-full text-center border border-gray-200 rounded-[20px] px-12 py-8 text-gray-500 font-semibold">
+              게시글이 없습니다.
+            </p>
+          </div>
         )}
 
         {/* 검색 창 + 문의하기 */}

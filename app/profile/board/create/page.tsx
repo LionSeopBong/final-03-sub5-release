@@ -40,10 +40,10 @@ export default function CreatePost() {
       setErrorMessage("로그인이 필요합니다.");
       return;
     }
-    // API 호출
+    // 게시글 생성 API 호출
     const result = await fetchAPI("/posts", {
       method: "POST",
-      body: { title: title, content: content, type: "inquiry" },
+      body: { title: title, content: content, type: "qna" },
       token: token,
     });
 

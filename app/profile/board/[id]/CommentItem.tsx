@@ -1,7 +1,11 @@
 import { Reply } from "@/types/post";
 
-// app/profile/board/[id]/CommentItem.tsx
-export default function CommentItem({ comment }: { comment: Reply }) {
+interface CommentItemProps {
+  comment: Reply;
+  postId: string; // 🔥 추가
+}
+
+export default function CommentItem({ comment, postId }: CommentItemProps) {
   return (
     <div className="border border-gray-200 rounded-md p-4 bg-gray-50">
       {/* 작성 정보 */}

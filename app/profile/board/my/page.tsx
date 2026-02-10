@@ -16,12 +16,7 @@ export default function MyBoard() {
 
   // zustand 상태 가져오기
   const user = useUserStore((state) => state.user);
-
-  console.log("user:", user); // ← ★★★★★  추가
-  console.log("user.token:", user?.token); // ← ★★★★★  추가
-
   const token = user?.token?.accessToken;
-  console.log("token:", token); // ← ★★★★★ 추가
 
   // 일반 변수들
   const postsPerPage = 5;
@@ -31,11 +26,8 @@ export default function MyBoard() {
 
   // API 호출
   useEffect(() => {
-    console.log("useEffect 실행됨"); // ← ★★★★★ 추가
-    console.log("token:", token); // ← ★★★★★ 추가
     const fetchMyPosts = async () => {
       if (!token) {
-        console.log("토큰 없음, API 호출 안 함"); // ← ★★★★★ 추가
         return;
       }
 
@@ -45,8 +37,6 @@ export default function MyBoard() {
       });
 
       if (result.ok === 1) {
-        console.log("API 응답:", result); // ← ★★★★★ 추가
-        console.log("items:", result.item); // ← ★★★★★ 추가
         setPosts(result.item);
       } else {
         console.error(result.message || "게시글 불러오기 실패");
@@ -100,7 +90,7 @@ export default function MyBoard() {
               </li>
             ))
           ) : (
-            <p className="text-center font-semibold">불러오는 중...</p>
+            <p className="text-center font-semibold m-20">불러오는 중...</p>
           )}
         </ul>
       </main>

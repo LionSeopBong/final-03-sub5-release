@@ -65,7 +65,13 @@ export default function InquiryListPage() {
 
         {/* ●●●●● 게시글 리스트 */}
         {isLoading ? (
-          <p className="text-center font-semibold m-20">불러오는 중...</p>
+          <div className="flex items-center justify-center mt-4 mb-8">
+            {" "}
+            {/* div로 감싸서 중앙 정렬 */}
+            <p className="border border-gray-200 rounded-[20px] px-12 py-8 text-gray-500 font-semibold">
+              불러오는 중...
+            </p>
+          </div>
         ) : posts && posts.length > 0 ? (
           <ul className="inquiry-list mt-4 mb-8">
             {posts.map((post) => (
@@ -73,7 +79,9 @@ export default function InquiryListPage() {
             ))}
           </ul>
         ) : (
-          <p className="text-center font-semibold mt-8">게시글이 없습니다.</p>
+          <p className="border border-gray-200 rounded-[20px] px-12 py-8 text-gray-500 font-semibold">
+            게시글이 없습니다.
+          </p>
         )}
 
         {/* 검색 창 + 문의하기 */}

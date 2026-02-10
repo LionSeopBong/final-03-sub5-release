@@ -1,12 +1,12 @@
 // 사용자 정보 인터페이스
 export interface User {
   _id: number;
-
   email: string;
   password: string;
   name: string;
   image?: string;
   profileImage?: string | null;
+  role?: "user" | "admin";
   token?: {
     accessToken: string;
     refreshToken: string;

@@ -100,6 +100,7 @@ export interface Station extends LocationCoords {
   //name: string;
   name_ko: string;
   address: string;
+  fct_id: string;
 }
 
 export interface LocationRow extends LocationCoords {
@@ -231,6 +232,16 @@ export interface RegIdRow {
   lon: number;
   lat: number;
 }
+
+export interface StnRow {
+  stn: number;
+  lon: number;
+  lat: number;
+  name_ko: string;
+  fct_id: string;
+  law_id: number;
+}
+
 
 export interface AnalysisFactor {
   label: string;

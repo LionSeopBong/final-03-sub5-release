@@ -277,10 +277,13 @@ export function outdoorScore(obs: KmaObservation): number {
   return Math.max(0, Math.min(100, score));
 }
 
-export function outdoorGrade(score: number): "좋음" | "보통" | "나쁨" {
-  if (score >= 80) return "좋음";
-  if (score >= 50) return "보통";
-  return "나쁨";
+export function outdoorGrade(
+  score: number,
+): "최적" | "양호" | "주의" | "부적합" {
+  if (score >= 85) return "최적";
+  if (score >= 60) return "양호";
+  if (score >= 45) return "주의";
+  return "부적합";
 }
 
 export function getCurrentTimeKoreanFormat(): string {
@@ -474,7 +477,7 @@ export function formatDate(date: Date) {
   const y = date.getFullYear();
   const m = String(date.getMonth() + 1).padStart(2, "0");
   const d = String(date.getDate()).padStart(2, "0");
-  return `${y}${m}${d}`;   //20260210 형식으로 반환
+  return `${y}${m}${d}`; //20260210 형식으로 반환
 }
 
 export function formatLabel(date: Date) {
@@ -539,3 +542,4 @@ export function getNearestBaseTime(now: Date): string {
 
   return `${String(targetHour).padStart(2, "0")}00`;
 }
+

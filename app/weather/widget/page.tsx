@@ -3,13 +3,14 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import STATIONS from "@/data/stn.json"; // 관측소 목록
 
 import Fetch3Hours from "./dongne";
 
 import {
   formatLabel,
   formatDate,
-  findNearestRegionFast,
+  findNearestStationFast,
   skyToSimpleEmoji,
 } from "@/lib/utils";
 
@@ -20,25 +21,22 @@ import {
 } from "@/lib/localWeather";
 
 import type { HalfDayForecast, TodayHalfDayCache } from "@/lib/localWeather";
-import type { ForecastRow, MidHalfDay, RegIdRow } from "@/types/kma";
+import type { ForecastRow, MidHalfDay, RegIdRow, StnRow } from "@/types/kma";
 
 import SearchLocationBar from "./components/searchLocationBar";
 import ShortTermColumns from "./ShortTermColumns";
-
-type MidTempDay = {
-  date: string;
-  min: number | null;
-  max: number | null;
-};
 
 export type MidForecastResponse = {
   raw: string;
 };
 
 export async function fetch3DayForecastClient(
-  regId: string,
+  reg: string | null,
 ): Promise<ForecastRow[]> {
-  const res = await fetch(`/api/forecast/3day?regId=${regId}`);
+  if (!reg) {
+    reg = "11B10101"; // 지역코드 불러오기 실패하면 기본값 사용
+  }
+  const res = await fetch(`/api/forecast/3day?regId=${reg}`);
 
   if (!res.ok) {
     throw new Error(`API error: ${res.status}`);
@@ -48,8 +46,11 @@ export async function fetch3DayForecastClient(
 }
 
 export async function fetchMidForecastClient(
-  reg: string,
+  reg: string | null,
 ): Promise<MidForecastResponse> {
+  if (!reg) {
+    reg = "11B00000"; // 지역코드 불러오기 실패하면 기본값 사용
+  }
   const res = await fetch(`/api/forecast/mid?reg=${reg}`);
 
   if (!res.ok) {
@@ -60,8 +61,11 @@ export async function fetchMidForecastClient(
 }
 
 export async function fetchMidTempForecast(
-  reg: string,
+  reg: string | null,
 ): Promise<MidForecastResponse> {
+  if (!reg) {
+    reg = "11B10101"; // 지역코드 불러오기 실패하면 기본값 사용
+  }
   const res = await fetch(`/api/forecast/mid-temp?reg=${reg}`);
 
   if (!res.ok) {
@@ -75,6 +79,7 @@ export default function ForecastPage() {
   const [error, setError] = useState<string | null>(null);
   const [selectedPlace, setSelectedPlace] = useState<string>("역삼동");
   const [regidRows, setRegidRows] = useState<RegIdRow[]>([]);
+  const [regId, setRegId] = useState<string | null>("11B10101");
   const [midRaw, setMidRaw] = useState<string | null>(null);
   const [midTempRaw, setMidTempRaw] = useState<string | null>(null);
 
@@ -130,8 +135,6 @@ export default function ForecastPage() {
         )
       : new Map();
 
-  console.log(midTempMap);
-
   const midDays = midRaw
     ? Array.from(midTempMap.keys()) // ✅ midTempMap 기준으로 날짜 추출
     : [];
@@ -158,7 +161,7 @@ export default function ForecastPage() {
       },
     };
   });
-
+  /*
   useEffect(() => {
     fetch("/api/regid")
       .then((res) => res.json())
@@ -167,11 +170,10 @@ export default function ForecastPage() {
       })
       .catch(console.error);
   }, []);
-
+*/
   // 오늘 포함 +0 ~ +3일 (총 4일)
   // 1️⃣ KST 기준 오늘 날짜
-  const kstNow = new Date().toLocaleString("ko-KR", { timeZone: "Asia/Seoul" });
-  const kstDate = new Date(kstNow);
+  //const kstNow = new Date().toLocaleString("ko-KR", { timeZone: "Asia/Seoul" });
 
   const todayString = formatDate(new Date());
   //console.log(data);
@@ -196,31 +198,33 @@ export default function ForecastPage() {
       };
     });
   useEffect(() => {
-    fetch3DayForecastClient("11B10101")
+    //TODO 하드코딩된 11B10101 을 검색 위치에 맞춰 변경
+    fetch3DayForecastClient(regId)
       .then(setData)
       .catch((err) => setError(err.message));
 
     // 중기 날씨
-    fetchMidForecastClient("11B00000")
+    fetchMidForecastClient(regId)
       .then((res) => setMidRaw(res.raw))
       .catch((err) => setError(err.message));
 
     // ✅ 중기 기온
-    fetchMidTempForecast("11B10101")
+    fetchMidTempForecast(regId)
       .then((res) => setMidTempRaw(res.raw))
       .catch((err) => setError(err.message));
-  }, []);
+  }, [regId]);
 
   if (error) return <p>에러 발생: {error}</p>;
 
   const todayStr = formatDate(new Date());
-  console.log(todayStr);
+
   const dayForecasts = days.map((d) => {
+    const todayStr = formatDate(new Date()); // KST 기준 오늘
     const isToday = d.date === todayStr;
 
     const match = (r: ForecastRow, date: string, hour: "00" | "12") =>
       r.TM_EF.slice(0, 8) === date && r.TM_EF.slice(8, 10) === hour;
-    const amRow = data.find((r) => match(r, d.date, "00")) ?? null;
+    let amRow = data.find((r) => match(r, d.date, "00")) ?? null;
     const pmRow = data.find((r) => match(r, d.date, "12")) ?? null;
 
     const normalizeTemp = (v: number | null) => (isValidTemp(v) ? v : null);
@@ -230,6 +234,33 @@ export default function ForecastPage() {
       st: amRow?.ST !== undefined ? Number(amRow.ST) : null,
       pref: amRow?.PREP !== undefined ? Number(amRow.PREP) : null,
     };
+
+    // ✅ 오전 데이터가 없고 오늘이면 로컬스토리지에서 가져오기
+    if (!amRow && isToday) {
+      const cache = loadTodayHalfDayCache();
+      if (cache && cache.date === todayStr && cache.am) {
+        amRow = {
+          TA: cache.am.temp?.toString() ?? null,
+          SKY: cache.am.sky,
+          ST: cache.am.st ?? null,
+          PREP: cache.am.pref ?? null,
+        } as unknown as ForecastRow; // 타입 맞춤
+      }
+    }
+
+    // ✅ 오늘 오전 데이터가 존재하면 로컬스토리지에 저장
+    if (amRow && isToday) {
+      const cache: TodayHalfDayCache = {
+        date: todayStr,
+        am: {
+          temp: normalizeTemp(Number(amRow.TA)),
+          sky: amRow.SKY ?? null,
+          st: amRow.ST !== undefined ? Number(amRow.ST) : null,
+          pref: amRow.PREP !== undefined ? Number(amRow.PREP) : null,
+        },
+      };
+      saveTodayHalfDayCache(cache);
+    }
 
     const pm: HalfDayForecast = {
       temp: pmRow ? normalizeTemp(Number(pmRow.TA)) : null,
@@ -268,14 +299,17 @@ export default function ForecastPage() {
             {/* 검색바 */}
             <SearchLocationBar
               onSelect={async (place) => {
+                // ✅ 검색 버튼 클릭 후 위치가 변경되었을 때 위치 이름 출력
+                console.log("선택된 위치 이름:", place.place_name);
                 setSelectedPlace(place.place_name);
                 try {
                   //console.log(place.x, place.y);
-                  const regId = findNearestRegionFast(
+                  const nearest = findNearestStationFast(
                     { lat: Number(place.y), lon: Number(place.x) },
-                    regidRows,
+                    STATIONS,
                   );
-                  //console.log("regId: ", regId);
+                  setRegId(nearest.fct_id);
+                  console.log("reg_id:", nearest.fct_id);
                 } catch (err: any) {
                   console.error(err);
                   setError(err.message);

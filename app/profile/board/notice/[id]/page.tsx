@@ -1,44 +1,37 @@
 "use client";
 
 import Navi from "@/app/components/common/Navi";
+import fetchAPI from "@/app/lib/api";
 import ProfileHeader from "@/app/profile/components/ProfileHeader";
-import { Notice } from "@/types/post";
-import { use, useState } from "react";
+import { Notice, Post } from "@/types/post";
+import useUserStore from "@/zustand/user";
+import { useRouter } from "next/router";
+import { use, useEffect, useState } from "react";
 
 export default function NoticePost({
   params,
 }: {
   params: Promise<{ id: string }>;
 }) {
-  const { id } = use(params);
+  const { id: noticeId } = use(params);
+  const router = useRouter();
 
-  // const notice = await fetchNotice(id)
-  const notices: Notice[] = [
-    {
-      _id: 1,
-      type: "notice",
-      title: "사이트 이용 관련 공지",
-      content:
-        "문의 접수 후 처리는 영업일 기준 1~2일이 소요됩니다. 고객센터 운영시간 내에는 02-000-0000으로 전화 상담도 가능합니다.",
-      createdAt: "2026-01-21",
-    },
-    {
-      _id: 2,
-      type: "notice",
-      title: "영업 시간 관련 공지",
-      content:
-        "런데이 서비스를 이용해주셔서 감사합니다. 원활한 서비스 이용을 위해 앱을 최신 버전으로 업데이트해주시기 바랍니다.",
-      createdAt: "2026-01-18",
-    },
-  ];
-  const notice = notices.find((n) => n._id === Number(id)) || notices[0];
+  // ■ zustand에서 유저 정보 가져오기
+  const user = useUserStore((state) => state.user);
+  const token = user?.token?.accessToken;
 
-  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false); // 삭제 모달
+  // ■ 상태 관리
+  const [notice, setNotice] = useState<Post | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
   const [isEditing, setIsEditing] = useState(false); // 편집 모드
-  const [title, setTitle] = useState(notice.title); // 편집할 제목
-  const [content, setContent] = useState(notice.content); // 편집할 내용
+  const [title, setTitle] = useState("");
+  const [content, setContent] = useState("");
 
-  const isAdmin = true; // ★★★★★★★★ 임시 관리자 변수
+  // ■ 권한 체크 - 관리자만 수정/삭제 가능
+  const isAdmin = user?.extra?.role === "admin" || false;
+
+  // 삭제 모달
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
   const openDeleteModal = () => {
     setIsDeleteModalOpen(true);
@@ -46,6 +39,62 @@ export default function NoticePost({
   const closeDeleteModal = () => {
     setIsDeleteModalOpen(false);
   };
+
+  //  ■ 공지사항 조회 API
+  useEffect(() => {
+    const fetchNotice = async () => {
+      if (!token) {
+        router.push("/auth/login");
+        return;
+      }
+      setIsLoading(true);
+      const result = await fetchAPI(`/posts/${noticeId}`, {
+        method: "GET",
+        token: token,
+      });
+
+      if (result.ok === 1) {
+        if (result.item.type != "notice") {
+          alert("잘못된 접근입니다.");
+          router.back();
+          return;
+        }
+        setNotice(result.item);
+        setTitle(result.item.title);
+        setContent(result.item.content);
+      } else {
+        alert("공지사항을 불러올 수 없습니다.");
+        router.back();
+      }
+      setIsLoading(false);
+    };
+    fetchNotice();
+  }, [noticeId, token, router]);
+
+  // ■ 공지사항 수정 API
+  const handleEdit = async () => {
+    if (isEditing) {
+      if (!token) return;
+
+      const result = await fetchAPI(`/posts/${noticeId}`, {
+        method: "PATCH",
+        token: token,
+        body: { title, content },
+      });
+
+      if (result.ok === 1) {
+        alert("수정되었습니다.");
+        setNotice({ ...notice!, title, content });
+        setIsEditing(false);
+      } else {
+        alert("수정 실패 : " + result.message);
+      }
+    } else {
+      setIsEditing(true);
+    }
+  };
+
+  // ■ 공지사항 삭제
 
   return (
     <>

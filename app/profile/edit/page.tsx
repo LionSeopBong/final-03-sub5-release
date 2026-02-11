@@ -7,9 +7,12 @@ import ProfileButton from "@/app/profile/components/ProfileButton";
 import ProfileHeader from "@/app/profile/components/ProfileHeader";
 import useUserStore from "@/zustand/user";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import React, { useRef, useState } from "react";
 
 export default function ProfileEdit() {
+  const router = useRouter();
+
   // zustand에서 현재 저장된 값 가져오기
   const user = useUserStore((state) => state.user);
   const setUser = useUserStore((state) => state.setUser);
@@ -32,17 +35,26 @@ export default function ProfileEdit() {
   const [nickname, setNickname] = useState(user?.name || "");
   const [birth, setBirth] = useState(user?.extra?.birthDate || "");
 
-  // 프로필 사진 저장
+  // 🔥 임시 파일 저장
+  const [tempFile, setTempFile] = useState<File | null>(null);
+
+  // 🔥 파일 선택 시 미리보기만 업데이트
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]; // 파일 가져오기
-    if (!file || !user?.token?.accessToken) return;
+    if (!file) return;
 
     // 미리보기 URL 생성
     const imageUrl = URL.createObjectURL(file);
     setSelectedImage(imageUrl); // state 업데이트
+    setTempFile(file); // 파일 임시 저장
+  }; // 🔥 여기서 handleFileChange 끝!
+
+  // 🔥 "변경" 버튼 클릭 시 실제 업로드 실행 (별도 함수)
+  const handleConfirmUpload = async () => {
+    if (!tempFile || !user?.token?.accessToken) return;
 
     // 파일 업로드
-    const uploadResult = await uploadFile(file);
+    const uploadResult = await uploadFile(tempFile);
 
     if (uploadResult.ok !== 1) {
       alert("이미지 업로드 실패");
@@ -62,7 +74,8 @@ export default function ProfileEdit() {
       setUser({ ...user, profileImage: imagePath });
     }
 
-    // 파일 선택 후 모달 닫기
+    // 업로드 완료 후 정리
+    setTempFile(null);
     setOpenPhotoSetter(false);
     setOpenGalleryModal(false);
   };
@@ -330,7 +343,7 @@ export default function ProfileEdit() {
               </h2>
               <div className="relative w-full h-[160px] px-4 py-2">
                 <Image
-                  src={selectedImage || "/icons/photo-gallery.svg"}
+                  src={selectedImage || "/icons/photo-gallery-final.svg"}
                   alt="프로필 선택"
                   fill
                   className="object-contain"
@@ -351,7 +364,11 @@ export default function ProfileEdit() {
                   type="button"
                   className="w-1/2 border border-[#003458] rounded-[5px] py-3 bg-[#003458] text-white cursor-pointer"
                   onClick={() => {
-                    fileInputRef.current?.click();
+                    if (tempFile) {
+                      handleConfirmUpload();
+                    } else {
+                      fileInputRef.current?.click();
+                    }
                   }}
                 >
                   {selectedImage ? "변경" : "선택"}
@@ -390,7 +407,10 @@ export default function ProfileEdit() {
 
               <button
                 className="post-submit-btn font-semibold text-white border border-[#003458] bg-[#003458] rounded-b-[20px] p-3 w-full cursor-pointer"
-                onClick={() => setOpenSuccessModal(false)}
+                onClick={() => {
+                  setOpenSuccessModal(false);
+                  router.push("/profile/home");
+                }}
               >
                 확인
               </button>

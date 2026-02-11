@@ -11,7 +11,7 @@ export default function ProfileRecord() {
   // zustand에서 사용자 데이터 가져오기
   const user = useUserStore((state) => state.user);
   const setUser = useUserStore((state) => state.setUser);
-  const token = user?.token?.accessToken; // 🔥 추가
+  const token = user?.token?.accessToken;
 
   // 신장, 체중 범위 스크롤
   const heightOptions = [];

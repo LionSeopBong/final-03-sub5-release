@@ -6,10 +6,18 @@ import useUserStore from "@/zustand/user";
 import Image from "next/image";
 import Link from "next/link";
 import { useState, useEffect } from "react";
+import { useGetRecords } from "@/app/hooks/useGetRecords"; // 🔴 추가
 
 export default function ProfileHome() {
   const { user, setUser } = useUserStore();
   const [hydrated, setHydrated] = useState(false);
+  const { data } = useGetRecords(); // 🔴 추가
+
+  // 🔴 간단한 통계만 계산
+  const totalRuns = data.length;
+  const totalDays = new Set(data.map((r) => r.extra?.date).filter(Boolean))
+    .size;
+  const recentDistance = data[0]?.extra?.distance || "0.00"; // 🔴 가장 최근 기록
 
   useEffect(() => {
     setHydrated(true);
@@ -19,12 +27,12 @@ export default function ProfileHome() {
 
   const [isLogoutOpen, setIsLogOutOpen] = useState(false);
 
-  // ■■■■■■■■■■■■■■■■■■■■ 로그아웃 모달 오픈 함수
+  // ■■■■■■■ 로그아웃 모달 오픈 함수
   const openLogoutModal = () => {
     setIsLogOutOpen(true);
   };
 
-  // ■■■■■■■■■■■■■■■■■■■■ 로그아웃 처리 (임시)
+  // ■■■■■■■ 로그아웃 처리 (임시)
   const handleLogout = () => {
     setUser(null);
     localStorage.removeItem("accessToken");
@@ -92,40 +100,40 @@ export default function ProfileHome() {
               </Link>
               <div className="flex items-center gap-0 m-2">
                 <div className="record-runner flex-1 text-center min-w-0">
-                  <div className="runner-icon flex items-center justify-center gap-2">
+                  <div className="runner-icon flex items-center justify-center gap-2 mb-1">
                     <Image
                       src="/icons/record-runner.svg"
                       alt=""
                       width={16}
                       height={16}
                     />
-                    <p className="font-semibold">0.00 km</p>
+                    <p className="font-semibold">{recentDistance} km</p>
                   </div>
-                  <p>총 거리</p>
+                  <p className="text-center">최근 거리</p>
                 </div>
                 <div className="record-frequency flex-1 text-center min-w-0">
-                  <div className="frequency-icon flex items-center justify-center gap-2 border-l-2 border-gray-400 ml-3">
+                  <div className="frequency-icon flex items-center justify-center gap-2 border-l-2 border-gray-400 ml-3 mb-1">
                     <Image
                       src="/icons/record-frequency.svg"
                       alt=""
                       width={16}
                       height={16}
                     />
-                    <p className="font-semibold">0 회</p>
+                    <p className="font-semibold">{totalRuns} 회</p>
                   </div>
-                  <p>러닝 횟수</p>
+                  <p className="text-center">러닝 횟수</p>
                 </div>
                 <div className="record-calendar flex-1 text-center min-w-0">
-                  <div className="calendar-icon flex items-center justify-center gap-2 border-l-2 border-gray-400 ml-3">
+                  <div className="calendar-icon flex items-center justify-center gap-2 border-l-2 border-gray-400 ml-3 mb-1">
                     <Image
                       src="/icons/record-calendar.svg"
                       alt=""
                       width={16}
                       height={16}
                     />
-                    <p className="font-semibold">0 일</p>
+                    <p className="font-semibold">{totalDays} 일</p>
                   </div>
-                  <p>활동일</p>
+                  <p className="text-center">활동일</p>
                 </div>
               </div>
             </div>

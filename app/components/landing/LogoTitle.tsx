@@ -1,3 +1,4 @@
+import StartButton from "@/app/components/landing/StartButton";
 import Image from "next/image";
 
 export default function LogoTitle() {
@@ -17,14 +18,15 @@ export default function LogoTitle() {
 
       {/* 이미지 위 콘텐츠 */}
       <div className="relative z-10 min-h-screen flex flex-col items-center justify-center text-white px-6">
-        <div className="w-full flex flex-col items-center text-center">
+        <div className=" flex flex-col items-center text-center">
           {/* 로고 */}
           <Image
             src="/images/landing-logo.svg"
             alt="로고"
             priority
             width={128}
-            height={128}
+            height={96}
+            className="w-32 h-24"
           />
 
           {/* 문구 */}
@@ -35,6 +37,8 @@ export default function LogoTitle() {
           </p>
         </div>
       </div>
+
+      <StartButton />
     </section>
   );
 }

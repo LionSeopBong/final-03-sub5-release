@@ -28,14 +28,14 @@ export default function SocialLoginButtons() {
             alt="Google"
             width={36}
             height={36}
-            priority
+            className="w-9 h-9"
           />
         </button>
 
         <button
           type="button"
           aria-label="Kakao 로그인"
-          className="h-9 w-9 rounded-full bg-[#FEE500] flex items-center justify-center"
+          className="h-9 w-9 rounded-full flex items-center justify-center"
           onClick={() =>
             signIn("kakao", { callbackUrl: "/auth/SocialCallback" })
           }
@@ -45,6 +45,7 @@ export default function SocialLoginButtons() {
             alt="카카오 로그인"
             width={34}
             height={34}
+            className="w-9 h-9"
           />
         </button>
       </div>

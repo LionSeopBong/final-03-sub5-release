@@ -13,7 +13,7 @@ export interface Reply {
 export type ReplyCreateForm = Pick<Reply, "content">;
 
 // 2-a. 게시글 타입
-export type PostType = "inquiry" | "notice";
+export type PostType = "qna" | "notice";
 
 // 2-b. 게시글 상세
 export interface Post {

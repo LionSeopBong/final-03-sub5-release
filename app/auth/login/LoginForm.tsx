@@ -9,11 +9,11 @@ import { useActionState, useEffect, useRef, useState } from "react";
 import { login } from "@/actions/user";
 import Alert from "@/app/components/ui/Alert";
 
-import useAlert from "@/hooks/useAlert";
 import useUserStore from "@/zustand/user";
 import { validateLogin } from "@/app/lib/components/login";
 import SocialLoginButtons from "@/app/auth/login/SocialLoginButtons";
 import LoginButton from "@/app/auth/login/LoginButton";
+import useAlert from "@/hooks/useAlert";
 
 export default function LoginForm() {
   const [userState, formAction, isPending] = useActionState(login, null);
@@ -101,6 +101,7 @@ export default function LoginForm() {
               alt=""
               width={20}
               height={20}
+              className="w-5 h-5"
             />
           </button>
         </div>
@@ -113,6 +114,7 @@ export default function LoginForm() {
             name="password"
             type={showPassword ? "text" : "password"}
             placeholder="password"
+            autoComplete="current-password"
             className={[
               "w-full border-b-2 border-gray-300 px-1 py-3 text-base",
               "caret-primary focus:border-b-primary focus:outline-none focus:ring-0",

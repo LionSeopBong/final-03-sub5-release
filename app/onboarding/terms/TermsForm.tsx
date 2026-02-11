@@ -27,9 +27,6 @@ export default function TermsForm() {
     // 이메일이면 email로 고정 + 소셜 흔적 제거
     onboarding.setMode("email");
 
-    // userId가 남아있으면 PATCH로 오해할 수 있어서 지우는 게 안전
-    // (현재 setUserId가 number만 받아서 임시로 any 처리)
-    onboarding.setUserId(undefined);
     router.replace("/auth/signup");
   };
 
@@ -60,7 +57,7 @@ export default function TermsForm() {
               alt="뒤로가기"
               width={24}
               height={24}
-              priority
+              className="w-6 h-6"
             />
           </button>
         </div>
@@ -109,7 +106,8 @@ export default function TermsForm() {
                     src="/icons/arrow_forward.svg"
                     alt=""
                     width={20}
-                    height={20}
+                    height={24}
+                    className="w-5 h-6"
                   />
                 </button>
               </li>
@@ -136,7 +134,8 @@ export default function TermsForm() {
                     src="/icons/arrow_forward.svg"
                     alt=""
                     width={20}
-                    height={20}
+                    height={24}
+                    className="w-5 h-6"
                   />
                 </button>
               </li>
@@ -163,7 +162,8 @@ export default function TermsForm() {
                     src="/icons/arrow_forward.svg"
                     alt=""
                     width={20}
-                    height={20}
+                    height={24}
+                    className="w-5 h-6"
                   />
                 </button>
               </li>

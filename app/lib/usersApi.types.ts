@@ -19,6 +19,8 @@ export interface CreateUserBody {
 // 이메일 로그인
 export type LoginBody = Pick<CreateUserBody, "email" | "password">;
 
+export type nameCheck = Pick<CreateUserBody, "email">;
+
 // 소셜 로그인
 export interface SocialLoginBody {
   providerAccountId: string;
@@ -38,6 +40,8 @@ export interface SocialSignupBody {
 
 // 유저 업데이트(PATCH)
 export interface UpdateUserBody {
+  image?: string;
+  name?: string;
   extra: {
     gender?: string;
     birthDate?: string;

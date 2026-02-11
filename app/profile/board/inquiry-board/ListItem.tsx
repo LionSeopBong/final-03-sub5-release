@@ -1,6 +1,11 @@
 import { PostListItem } from "@/types/post";
 import Link from "next/link";
 
+// 날짜 형식 변경 - 연도/월/일만 표시
+const formatDate = (dateString: string) => {
+  return dateString.split(" ")[0]; // 공백 기준으로 자르기
+};
+
 export default function ListItem({ post }: { post: PostListItem }) {
   return (
     <li className="border-b border-gray-200 px-2 py-3">
@@ -19,7 +24,7 @@ export default function ListItem({ post }: { post: PostListItem }) {
             {post.user.name}
           </span>
           <span className="pl-2 border-l-2 border-gray-300 shrink-0">
-            {post.createdAt}
+            {formatDate(post.createdAt)}
           </span>
         </div>
       </Link>

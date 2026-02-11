@@ -1,7 +1,6 @@
 "use server";
 
 import { createRecord, deleteRecord, updateRecord } from "@/app/lib/recordsAPI";
-import { redirect } from "next/navigation";
 
 export async function addRecord(prevState: any, formData: FormData) {
   try {
@@ -46,7 +45,6 @@ export async function addRecord(prevState: any, formData: FormData) {
     // 호출 성공
     if (result.ok) {
       return { success: true };
-      // redirect("/records");
     } else {
       return { error: "저장 실패" };
     }

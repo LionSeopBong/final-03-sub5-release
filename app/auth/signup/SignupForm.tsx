@@ -7,6 +7,8 @@ import SignupFooter from "./SignupFooter";
 import { validateSignup, checkEmail } from "@/app/lib/components/signup";
 import { useRouter } from "next/navigation";
 import Alert from "@/app/components/ui/Alert";
+
+import { useOnboardingStore } from "@/zustand/onboardingStore";
 import useAlert from "@/hooks/useAlert";
 import { useOnboardingStore } from "@/zustand/onboardingStore";
 
@@ -127,6 +129,7 @@ export default function SignupForm() {
                 type="email"
                 name="email"
                 placeholder="이메일"
+                autoComplete="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 className="
@@ -168,6 +171,7 @@ export default function SignupForm() {
                 type={showPassword ? "text" : "password"}
                 name="password"
                 placeholder="비밀번호"
+                autoComplete="current-password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 className="
@@ -212,6 +216,7 @@ export default function SignupForm() {
                 type={showPasswordConfirm ? "text" : "password"}
                 name="passwordConfirm"
                 placeholder="비밀번호 재입력"
+                autoComplete="current-password"
                 value={passwordConfirm}
                 onChange={(e) => setPasswordConfirm(e.target.value)}
                 className="

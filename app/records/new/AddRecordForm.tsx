@@ -1,23 +1,26 @@
 "use client";
 import { addRecord } from "@/app/action/records";
-import useUserStore from "@/zustand/user";
+import { useCalcPace } from "@/app/hooks/useCalcPace";
+import { useLoginCheck } from "@/app/hooks/useLoginCheck";
+import { useSuccessRedirect } from "@/app/hooks/useSuccessRedirect";
 import { ArrowLeft } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { memo, useActionState, useEffect, useState } from "react";
+import { useActionState, useState } from "react";
 
 export default function AddRecordForm() {
+  const [data, setData] = useState(""); // 버튼 활성화, 비활성화 여부
+  const [selectExerciseType, setSelectExerciseType] = useState<"running" | "treadmill" | "hiking" | "interval" | "walk">("running");
   const [state, formAction, isPending] = useActionState(addRecord, null);
   const router = useRouter();
-  const [data, setData] = useState(""); // 버튼 활성화, 비활성화 여부
-  const user = useUserStore((state) => state.user);
-  const [selectExerciseType, setSelectExerciseType] = useState<"running" | "treadmill" | "hiking" | "interval" | "walk">("running");
-  const [hour, setHour] = useState("");
-  const [min, setMin] = useState("");
-  const [sec, setSec] = useState("");
-  const [distance, setDistance] = useState("");
-  const [pace, setPace] = useState("");
-  const [memo, setMemo] = useState("");
 
+  const [memo, setMemo] = useState("");
+  // 성공후 기록 페이지로
+  useSuccessRedirect(state, "/records");
+  // 로그인 여부
+  const { user } = useLoginCheck();
+  // 페이스 계산
+  const { hour, setHour, min, setMin, sec, setSec, distance, setDistance, pace } = useCalcPace();
+  // 운동 타입
   const exerciseTypes = [
     { id: "running", label: "러닝" },
     { id: "treadmill", label: "러닝머신" },
@@ -25,43 +28,12 @@ export default function AddRecordForm() {
     { id: "interval", label: "인터벌" },
     { id: "walk", label: "걷기" },
   ] as const;
+
   const handleExerciseSelect = (type: typeof selectExerciseType) => {
     setSelectExerciseType(type);
     return;
   };
-  useEffect(() => {
-    const h = parseInt(hour) || 0;
-    const m = parseInt(min) || 0;
-    const s = parseInt(sec) || 0;
-    const d = parseInt(distance) || 0;
-    if (d > 0 && (h > 0 || m > 0 || s > 0)) {
-      const totalMinutes = h * 60 + m + s / 60;
-      const paceInMinutes = totalMinutes / d;
-      const paceMin = Math.floor(paceInMinutes);
-      const paceSec = Math.round((paceInMinutes - paceMin) * 60);
-      if (paceSec >= 60) {
-        setPace(`${paceMin + 1}:00`);
-      } else {
-        setPace(`${paceMin}:${paceSec.toString().padStart(2, "0")}`);
-      }
-    } else {
-      setPace("");
-    }
-  }, [hour, min, sec, distance]);
 
-  useEffect(() => {
-    if (!user) {
-      alert("로그인이 필요합니다");
-      router.push("/login");
-    }
-  }, [user, router]);
-
-  useEffect(() => {
-    if (state?.success) {
-      router.push("/records");
-      router.refresh();
-    }
-  }, [state, router]);
   // 필수 요소 미입력 시 버튼 비활성화
   const isFormValid = data && (hour || min || sec) && distance && parseFloat(distance) > 0 && pace;
   return (

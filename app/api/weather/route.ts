@@ -1,11 +1,6 @@
 import { NextResponse } from "next/server";
 import type { KmaObservation } from "@/types/kma";
 
-import fs from "fs";
-import path from "path";
-
-import type { Station } from "@/types/kma";
-
 // function import
 import { findNearestStationFast } from "@/lib/utils";
 
@@ -22,13 +17,8 @@ export async function GET(req: Request) {
     if (Number.isNaN(lat) || Number.isNaN(lon)) {
       return NextResponse.json({ error: "invalid coords" }, { status: 400 });
     }
-    /* 불필요한 레거시 코드 제거
-    const filePath = path.join(process.cwd(), "data", "stn.json");
-    const jsonData = fs.readFileSync(filePath, "utf8");
-    const stations: Station[] = JSON.parse(jsonData);
-    */
     const nearest = findNearestStationFast({ lat, lon }, STATIONS);
-    const stn = nearest.stn;
+    const stn = nearest?.stn;
     //console.log("stn: ", stn);
     const res = await fetch(
       `https://apihub.kma.go.kr/api/typ01/url/kma_sfctm2.php?stn=${stn}&tm=${tm}&authKey=${process.env.KMA_API_KEY}`,

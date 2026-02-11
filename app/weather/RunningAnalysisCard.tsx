@@ -5,6 +5,8 @@ import type { KmaObservation } from "@/types/kma";
 import { outdoorScore, outdoorGrade } from "@/lib/utils";
 import { getRunningTip } from "@/lib/runningTips";
 import { getAnalysisFactors } from "@/lib/runningAnalysis";
+import { useMemo } from "react";
+import RunningAnalysisCardSkeleton from "./RunningAnalysisCardSkeleton";
 
 interface RunningAnalysisCardProps {
   weather: KmaObservation | null;
@@ -13,12 +15,25 @@ interface RunningAnalysisCardProps {
 export default function RunningAnalysisCard({
   weather,
 }: RunningAnalysisCardProps) {
-  if (!weather) return null;
 
-  const score = outdoorScore(weather);
-  const grade = outdoorGrade(score);
-  const factors = getAnalysisFactors(weather);
-  const tip = getRunningTip(score, weather);
+  // ✅ Hook은 항상 실행
+  const analysis = useMemo(() => {
+    if (!weather) return null;
+
+    const score = outdoorScore(weather);
+    const grade = outdoorGrade(score);
+    const factors = getAnalysisFactors(weather);
+    const tip = getRunningTip(score, weather);
+
+    return { score, grade, factors, tip };
+  }, [weather]);
+
+  // ✅ Hook 아래에서만 조건부 렌더
+  if (!analysis) {
+    return <RunningAnalysisCardSkeleton />;
+  }
+
+  const { score, grade, factors, tip } = analysis;
 
   return (
     <div className="min-w-[375px] items-stretch p-4">

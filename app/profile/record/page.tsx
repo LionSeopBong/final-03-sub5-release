@@ -1,6 +1,7 @@
 "use client";
 
 import Navi from "@/app/components/common/Navi";
+import fetchAPI from "@/app/lib/api";
 import ProfileHeader from "@/app/profile/components/ProfileHeader";
 import useUserStore from "@/zustand/user";
 import Image from "next/image";
@@ -10,43 +11,57 @@ export default function ProfileRecord() {
   // zustand에서 사용자 데이터 가져오기
   const user = useUserStore((state) => state.user);
   const setUser = useUserStore((state) => state.setUser);
+  const token = user?.token?.accessToken; // 🔥 추가
 
   // 신장, 체중 범위 스크롤
   const heightOptions = [];
-  for (let i = 150; i <= 200; i++) {
+  for (let i = 90; i <= 240; i++) {
     heightOptions.push(i);
   }
   const weightOptions = [];
-  for (let i = 40; i <= 110; i++) {
+  for (let i = 10; i <= 230; i++) {
     weightOptions.push(i);
   }
 
   // 신장, 체중 바텀시트
   const [isHeightSheetOpen, setIsHeightSheetOpen] = useState(false);
   const [isWeightSheetOpen, setIsWeightSheetOpen] = useState(false);
-  const [selectedHeight, setSelectedHeight] = useState(
-    user?.extra?.height || 183,
-  );
-  const [selectedWeight, setSelectedWeight] = useState(
-    user?.extra?.weight || 80,
-  );
+
   const [tempHeight, setTempHeight] = useState(user?.extra?.height || 183); // 바텀시트에서 임시 선택
   const [tempWeight, setTempWeight] = useState(user?.extra?.weight || 80);
 
-  const handleHeightConfirm = () => {
-    setSelectedHeight(tempHeight); // 임시값 확정
-
-    if (user) {
+  // 신장 cm 서버 반영 함수
+  const handleHeightConfirm = async () => {
+    if (user && token) {
       setUser({ ...user, extra: { ...user.extra, height: tempHeight } });
+
+      const result = await fetchAPI(`/users/${user._id}`, {
+        method: "PATCH",
+        body: { extra: { ...user.extra, height: tempHeight } },
+        token: token,
+      });
+
+      if (result.ok === 0) {
+        console.error(result.message);
+      }
     }
     setIsHeightSheetOpen(false);
   };
 
-  const handleWeightConfirm = () => {
-    setSelectedWeight(tempWeight); // 임시값 확정
-
-    if (user) {
+  // 체중 kg 서버 반영 함수
+  const handleWeightConfirm = async () => {
+    if (user && token) {
       setUser({ ...user, extra: { ...user.extra, weight: tempWeight } });
+
+      const result = await fetchAPI(`/users/${user._id}`, {
+        method: "PATCH",
+        body: { extra: { ...user.extra, weight: tempWeight } },
+        token: token,
+      });
+
+      if (result.ok === 0) {
+        console.error(result.message);
+      }
     }
     setIsWeightSheetOpen(false);
   };
@@ -62,10 +77,15 @@ export default function ProfileRecord() {
             {/* --------------- 신장 버튼 --------------- */}
             <button
               className="flex items-center justify-between px-7 gap-2 w-full cursor-pointer"
-              onClick={() => setIsHeightSheetOpen(true)}
+              onClick={() => {
+                setTempHeight(user?.extra?.height || 183); // 💀 추가
+                setIsHeightSheetOpen(true);
+              }}
             >
               <p className="basis-1/2 text-left shrink-0">신장</p>
-              <p className="basis-1/2 text-left">{selectedHeight}</p>
+              <p className="basis-1/2 text-left">
+                {user?.extra?.height || 183}
+              </p>
               <Image src="/icons/right-btn.svg" alt="" width={16} height={16} />
             </button>
           </li>
@@ -73,10 +93,13 @@ export default function ProfileRecord() {
             {/* --------------- 체중 버튼 --------------- */}
             <button
               className="flex items-center justify-between px-7 gap-2 w-full cursor-pointer"
-              onClick={() => setIsWeightSheetOpen(true)}
+              onClick={() => {
+                setTempWeight(user?.extra?.weight || 80); // 💀 추가
+                setIsWeightSheetOpen(true);
+              }}
             >
               <p className="basis-1/2 text-left shrink-0">체중</p>
-              <p className="basis-1/2 text-left">{selectedWeight}</p>
+              <p className="basis-1/2 text-left">{user?.extra?.weight || 80}</p>
               <Image src="/icons/right-btn.svg" alt="" width={16} height={16} />
             </button>
           </li>

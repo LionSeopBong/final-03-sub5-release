@@ -178,7 +178,7 @@ export default function WeatherPage() {
       rounded-full
       bg-white
       border border-gray-200
-      text-gray-700
+      text-[#003480]
       shadow-sm
       hover:bg-gray-50
       active:scale-95

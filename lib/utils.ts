@@ -190,17 +190,17 @@ export function getWeatherIcon({ caTot, ww }: WeatherInput): WeatherIconKey {
  * 4: 흐림
  */
 export function getSKY({ caTot, ww, wc }: WeatherInput): number {
-  // wc -> 5(가랑비),6(비),7(눈),8(소나기),9(뇌전)
-  if (wc >= 5 && wc <= 9) return wc;
+  // wc -> 5(안개),6(미세먼지),7(약한황사),8(강한황사),9(돌풍)
+  if (wc >= 5 && wc <= 9) return 4;
   // 강수·현상 우선 처리 (비/눈/소나기 등 → 흐림)
-  if (ww !== undefined) {
-    // KMA WW 코드에서 강수/현상 범주
-    // (비, 눈, 진눈개비, 소나기, 뇌우 등)
+  // wc -> 13(번개) 14(약한비) 15(중간비) 16(강한비)
+  if (wc >=13 && wc <= 16) return 8;
+  if (ww !== undefined) {    
     if (
       ww >= 20 &&
       ww <= 99 // 관측 가능한 기상현상 전반
     ) {
-      return 4;
+      return 3;
     }
   }
 
@@ -371,9 +371,9 @@ export function skyToEmoji(sky?: number, datetime?: Date): string {
       case 4:
         return "☁️"; // 흐린 밤
       case 5:
-        return "🌦"; // 가랑비
+        return "🌫️"; // 안개
       case 6:
-        return "☔"; // 비
+        return "😷"; // 황사
       case 7:
         return "❄"; // 눈
       case 8:
@@ -396,9 +396,9 @@ export function skyToEmoji(sky?: number, datetime?: Date): string {
     case 4:
       return "☁️"; // 흐림
     case 5:
-      return "🌦"; // 가랑비
+      return "🌫️"; // 안개
     case 6:
-      return "☔"; // 비
+      return "😷"; // 황사
     case 7:
       return "❄"; // 눈
     case 8:

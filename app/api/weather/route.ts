@@ -43,8 +43,8 @@ export async function GET(req: Request) {
 
     const weather: KmaObservation = {
       CA_TOT: Number(c[25]),
-      WC: Number(c[22].slice(0, 2)),
-      WW: Number(c[24].slice(0, 2)),
+      WC: Number(c[22]?.slice(0, 2) ?? 0),
+      WW: Number(c[24]?.slice(0, 2) ?? 0),
       TA: Math.floor(Number(c[11])),
       HM: Number(c[13]),
       WS: Math.round(Number(c[3])),

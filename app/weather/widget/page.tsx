@@ -25,6 +25,8 @@ import type { ForecastRow, LocationCoords, MidHalfDay } from "@/types/kma";
 
 import SearchLocationBar from "./components/searchLocationBar";
 import ShortTermColumns from "./ShortTermColumns";
+import Header from "@/app/components/common/Header";
+import Navi from "@/app/components/common/Navi";
 
 export type MidForecastResponse = {
   raw: string;
@@ -191,22 +193,33 @@ export default function ForecastPage() {
       };
     });
   useEffect(() => {
+    setError(null); // regId 변경 시 기존 에러 초기화
     fetch3DayForecastClient(regId)
       .then(setData)
-      .catch((err) => setError(err.message));
+      .catch(() =>
+        setError(
+          "일시적인 오류로 데이터를 불러올 수 없습니다 잠시 후 다시 시도해주세요",
+        ),
+      );
 
     // 중기 날씨
     fetchMidForecastClient(regId)
       .then((res) => setMidRaw(res.raw))
-      .catch((err) => setError(err.message));
+      .catch(() =>
+        setError(
+          "일시적인 오류로 데이터를 불러올 수 없습니다 잠시 후 다시 시도해주세요",
+        ),
+      );
 
     // ✅ 중기 기온
     fetchMidTempForecast(regId)
       .then((res) => setMidTempRaw(res.raw))
-      .catch((err) => setError(err.message));
+      .catch(() =>
+        setError(
+          "일시적인 오류로 데이터를 불러올 수 없습니다 잠시 후 다시 시도해주세요",
+        ),
+      );
   }, [regId]);
-
-  if (error) return <p>에러 발생: {error}</p>;
 
   const todayStr = formatDate(new Date());
 
@@ -269,7 +282,9 @@ export default function ForecastPage() {
   });
 
   return (
-    <main className="min-h-screen bg-white ">
+    <>
+    <Header />
+    
       <div className="mx-auto w-full max-w-md px-5 pb-10">
         <div className="bg-gray-50 flex justify-center py-4">
           <div className="w-full max-w-md px-4">
@@ -292,10 +307,10 @@ export default function ForecastPage() {
             <SearchLocationBar
               onSelect={async (place) => {
                 // ✅ 검색 버튼 클릭 후 위치가 변경되었을 때 위치 이름 출력
-                console.log("선택된 위치 이름:", place.place_name);
+                //console.log("선택된 위치 이름:", place.place_name);
                 setSelectedPlace(place.place_name);
                 try {
-                  console.log(place.x, place.y);
+                  //console.log(place.x, place.y);
                   setPos({ lat: Number(place.y), lon: Number(place.x) });
                   const nearest = findNearestStationFast(
                     { lat: Number(place.y), lon: Number(place.x) },
@@ -303,7 +318,7 @@ export default function ForecastPage() {
                   );
 
                   setRegId(nearest!.fct_id);
-                  console.log("reg_id:", nearest!.fct_id);
+                  //console.log("reg_id:", nearest!.fct_id);
                 } catch (err: any) {
                   console.error(err);
                   setError(err.message);
@@ -316,107 +331,135 @@ export default function ForecastPage() {
 
               <div className="overflow-x-auto pb-2">
                 <div className="min-w-[600px] border-collapse text-[10px] text-center">
-                  <div className="grid grid-cols-[60px_repeat(8,1fr)] border-b border-t border-gray-100">
-                    <div className="flex items-center justify-center bg-gray-50 font-medium ">
-                      날짜
+                  {error ? (
+                    <div className="py-12 text-center text-sm text-gray-500">
+                      일시적인 오류로 데이터를 불러올 수 없습니다 잠시 후 다시
+                      시도해주세요
                     </div>
+                  ) : (
+                    <>
+                      <div className="grid grid-cols-[60px_repeat(8,1fr)] border-b border-t border-gray-100">
+                        <div className="flex items-center justify-center bg-gray-50 font-medium ">
+                          날짜
+                        </div>
 
-                    <ShortTermColumns dayForecasts={dayForecasts} type="date" />
-                    {midDayForecasts.map((d, i) => (
-                      <div
-                        key={i}
-                        className="py-1 border-r border-gray-100 flex flex-col items-center"
-                      >
-                        <span>
-                          {formatLabel(
-                            new Date(
-                              d.date.slice(0, 4) +
-                                "-" +
-                                d.date.slice(4, 6) +
-                                "-" +
-                                d.date.slice(6),
-                            ),
-                          )}
-                        </span>
+                        <ShortTermColumns
+                          dayForecasts={dayForecasts}
+                          type="date"
+                        />
+                        {midDayForecasts.map((d, i) => (
+                          <div
+                            key={i}
+                            className="py-1 border-r border-gray-100 flex flex-col items-center"
+                          >
+                            <span>
+                              {formatLabel(
+                                new Date(
+                                  d.date.slice(0, 4) +
+                                    "-" +
+                                    d.date.slice(4, 6) +
+                                    "-" +
+                                    d.date.slice(6),
+                                ),
+                              )}
+                            </span>
+                          </div>
+                        ))}
                       </div>
-                    ))}
-                  </div>
 
-                  <div className="grid grid-cols-[60px_repeat(8,1fr)] border-b border-gray-100">
-                    <div className="py-1 bg-gray-50 font-medium border-r border-gray-100">
-                      시각
-                    </div>
-                    <ShortTermColumns dayForecasts={dayForecasts} type="time" />
-                    {midDayForecasts.map((_, i) => (
-                      <div
-                        key={i}
-                        className="col-span-1 grid grid-cols-2 border-r border-gray-100"
-                      >
-                        <span>오전</span>
-                        <span>오후</span>
+                      <div className="grid grid-cols-[60px_repeat(8,1fr)] border-b border-gray-100">
+                        <div className="py-1 bg-gray-50 font-medium border-r border-gray-100">
+                          시각
+                        </div>
+                        <ShortTermColumns
+                          dayForecasts={dayForecasts}
+                          type="time"
+                        />
+                        {midDayForecasts.map((_, i) => (
+                          <div
+                            key={i}
+                            className="col-span-1 grid grid-cols-2 border-r border-gray-100"
+                          >
+                            <span>오전</span>
+                            <span>오후</span>
+                          </div>
+                        ))}
                       </div>
-                    ))}
-                  </div>
 
-                  <div className="grid grid-cols-[60px_repeat(8,1fr)] border-b border-gray-100">
-                    <div className="py-2 bg-gray-50 font-medium border-r border-gray-100">
-                      날씨
-                    </div>
-                    <ShortTermColumns dayForecasts={dayForecasts} type="sky" />
-                    {midDayForecasts.map((d, i) => (
-                      <div
-                        key={i}
-                        className="grid grid-cols-2 border-r border-gray-100"
-                      >
-                        <span>
-                          {d.am.sky
-                            ? skyToSimpleEmoji(d.am.sky, d.am.pref)
-                            : "-"}
-                        </span>
-                        <span>
-                          {d.pm.sky
-                            ? skyToSimpleEmoji(d.pm.sky, d.pm.pref)
-                            : "-"}
-                        </span>
+                      <div className="grid grid-cols-[60px_repeat(8,1fr)] border-b border-gray-100">
+                        <div className="py-2 bg-gray-50 font-medium border-r border-gray-100">
+                          날씨
+                        </div>
+                        <ShortTermColumns
+                          dayForecasts={dayForecasts}
+                          type="sky"
+                        />
+                        {midDayForecasts.map((d, i) => (
+                          <div
+                            key={i}
+                            className="grid grid-cols-2 border-r border-gray-100"
+                          >
+                            <span>
+                              {d.am.sky
+                                ? skyToSimpleEmoji(d.am.sky, d.am.pref)
+                                : "-"}
+                            </span>
+                            <span>
+                              {d.pm.sky
+                                ? skyToSimpleEmoji(d.pm.sky, d.pm.pref)
+                                : "-"}
+                            </span>
+                          </div>
+                        ))}
                       </div>
-                    ))}
-                  </div>
 
-                  <div className="grid grid-cols-[60px_repeat(8,1fr)] border-b border-gray-100">
-                    <div className="py-2 bg-gray-50 font-medium border-r border-gray-100">
-                      기온
-                    </div>
-                    <ShortTermColumns dayForecasts={dayForecasts} type="temp" />
-                    {midDayForecasts.map((d, i) => (
-                      <div
-                        key={i}
-                        className="grid grid-cols-2 border-r border-gray-100"
-                      >
-                        <span className="text-blue-500">
-                          {d.am.temp !== null ? `${d.am.temp}°` : "-"}
-                        </span>
-                        <span className="text-red-500">
-                          {d.pm.temp !== null ? `${d.pm.temp}°` : "-"}
-                        </span>
+                      <div className="grid grid-cols-[60px_repeat(8,1fr)] border-b border-gray-100">
+                        <div className="py-2 bg-gray-50 font-medium border-r border-gray-100">
+                          기온
+                        </div>
+                        <ShortTermColumns
+                          dayForecasts={dayForecasts}
+                          type="temp"
+                        />
+                        {midDayForecasts.map((d, i) => (
+                          <div
+                            key={i}
+                            className="grid grid-cols-2 border-r border-gray-100"
+                          >
+                            <span className="text-blue-500">
+                              {d.am.temp !== null ? `${d.am.temp}°` : "-"}
+                            </span>
+                            <span className="text-red-500">
+                              {d.pm.temp !== null ? `${d.pm.temp}°` : "-"}
+                            </span>
+                          </div>
+                        ))}
                       </div>
-                    ))}
-                  </div>
 
-                  <div className="grid grid-cols-[60px_repeat(8,1fr)]">
-                    <div className="py-2 bg-gray-50 font-medium border-r border-gray-100">
-                      강수확률
-                    </div>
-                    <ShortTermColumns dayForecasts={dayForecasts} type="st" />
-                    {midDayForecasts.map((d, i) => (
-                      <div
-                        key={i}
-                        className="grid grid-cols-2 border-r border-gray-100"
-                      >
-                        <span>{d.am.st !== null ? `${d.am.st}%` : "-"}</span>
-                        <span>{d.pm.st !== null ? `${d.pm.st}%` : "-"}</span>
+                      <div className="grid grid-cols-[60px_repeat(8,1fr)]">
+                        <div className="py-2 bg-gray-50 font-medium border-r border-gray-100">
+                          강수확률
+                        </div>
+                        <ShortTermColumns
+                          dayForecasts={dayForecasts}
+                          type="st"
+                        />
+                        {midDayForecasts.map((d, i) => (
+                          <div
+                            key={i}
+                            className="grid grid-cols-2 border-r border-gray-100"
+                          >
+                            <span>
+                              {d.am.st !== null ? `${d.am.st}%` : "-"}
+                            </span>
+                            <span>
+                              {d.pm.st !== null ? `${d.pm.st}%` : "-"}
+                            </span>
+                          </div>
+                        ))}
                       </div>
-                    ))}
-                  </div>
+                    </>
+                  )}
                 </div>
               </div>
             </div>
@@ -428,6 +471,7 @@ export default function ForecastPage() {
           </div>
         </div>
       </div>
-    </main>
+    <Navi />
+    </>
   );
 }

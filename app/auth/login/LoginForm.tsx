@@ -9,13 +9,14 @@ import { useActionState, useEffect, useRef, useState } from "react";
 import { login } from "@/actions/user";
 import Alert from "@/app/components/ui/Alert";
 
-import useAlert from "@/hooks/useAlert";
 import useUserStore from "@/zustand/user";
-import { validateLogin } from "@/app/lib/validation/login";
-import SocialLoginButtons from "@/app/auth/login/_components/SocialLoginButtons";
+import { validateLogin } from "@/app/lib/components/login";
+import SocialLoginButtons from "@/app/auth/login/SocialLoginButtons";
+import LoginButton from "@/app/auth/login/LoginButton";
+import useAlert from "@/hooks/useAlert";
 
 export default function LoginForm() {
-  const [userState, formAction] = useActionState(login, null);
+  const [userState, formAction, isPending] = useActionState(login, null);
   const router = useRouter();
   const setUser = useUserStore((state) => state.setUser);
 
@@ -33,27 +34,25 @@ export default function LoginForm() {
 
   useEffect(() => {
     if (userState?.ok === 1) {
+      closeAlert();
       setUser(userState.item);
-
       router.replace("/home");
       return;
-    } else if (userState?.ok === 0) {
+    }
+    if (userState?.ok === 0) {
       openAlert(
         userState.message ??
           "이메일 또는 비밀번호가 올바르지 않습니다.\n다시 확인해주세요.",
       );
     }
-  }, [userState, router, setUser, openAlert]);
+  }, [userState, setUser, router, openAlert]);
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     const emailTrim = email.trim();
-    const passwordValue = password;
-
-    const error = validateLogin(emailTrim, passwordValue);
+    const error = validateLogin(emailTrim, password);
     if (error) {
       e.preventDefault();
       openAlert(error);
-      return;
     }
   };
 
@@ -102,6 +101,7 @@ export default function LoginForm() {
               alt=""
               width={20}
               height={20}
+              className="w-5 h-5"
             />
           </button>
         </div>
@@ -114,6 +114,7 @@ export default function LoginForm() {
             name="password"
             type={showPassword ? "text" : "password"}
             placeholder="password"
+            autoComplete="current-password"
             className={[
               "w-full border-b-2 border-gray-300 px-1 py-3 text-base",
               "caret-primary focus:border-b-primary focus:outline-none focus:ring-0",
@@ -140,22 +141,7 @@ export default function LoginForm() {
           </button>
         </div>
 
-        {/* 로그인 버튼 */}
-        <button
-          type="submit"
-          className="w-full rounded-2xl bg-primary px-3 py-2.5 text-lg font-semibold text-white"
-        >
-          로그인
-        </button>
-
-        <div className="mt-6 flex justify-center">
-          <Link
-            href="/auth/terms"
-            className="text-sm font-semibold text-logText"
-          >
-            이메일 회원가입
-          </Link>
-        </div>
+        <LoginButton isPending={isPending} />
 
         <SocialLoginButtons />
       </form>

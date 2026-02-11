@@ -1,13 +1,9 @@
 "use client";
 
+import { signIn } from "next-auth/react";
 import Image from "next/image";
 
-type Props = {
-  onGoogle?: () => void;
-  onKakao?: () => void;
-};
-
-export default function SocialLoginButtons({ onGoogle, onKakao }: Props) {
+export default function SocialLoginButtons() {
   return (
     <div className="space-y-2 pt-2">
       <div className="flex items-center gap-3">
@@ -23,28 +19,33 @@ export default function SocialLoginButtons({ onGoogle, onKakao }: Props) {
           type="button"
           aria-label="Google 로그인"
           className="h-9 w-9  flex items-center justify-center"
-          onClick={() => alert("구글 로그인 연결 예정")}
+          onClick={() =>
+            signIn("google", { callbackUrl: "/auth/SocialCallback" })
+          }
         >
           <Image
             src="/icons/google.svg"
             alt="Google"
             width={36}
             height={36}
-            priority
+            className="w-9 h-9"
           />
         </button>
 
         <button
           type="button"
           aria-label="Kakao 로그인"
-          className="h-9 w-9 rounded-full bg-[#FEE500] flex items-center justify-center"
-          onClick={() => alert("카카오 로그인 연결 예정")}
+          className="h-9 w-9 rounded-full flex items-center justify-center"
+          onClick={() =>
+            signIn("kakao", { callbackUrl: "/auth/SocialCallback" })
+          }
         >
           <Image
             src="/icons/kakao.svg"
             alt="카카오 로그인"
             width={34}
             height={34}
+            className="w-9 h-9"
           />
         </button>
       </div>

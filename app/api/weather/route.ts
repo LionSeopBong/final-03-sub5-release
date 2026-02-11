@@ -4,24 +4,30 @@ import type { KmaObservation } from "@/types/kma";
 import fs from "fs";
 import path from "path";
 
+import type { Station } from "@/types/kma";
+
+// function import
+import { findNearestStationFast } from "@/lib/utils";
+
 export async function GET(req: Request) {
   try {
     const { searchParams } = new URL(req.url);
-    const stn = searchParams.get("stn");
-    const tm = searchParams.get("tm");
-    /* 필요하면 읽어들임
-     * const filePath = path.join(process.cwd(), "data", "stn.json");
-     * const jsonData = fs.readFileSync(filePath, "utf8");
-     * const data = JSON.parse(jsonData);
-     */
 
-    if (!stn || !tm) {
-      return NextResponse.json(
-        { error: "stn, tm 파라미터가 필요합니다" },
-        { status: 400 },
-      );
+    const tm = Number(searchParams.get("tm"));
+    const lat = Number(searchParams.get("lat"));
+    const lon = Number(searchParams.get("lon"));
+
+    if (Number.isNaN(lat) || Number.isNaN(lon)) {
+      return NextResponse.json({ error: "invalid coords" }, { status: 400 });
     }
 
+    const filePath = path.join(process.cwd(), "data", "stn.json");
+    const jsonData = fs.readFileSync(filePath, "utf8");
+    const stations: Station[] = JSON.parse(jsonData);
+
+    const nearest = findNearestStationFast({ lat, lon }, stations);
+    const stn = nearest.stn;
+    //console.log("stn: ", stn);
     const res = await fetch(
       `https://apihub.kma.go.kr/api/typ01/url/kma_sfctm2.php?stn=${stn}&tm=${tm}&authKey=${process.env.KMA_API_KEY}`,
       { cache: "no-store" },

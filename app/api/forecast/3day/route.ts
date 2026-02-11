@@ -14,18 +14,23 @@ export async function GET(request: Request) {
 
     const serviceKey = process.env.KMA_API_KEY;
     if (!serviceKey) {
-      return NextResponse.json({ error: "KMA_API_KEY is missing" }, { status: 500 });
+      return NextResponse.json(
+        { error: "KMA_API_KEY is missing" },
+        { status: 500 },
+      );
     }
 
-    const tmfc = "202602060000"; // 임시 고정, 필요 시 getLatestTmFc()로 대체
     const url =
       `https://apihub.kma.go.kr/api/typ01/url/fct_afs_dl.php` +
-      `?tmfc=${tmfc}&reg=${regId}&disp=1&authKey=${serviceKey}`;
+      `?reg=${regId}&disp=1&authKey=${serviceKey}`;
 
     const res = await fetch(url);
     if (!res.ok) {
       const errText = await res.text();
-      return NextResponse.json({ error: `KMA API error ${res.status}`, detail: errText }, { status: 500 });
+      return NextResponse.json(
+        { error: `KMA API error ${res.status}`, detail: errText },
+        { status: 500 },
+      );
     }
 
     // text 그대로 가져오기
@@ -57,16 +62,7 @@ export async function GET(request: Request) {
       };
     });
 
-    // 현재 시각 기준 3일치 필터링
-    const now = nowKST();
-    const end = new Date(now.getTime() + 3 * 24 * 60 * 60 * 1000);
-
-    const filtered = rows.filter((r) => {
-      const ef = parseTm(r.TM_EF);
-      return ef >= now && ef <= end;
-    });
-
-    return NextResponse.json(filtered);
+    return NextResponse.json(rows);
   } catch (err: any) {
     console.error("Forecast API error:", err);
     return NextResponse.json({ error: String(err) }, { status: 500 });

@@ -1,10 +1,18 @@
+import { ErrorRes } from "@/types/api";
+
+const API_URL = process.env.NEXT_PUBLIC_API_URL;
+const CLIENT_ID = process.env.NEXT_PUBLIC_CLIENT_ID || "";
+
+/*
+  회원가입 입력값 검증
+*/
 type SignupValues = {
   email: string;
   password: string;
   passwordConfirm: string;
 };
 
-type SignupError =
+export type SignupError =
   | { field: "email"; message: string }
   | { field: "password"; message: string }
   | { field: "passwordConfirm"; message: string }
@@ -48,4 +56,38 @@ export function validateSignup(values: SignupValues): SignupError {
   }
 
   return null;
+}
+
+/* 
+  이메일 중복 체크
+  - 중복 없음 → null
+  - 중복/에러 → ErrorRes
+*/
+export async function checkEmail(email: string): Promise<ErrorRes | null> {
+  const trimmed = email.trim();
+
+  try {
+    const res = await fetch(
+      `${API_URL}/users/email?email=${encodeURIComponent(trimmed)}`,
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          "Client-Id": CLIENT_ID,
+        },
+      },
+    );
+
+    const data = (await res.json().catch(() => null)) as
+      | { ok: 1 }
+      | ErrorRes
+      | null;
+
+    if (data?.ok === 1) return null;
+    if (data?.ok === 0) return data; // 중복/에러
+
+    return { ok: 0, message: "이메일 확인 중 문제가 발생했어요." };
+  } catch {
+    return { ok: 0, message: "네트워크 문제로 이메일 확인에 실패했어요." };
+  }
 }

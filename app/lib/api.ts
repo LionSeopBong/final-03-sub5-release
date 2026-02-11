@@ -11,24 +11,24 @@ async function fetchAPI(
   const url = API_URL + endpoint;
 
   const headers: HeadersInit = {
-    "client-id": `${CLIENT_ID}`,
+    "Client-Id": `${CLIENT_ID}`,
     "Content-Type": "application/json",
   };
 
   if (options?.token) {
     headers["Authorization"] = `Bearer ${options.token}`;
   }
-  const response = await fetch(url, {
-    method: options?.method || "GET",
+  const res = await fetch(url, {
+    method: options?.method ?? "GET",
     headers,
     body: options?.body ? JSON.stringify(options.body) : undefined,
   });
 
-  if (!response.ok) {
-    throw new Error(`API Error: ${response.status}`);
+  try {
+    return await res.json();
+  } catch {
+    return { ok: 0, message: `API Error: ${res.status}` };
   }
-
-  return response.json();
 }
 
 export default fetchAPI;

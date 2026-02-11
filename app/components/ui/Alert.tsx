@@ -37,7 +37,9 @@ export default function Alert({
       <button
         aria-label="닫기"
         className="absolute inset-0 bg-black/40"
-        onClick={onClose}
+        onClick={() => {
+          if (!isConfirm) onClose(); // confirm일 땐 바깥 클릭 막기
+        }}
         type="button"
       />
 
@@ -62,8 +64,8 @@ export default function Alert({
           <button
             type="button"
             onClick={() => {
-              if (isConfirm) onConfirm();
-              else onClose();
+              onClose(); // 먼저 닫고
+              if (isConfirm) onConfirm(); // 그 다음 실행
             }}
             className="flex-1 rounded-2xl bg-primary py-3 text-sm font-semibold text-white"
           >
@@ -71,6 +73,83 @@ export default function Alert({
           </button>
         </div>
       </div>
+    </div>
+  );
+}
+
+export function ActionSheet({
+  open,
+  onClose,
+  onDefault,
+  onAlbum,
+}: {
+  open: boolean;
+  onClose: () => void;
+  onDefault: () => void;
+  onAlbum: () => void;
+}) {
+  if (!open) return null;
+
+  return (
+    <div className="fixed inset-0 z-50">
+      {/* overlay */}
+      <button
+        className="absolute inset-0 bg-black/35"
+        aria-label="닫기"
+        onClick={onClose}
+      />
+
+      {/* sheet */}
+      <div className="absolute bottom-0 left-0 right-0 px-5 pb-5">
+        <div className="translate-y-0 animate-sheet-up space-y-3">
+          {/* 그룹 1: 액션들 */}
+          <div className="rounded-3xl bg-[#F2F2F7] p-3 shadow-xl ring-1 ring-black/10">
+            <button
+              type="button"
+              onClick={onDefault}
+              className="h-14 w-full rounded-2xl bg-white text-base font-semibold text-gray-900 active:scale-[0.99]"
+            >
+              기본 이미지 선택
+            </button>
+
+            <div className="my-3 h-px bg-black/10" />
+
+            <button
+              type="button"
+              onClick={onAlbum}
+              className="h-14 w-full rounded-2xl bg-white text-base font-semibold text-gray-900 active:scale-[0.99]"
+            >
+              앨범에서 선택
+            </button>
+          </div>
+
+          {/* 그룹 2: 취소 (분리) */}
+          <button
+            type="button"
+            onClick={onClose}
+            className="h-14 w-full rounded-3xl bg-white text-base font-semibold text-gray-900 shadow-xl ring-1 ring-black/10 active:scale-[0.99]"
+          >
+            취소
+          </button>
+        </div>
+      </div>
+
+      {/* animation keyframes */}
+      <style jsx>{`
+        @keyframes sheetUp {
+          from {
+            transform: translateY(16px);
+            opacity: 0;
+          }
+          to {
+            transform: translateY(0);
+            opacity: 1;
+          }
+        }
+        .animate-sheet-up {
+          animation: sheetUp 140ms ease-out;
+        }
+      `}</style>
     </div>
   );
 }

@@ -1,7 +1,9 @@
 "use client";
 
 import Navi from "@/app/components/common/Navi";
+import fetchAPI from "@/app/lib/api";
 import ProfileHeader from "@/app/profile/components/ProfileHeader";
+import useUserStore from "@/zustand/user";
 import Image from "next/image";
 import { useState } from "react";
 
@@ -11,6 +13,10 @@ export default function CreatePost() {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [showValidation, setShowValidation] = useState(false);
+
+  // zustand 상태 가져오기
+  const { user } = useUserStore();
+  const token = user?.token?.accessToken;
 
   const closeSubmitModal = () => {
     setIsSubmitSuccess(false);
@@ -24,41 +30,33 @@ export default function CreatePost() {
     setErrorMessage(null); // 제출 시도 시, 기존 에러 초기화
     setShowValidation(true); // 제출 시도 시, 활성화
 
+    // 입력 유효성 검증
     if (!title.trim() || !content.trim()) {
       return;
     }
 
-    const formData = new FormData(e.currentTarget);
-    const body = Object.fromEntries(formData.entries());
-    const token = localStorage.getItem("accessToken");
-
+    // 토큰 검증
     if (!token) {
       setErrorMessage("로그인이 필요합니다.");
       return;
     }
+    // 게시글 생성 API 호출
+    const result = await fetchAPI("/posts", {
+      method: "POST",
+      body: { title: title, content: content, type: "qna" },
+      token: token,
+    });
 
-    // ★★★★★★★★★★★★★★ 임시로 API 호출 주석 처리
-    // try {
-    //   await fetchAPI("/posts", {
-    //     method: "POST",
-    //     body,
-    //     token,
-    //   });
-    //   setIsSubmitSuccess(true);
-    // } catch (err: unknown) {
-    //   if (err instanceof Error) {
-    //     setErrorMessage(err.message);
-    //   } else {
-    //     setErrorMessage("일시적인 네트워크 오류가 발생했습니다.");
-    //   }
-    // }
-
-    setIsSubmitSuccess(true);
+    if (result.ok === 1) {
+      setIsSubmitSuccess(true);
+    } else {
+      setErrorMessage(result.message || "문의 등록에 실패했습니다.");
+    }
   }
 
   return (
     <>
-      <ProfileHeader />
+      <ProfileHeader title="문의글 작성" />
       <main className="pb-16">
         <div className="inquiry-wrapper m-4 px-4 py-6 flex flex-col gap-4 border border-gray-200 rounded-xl">
           <form onSubmit={PostSubmit} className="flex flex-col gap-4">

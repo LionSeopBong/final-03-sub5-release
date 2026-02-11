@@ -1,9 +1,14 @@
 // ■■■■■ profile 헤더 컴포넌트 ■■■■■
 "use client";
+
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 
-export default function ProfileHeader() {
+interface ProfileHeaderProps {
+  title: string;
+}
+
+export default function ProfileHeader({ title }: ProfileHeaderProps) {
   const router = useRouter();
 
   return (
@@ -22,7 +27,7 @@ export default function ProfileHeader() {
           />
         </button>
         <h2 className="font-pretendard profile-title text-xl font-semibold absolute left-1/2 -translate-x-1/2">
-          프로필
+          {title}
         </h2>
       </header>
     </div>

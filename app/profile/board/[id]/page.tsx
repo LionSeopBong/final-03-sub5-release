@@ -1,9 +1,13 @@
 "use client";
 
 import Navi from "@/app/components/common/Navi";
+import fetchAPI from "@/app/lib/api";
 import CommentList from "@/app/profile/board/[id]/CommentList";
 import ProfileHeader from "@/app/profile/components/ProfileHeader";
-import { use, useState } from "react";
+import { Post } from "@/types/post";
+import useUserStore from "@/zustand/user";
+import { useRouter } from "next/navigation";
+import { use, useEffect, useState } from "react";
 
 export default function PostDetailPage({
   params,
@@ -11,50 +15,37 @@ export default function PostDetailPage({
   params: Promise<{ id: string }>;
 }) {
   const { id: postId } = use(params);
+  const router = useRouter();
 
-  // const post = await fetchPost(postId)
-  const post = {
-    _id: 1,
-    type: "qna",
-    user: {
-      _id: 4,
-      name: "제이지",
-      email: "u1@market.com",
-      image: "user-jayg.webp",
-    },
-    title: "크기가 얼만만한가요?",
-    content: "아이가 6살인데 가지고 놀기 적당한 크기인가요?",
-    replies: [
-      {
-        _id: 1,
-        user: {
-          _id: 2,
-          name: "네오",
-          email: "s1@market.com",
-          image: "user-neo.webp",
-        },
-        content: "크기는 상품 상세정보에 나와 있습니다.",
-        createdAt: "2026.01.31 08:15:14",
-        updatedAt: "2026.01.31 11:15:14",
-      },
-    ],
-    createdAt: "2026.02.02 06:15:14",
-    updatedAt: "2026.01.31 12:15:14",
-  };
+  // zustand 에서 유저 정보 가져오기
+  const user = useUserStore((state) => state.user);
+  const token = user?.token?.accessToken;
 
+  // 상태 관리
+  const [post, setPost] = useState<Post | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isEditing, setIsEditing] = useState(false); // 편집 모드
+  const [title, setTitle] = useState(""); // 편집할 제목
+  const [content, setContent] = useState(""); // 편집할 내용
+
+  // 댓글 관리
+  const [replyContent, setReplyContent] = useState(""); // 댓글 내용
+  const [replyRefresh, setReplyRefresh] = useState(0); // 댓글 목록 새로 고침
+
+  // 권한 체크
+  const isAdmin = user?.extra?.role === "admin" || false;
+  const isAuthor = post?.user._id === user?._id || false;
+
+  // 모달
   const [isReplyModalOpen, setIsReplyModalOpen] = useState(false); // 답변 모달
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false); // 삭제 모달
-  const [isEditing, setIsEditing] = useState(false); // 편집 모드
-  const [title, setTitle] = useState(post.title); // 편집할 제목
-  const [content, setContent] = useState(post.content); // 편집할 내용
-  const isAdmin = true; // ★★★★★★★★ 임시 관리자 변수
-  const isAuthor = true; // ★★★★★★★★ 임시 작성자 변수
 
   const openReplyModal = () => {
     setIsReplyModalOpen(true);
   };
   const closeReplyModal = () => {
     setIsReplyModalOpen(false);
+    setReplyContent("");
   };
   const openDeleteModal = () => {
     setIsDeleteModalOpen(true);
@@ -63,10 +54,134 @@ export default function PostDetailPage({
     setIsDeleteModalOpen(false);
   };
 
+  // 게시글 조회 API
+  useEffect(() => {
+    const fetchPost = async () => {
+      if (!token) {
+        router.push("/login");
+        return;
+      }
+      setIsLoading(true);
+      const result = await fetchAPI(`/posts/${postId}`, {
+        method: "GET",
+        token: token,
+      });
+
+      if (result.ok === 1) {
+        if (result.item.type !== "qna") {
+          alert("잘못된 접근입니다.");
+          router.back();
+          return;
+        }
+        setPost(result.item);
+        setTitle(result.item.title);
+        setContent(result.item.content);
+      } else {
+        alert("게시글을 불러올 수 없습니다.");
+        router.back();
+      }
+      setIsLoading(false);
+    };
+    fetchPost();
+  }, [postId, token, router]);
+
+  // 게시글 수정 API
+  const handleEdit = async () => {
+    if (isEditing) {
+      if (!token) return;
+
+      const result = await fetchAPI(`/posts/${postId}`, {
+        method: "PATCH",
+        token: token,
+        body: { title, content },
+      });
+
+      if (result.ok === 1) {
+        alert("수정되었습니다.");
+        setPost({ ...post!, title, content });
+        setIsEditing(false);
+      } else {
+        alert("수정 실패 : " + result.message);
+      }
+    } else {
+      setIsEditing(true);
+    }
+  };
+
+  // 게시글 삭제
+  const handleDelete = async () => {
+    if (!token) return;
+
+    const result = await fetchAPI(`/posts/${postId}`, {
+      method: "DELETE",
+      token: token,
+    });
+
+    if (result.ok === 1) {
+      alert("삭제되었습니다.");
+      router.back();
+    } else {
+      alert("삭제 실패: " + result.message);
+    }
+    closeDeleteModal();
+  };
+
+  // 댓글 작성
+  const handleReplySubmit = async () => {
+    if (!token || !replyContent.trim()) {
+      alert("답변 내용을 입력해주세요.");
+      return;
+    }
+
+    const result = await fetchAPI(`/posts/${postId}/replies`, {
+      method: "POST",
+      token: token,
+      body: { content: replyContent },
+    });
+
+    if (result.ok === 1) {
+      alert("답변이 등록되었습니다.");
+      setReplyContent("");
+      closeReplyModal();
+      setReplyRefresh((prev) => prev + 1); // ← 댓글 목록 새로고침
+    } else {
+      alert("답변 등록 실패: " + result.message);
+    }
+  };
+
+  // 로딩 중 처리
+  if (isLoading) {
+    return (
+      <>
+        <ProfileHeader title="게시글 상세" />
+        <div className="flex items-center justify-center min-h-[400px]">
+          <p className="border border-gray-200 rounded-[20px] px-20 py-10 text-gray-500 font-semibold text-center w-full">
+            불러오는 중...
+          </p>
+        </div>
+        <Navi />
+      </>
+    );
+  }
+
+  // 게시글 없음
+  if (!post) {
+    return (
+      <>
+        <ProfileHeader title="게시글 상세" />
+        <div className="flex items-center justify-center min-h-[400px]">
+          <p className="border border-gray-200 rounded-[20px] px-12 py-8 text-gray-500 font-semibold">
+            게시글을 찾을 수 없습니다.
+          </p>
+        </div>
+        <Navi />
+      </>
+    );
+  }
+
   return (
     <>
-      <ProfileHeader />
-
+      <ProfileHeader title="게시글 상세" />
       {/* ---------------------------- 게시글 상세 ---------------------------- */}
       <main className="p-4 pb-24 flex flex-col gap-4 min-h-[calc(100vh-120px)]">
         <section className="flex flex-col gap-4 px-4">
@@ -92,7 +207,7 @@ export default function PostDetailPage({
               className="border border-gray-200 rounded-md p-3 leading-relaxed min-h-[200px]"
             />
           ) : (
-            <p className="border border-gray-200 rounded-md p-3 leading-relaxed">
+            <p className="border border-gray-200 rounded-md p-3 leading-relaxed whitespace-pre-wrap">
               {content}
             </p>
           )}
@@ -111,7 +226,7 @@ export default function PostDetailPage({
             <button
               type="button"
               className="edit-post-btn border border-gray-400 rounded-md py-1 px-2 cursor-pointer"
-              onClick={() => setIsEditing(!isEditing)}
+              onClick={handleEdit}
             >
               {isEditing ? "저장" : "수정"}
             </button>
@@ -126,7 +241,7 @@ export default function PostDetailPage({
             </button>
           )}
         </div>
-        <CommentList />
+        <CommentList postId={postId} key={replyRefresh} />
 
         {/* ●●●●● 답변하기 모달창 */}
         {isReplyModalOpen && (
@@ -150,10 +265,12 @@ export default function PostDetailPage({
                   <textarea
                     placeholder="이곳에 답변 내용을 작성해 주세요."
                     maxLength={500}
+                    value={replyContent}
+                    onChange={(e) => setReplyContent(e.target.value)}
                     className="w-full h-[100px] border border-gray-200 rounded-sm p-2 resize-none leading-relaxed"
                   ></textarea>
                   <span className="absolute bottom-2 right-4 text-sm text-gray-400">
-                    0 / 500
+                    {replyContent.length}/500
                   </span>
                 </div>
 
@@ -161,6 +278,7 @@ export default function PostDetailPage({
                   <button
                     type="button"
                     className="w-1/2 border border-[#003458] rounded-[5px] py-2 bg-[#003458] text-white cursor-pointer"
+                    onClick={handleReplySubmit}
                   >
                     등록
                   </button>
@@ -207,6 +325,7 @@ export default function PostDetailPage({
                   <button
                     type="button"
                     className="w-1/2 border border-[#e85c5c] rounded-[5px] py-2 bg-[#e85c5c] text-white cursor-pointer"
+                    onClick={handleDelete}
                   >
                     삭제
                   </button>

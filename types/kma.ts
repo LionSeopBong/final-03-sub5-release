@@ -90,7 +90,6 @@ export interface WeatherDataResponse {
   kma_sfctm2: WeatherData[];
 }
 
-
 export interface LocationCoords {
   lat: number;
   lon: number;
@@ -98,15 +97,16 @@ export interface LocationCoords {
 
 export interface Station extends LocationCoords {
   stn: number;
-  name: string;
+  //name: string;
+  name_ko: string;
   address: string;
-};
+}
 
 export interface LocationRow extends LocationCoords {
   code: string;
   sido: string;
-  dong: string;  
-};
+  dong: string;
+}
 
 export interface RawForecastItem {
   tmef: string; // YYYYMMDDHH
@@ -119,7 +119,6 @@ export interface HourlyForecast {
   temperature?: number;
   rainProbability?: number;
 }
-
 
 export interface ForecastItem {
   baseDate: string;
@@ -137,10 +136,10 @@ export interface TempForecast {
   temperature: number;
 }
 
-export interface StationXY extends LocationCoords{
+export interface StationXY extends LocationCoords {
   grid_x: number;
-  grid_y: number;  
-};
+  grid_y: number;
+}
 
 export type ForecastRow = {
   REG_ID: string;
@@ -159,7 +158,6 @@ export type ForecastRow = {
   WF: string;
 };
 
-
 export type KakaoRegion = {
   region_type: "B" | "H";
   region_1depth_name: string; // 시/도
@@ -172,7 +170,6 @@ export type KakaoRegion = {
 export type KakaoCoord2RegionResponse = {
   documents: KakaoRegion[];
 };
-
 
 export type WeatherIconKey =
   | "clear"
@@ -188,12 +185,10 @@ export type WeatherIconKey =
   | "drizzle"
   | "unknown";
 
-
 export type WeatherInput = {
   caTot: number; // CA(TOT)
   ww: number; // WW
 };
-
 
 export interface KakaoAddressResult {
   address_name: string;
@@ -208,15 +203,34 @@ export interface KakaoSearchResponse {
 
 export type KmaObservation = {
   CA_TOT: number; // 전운량 (0~10)
-  WW: number;     // 기상현상 코드
-  TA: number;     // 기온 (°C)
-  HM: number;     // 상대습도 (%)
-  WS: number;     // 풍속 (m/s)
-  VS: number;     // 가시거리 (m)
+  WW: number; // 기상현상 코드
+  TA: number; // 기온 (°C)
+  HM: number; // 상대습도 (%)
+  WS: number; // 풍속 (m/s)
+  VS: number; // 가시거리 (m)
 };
-
 
 export type TempItem = {
   datetime: Date;
   temperature: number;
 };
+
+export type Hours3Forecast = {
+  datetime: Date;
+  temperature?: number;
+  sky?: number;
+  pcp?: number;
+};
+
+export interface RegIdRow {
+  code: string;
+  sido: string;
+  dong: string;
+  lon: number;
+  lat: number;
+}
+
+export interface AnalysisFactor {
+  label: string;
+  penalty: number;
+}

@@ -6,7 +6,7 @@ export async function GET(request: Request) {
 
   const nx = searchParams.get("nx") || "63";
   const ny = searchParams.get("ny") || "124";
-  const base_date = searchParams.get("base_date") || "20260206";
+  const base_date = searchParams.get("base_date") || "20260207";
   const base_time = searchParams.get("base_time") || "0500";
 
   const url = new URL(
@@ -14,9 +14,7 @@ export async function GET(request: Request) {
   );
 
   const params = {
-    serviceKey: process.env.DATA_PORTAL_KMA!,
-    pageNo: "1",
-    numOfRows: "300",
+    serviceKey: process.env.DATA_PORTAL_KMA!,    
     dataType: "JSON",
     base_date,
     base_time,

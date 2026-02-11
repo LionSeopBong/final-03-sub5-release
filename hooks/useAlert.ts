@@ -20,6 +20,8 @@ export default function useAlert() {
     setState({
       open: true,
       message,
+      onConfirm: undefined,
+      showCancel: false,
     });
   }, []);
 
@@ -40,6 +42,8 @@ export default function useAlert() {
     setState({
       open: false,
       message: "",
+      onConfirm: undefined,
+      showCancel: false,
     });
   }, []);
 

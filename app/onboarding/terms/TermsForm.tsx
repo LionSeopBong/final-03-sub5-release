@@ -1,15 +1,34 @@
 "use client";
 
-import CheckIcon from "@/app/auth/terms/components/CheckIcon";
 import TermsDialog, { TermKey } from "@/app/components/ui/TermsDialog";
+import CheckIcon from "@/app/onboarding/terms/CheckIcon";
 import { useTerms } from "@/hooks/useTerms";
+import { useOnboardingStore } from "@/zustand/onboardingStore";
 
 import Image from "next/image";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
 
-export default function TermsPage() {
+export default function TermsForm() {
   const router = useRouter();
+  const social = useSearchParams();
+  const from = social.get("from");
+
+  const handleNext = () => {
+    const onboarding = useOnboardingStore.getState();
+
+    // 소셜이면 oauth로 고정 + userId는 SocialCallbackPage에서 이미 세팅됨
+    if (from === "oauth") {
+      onboarding.setMode("oauth"); // 안전장치(있어도 됨)
+      router.replace("/onboarding/profile");
+      return;
+    }
+
+    // 이메일이면 email로 고정 + 소셜 흔적 제거
+    onboarding.setMode("email");
+
+    router.replace("/auth/signup");
+  };
 
   const [detailOpen, setDetailOpen] = useState(false);
   const [detailKey, setDetailKey] = useState<TermKey | null>(null);
@@ -38,7 +57,7 @@ export default function TermsPage() {
               alt="뒤로가기"
               width={24}
               height={24}
-              priority
+              className="w-6 h-6"
             />
           </button>
         </div>
@@ -87,7 +106,8 @@ export default function TermsPage() {
                     src="/icons/arrow_forward.svg"
                     alt=""
                     width={20}
-                    height={20}
+                    height={24}
+                    className="w-5 h-6"
                   />
                 </button>
               </li>
@@ -114,7 +134,8 @@ export default function TermsPage() {
                     src="/icons/arrow_forward.svg"
                     alt=""
                     width={20}
-                    height={20}
+                    height={24}
+                    className="w-5 h-6"
                   />
                 </button>
               </li>
@@ -141,7 +162,8 @@ export default function TermsPage() {
                     src="/icons/arrow_forward.svg"
                     alt=""
                     width={20}
-                    height={20}
+                    height={24}
+                    className="w-5 h-6"
                   />
                 </button>
               </li>
@@ -171,7 +193,7 @@ export default function TermsPage() {
           <button
             type="button"
             disabled={!isRequiredAllChecked}
-            onClick={() => router.push("/auth/signup")}
+            onClick={handleNext}
             className="h-14 w-full rounded-2xl bg-primary text-base font-semibold text-white disabled:opacity-50"
           >
             동의하고 시작하기

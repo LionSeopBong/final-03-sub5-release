@@ -1,21 +1,23 @@
 "use client";
 
 import Image from "next/image";
-
-import { useActionState, useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 
 import SignupFooter from "./SignupFooter";
-import { validateSignup } from "@/app/lib/validation/signup";
-import { createUser } from "@/actions/user";
+import { validateSignup, checkEmail } from "@/app/lib/components/signup";
 import { useRouter } from "next/navigation";
 import Alert from "@/app/components/ui/Alert";
+
+import { useOnboardingStore } from "@/zustand/onboardingStore";
 import useAlert from "@/hooks/useAlert";
 
 export default function SignupForm() {
   const router = useRouter();
 
-  // 서버 액션 연결
-  const [state, formAction] = useActionState(createUser, null);
+  // onboarding store
+  const setEmailCredentials = useOnboardingStore(
+    (state) => state.setEmailCredentials,
+  );
 
   // 입력값
   const [email, setEmail] = useState("");
@@ -36,6 +38,8 @@ export default function SignupForm() {
   const [showPassword, setShowPassword] = useState(false);
   const [showPasswordConfirm, setShowPasswordConfirm] = useState(false);
 
+  const [isCheckingEmail, setIsCheckingEmail] = useState(false);
+
   const {
     open,
     message,
@@ -46,59 +50,58 @@ export default function SignupForm() {
     closeAlert,
   } = useAlert();
 
-  // 서버 응답 처리
-  useEffect(() => {
-    if (!state) return;
-
-    if (state.ok === 1) {
-      // 성공 → 프로필 설정 페이지로
-      router.replace("/onboarding/profile");
-      return;
-    }
-
-    if (state.ok === 0) {
-      openAlert(state.message);
-    }
-  }, [state, router, openAlert]);
-
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-
+  const clearErrors = () => {
     setEmailError("");
     setPasswordError("");
     setPasswordConfirmError("");
+  };
 
-    const error = validateSignup({
-      email,
-      password,
-      passwordConfirm,
-    });
+  const focusField = (field: "email" | "password" | "passwordConfirm") => {
+    if (field === "email") emailRef.current?.focus();
+    if (field === "password") passwordRef.current?.focus();
+    if (field === "passwordConfirm") passwordConfirmRef.current?.focus();
+  };
 
-    if (error) {
-      if (error.field === "email") {
-        setEmailError(error.message);
-        emailRef.current?.focus();
-      } else if (error.field === "password") {
-        setPasswordError(error.message);
-        passwordRef.current?.focus();
-      } else if (error.field === "passwordConfirm") {
-        setPasswordConfirmError(error.message);
-        passwordConfirmRef.current?.focus();
-      }
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
 
+    clearErrors();
+
+    const err = validateSignup({ email, password, passwordConfirm });
+    if (err) {
+      if (err.field === "email") setEmailError(err.message);
+      if (err.field === "password") setPasswordError(err.message);
+      if (err.field === "passwordConfirm") setPasswordConfirmError(err.message);
+      focusField(err.field);
       return;
     }
-    openConfirm(
-      `입력하신 계정으로\nSub.5 회원가입을 하시겠습니까?\n${email.trim()}`,
-      () => {
-        // 확인 눌렀을 때만 서버 저장
-        const fd = new FormData();
-        fd.set("email", email.trim());
-        fd.set("password", password);
 
-        formAction(fd);
-      },
-    );
+    const trimmedEmail = email.trim();
+
+    // 2) 이메일 중복 체크
+    try {
+      // 체크 중 상태
+      // - 버튼 비활성화 / 로딩 / 중복 클릭 방지
+      setIsCheckingEmail(true);
+
+      const check = await checkEmail(trimmedEmail);
+      if (check) {
+        setEmailError(check.message);
+        focusField("email");
+        return;
+      }
+
+      // 3) 확인 → store 저장 → 다음 단계
+      openConfirm(
+        `입력하신 계정으로\nSub.5 회원가입을 진행할까요?\n${trimmedEmail}`,
+        () => {
+          setEmailCredentials(trimmedEmail, password);
+          router.replace("/onboarding/profile");
+        },
+      );
+    } finally {
+      setIsCheckingEmail(false);
+    }
   };
 
   return (
@@ -125,6 +128,7 @@ export default function SignupForm() {
                 type="email"
                 name="email"
                 placeholder="이메일"
+                autoComplete="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 className="
@@ -143,7 +147,7 @@ export default function SignupForm() {
                 ].join(" ")}
                 onClick={() => {
                   setEmail("");
-                  emailRef.current?.focus();
+                  focusField("email");
                 }}
               >
                 <Image
@@ -166,6 +170,7 @@ export default function SignupForm() {
                 type={showPassword ? "text" : "password"}
                 name="password"
                 placeholder="비밀번호"
+                autoComplete="current-password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 className="
@@ -210,6 +215,7 @@ export default function SignupForm() {
                 type={showPasswordConfirm ? "text" : "password"}
                 name="passwordConfirm"
                 placeholder="비밀번호 재입력"
+                autoComplete="current-password"
                 value={passwordConfirm}
                 onChange={(e) => setPasswordConfirm(e.target.value)}
                 className="
@@ -249,7 +255,7 @@ export default function SignupForm() {
           </div>
         </section>
 
-        <SignupFooter />
+        <SignupFooter isPending={isCheckingEmail} />
       </form>
     </>
   );

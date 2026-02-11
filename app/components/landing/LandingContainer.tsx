@@ -5,7 +5,6 @@ export default function LandingContainer() {
   return (
     <main className="min-h-screen flex flex-col">
       <LogoTitle />
-      <StartButton />
     </main>
   );
 }

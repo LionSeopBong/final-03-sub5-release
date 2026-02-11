@@ -11,6 +11,15 @@ interface LogoutButtonProps {
   onLogout: () => void;
 }
 
+export function resolveImageSrc(image?: string) {
+  const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "";
+
+  if (!image) return "/icons/et--profile-male.svg";
+  if (image.startsWith("blob:")) return image;
+  if (image.startsWith("http")) return image;
+  return `${API_URL}${image}`;
+}
+
 export function LogoutButton({ onLogout }: LogoutButtonProps) {
   const resetUser = useUserStore((state) => state.resetUser);
 
@@ -67,10 +76,11 @@ export default function ProfileMenu({ user }: ProfileMenuProps) {
         className="w-7 h-7 rounded-full border border-gray-300 overflow-hidden cursor-pointer flex items-center justify-center"
       >
         <Image
-          src={user?.image ?? "/icons/et--profile-male.svg"}
+          src={user?.image || "/icons/et--profile-male.svg"}
           className="object-cover"
-          width={24}
-          height={24}
+          width={36}
+          height={32}
+          style={{ width: "auto", height: "32" }}
           alt="프로필"
         />
       </button>

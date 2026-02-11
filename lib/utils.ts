@@ -9,37 +9,14 @@ import type {
   WeatherIconKey,
   WeatherInput,
   KmaObservation,
+  Hours3Forecast,
+  RegIdRow,
 } from "@/types/kma";
 
 export function validateLatLon(lat: number, lon: number) {
   if (lat < -50 || lat > 50 || lon < -180 || lon > 180) {
     throw new Error(`잘못된 위경도: lat=${lat}, lon=${lon}`);
   }
-}
-
-function fastDistance(a: LocationCoords, b: LocationCoords): number {
-  const latRad = ((a.lat + b.lat) * 0.5 * Math.PI) / 180;
-  const x = (b.lon - a.lon) * Math.cos(latRad);
-  const y = b.lat - a.lat;
-  return x * x + y * y;
-}
-
-export function findNearestStationFast(
-  pos: LocationCoords,
-  stations: Station[],
-): Station {
-  let nearest = stations[0];
-  let minDist = Infinity;
-
-  for (const s of stations) {
-    const d = fastDistance(pos, { lat: s.lat, lon: s.lon });
-    if (d < minDist) {
-      minDist = d;
-      nearest = s;
-    }
-  }
-
-  return nearest;
 }
 
 export function parseCSV(csvText: string): LocationRow[] {
@@ -279,6 +256,34 @@ export function getWeatherIcon({ caTot, ww }: WeatherInput): WeatherIconKey {
   return skyIconFromCA(caTot);
 }
 
+/**
+ * SKY 코드 반환
+ * 1: 맑음
+ * 2: 구름조금
+ * 3: 구름많음
+ * 4: 흐림
+ */
+export function getSKY({ caTot, ww }: WeatherInput): number {
+  // 강수·현상 우선 처리 (비/눈/소나기 등 → 흐림)
+  if (ww !== undefined) {
+    // KMA WW 코드에서 강수/현상 범주
+    // (비, 눈, 진눈개비, 소나기, 뇌우 등)
+    if (
+      (ww >= 20 && ww <= 99) // 관측 가능한 기상현상 전반
+    ) {
+      return 4;
+    }
+  }
+
+  // 전운량 기준 처리
+  if (caTot === undefined) return 1;
+
+  if (caTot <= 2) return 1;      // 맑음
+  if (caTot <= 5) return 2;      // 구름조금
+  if (caTot <= 8) return 3;      // 구름많음
+  return 4;                      // 흐림
+}
+
 export function outdoorScore(obs: KmaObservation): number {
   let score = 100;
 
@@ -367,4 +372,147 @@ export function parseTm(tm: string): Date {
   const h = Number(tm.slice(8, 10));
   const min = Number(tm.slice(10, 12));
   return new Date(Date.UTC(y, m, d, h, min));
+}
+
+export function extractHour3(
+  items: ForecastItem[],
+  now: Date = new Date(),
+): Hours3Forecast[] {
+  const end = new Date(now.getTime() + 24 * 60 * 60 * 1000);
+  const map = new Map<string, Hours3Forecast>();
+
+  for (const item of items) {
+    if (
+      item.category !== "TMP" &&
+      item.category !== "SKY" &&
+      item.category !== "PCP"
+    )
+      continue;
+
+    const datetime = parseKmaDate(item.fcstDate, item.fcstTime);
+    const key = `${item.fcstDate}${item.fcstTime}`;
+
+    if (!map.has(key)) {
+      map.set(key, {
+        datetime,
+        pcp: 0, // ✅ 반드시 필요
+      });
+    }
+
+    const target = map.get(key)!;
+
+    if (item.category === "TMP") {
+      target.temperature = Number(item.fcstValue);
+    }
+
+    if (item.category === "SKY") {
+      target.sky = Number(item.fcstValue);
+    }
+
+    if (item.category === "PCP") {
+      target.pcp = Number(item.fcstValue); // "1" → 1
+    }
+  }
+
+  return Array.from(map.values())
+    .filter(
+      (f) =>
+        f.datetime >= now &&
+        f.datetime <= end &&
+        f.datetime.getHours() % 3 === 0,
+    )
+    .sort((a, b) => a.datetime.getTime() - b.datetime.getTime());
+}
+
+export function skyToEmoji(sky?: number, datetime?: Date): string {
+  const hour = datetime?.getHours();
+  const isNight = hour !== undefined && (hour >= 18 || hour < 6);
+
+  if (isNight) {
+    switch (sky) {
+      case 1:
+        return "🌙"; // 맑은 밤
+      case 2:
+        return "🌙☁️"; // 구름조금 밤
+      case 3:
+        return "☁️🌙"; // 구름많음 밤
+      case 4:
+        return "☁️"; // 흐린 밤
+      default:
+        return "🌙";
+    }
+  }
+
+  // 🌞 주간
+  switch (sky) {
+    case 1:
+      return "☀️"; // 맑음
+    case 2:
+      return "🌤️"; // 구름조금
+    case 3:
+      return "⛅"; // 구름많음
+    case 4:
+      return "☁️"; // 흐림
+    default:
+      return "❓";
+  }
+}
+
+export function formatDate(date: Date) {
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, "0");
+  const d = String(date.getDate()).padStart(2, "0");
+  return `${y}${m}${d}`;
+}
+
+export function formatLabel(date: Date) {
+  const day = date.getDate();
+  const weekday = ["일", "월", "화", "수", "목", "금", "토"][date.getDay()];
+  return `${day}일(${weekday})`;
+}
+
+
+function fastDistance(a: LocationCoords, b: LocationCoords): number {
+  const latRad = ((a.lat + b.lat) * 0.5 * Math.PI) / 180;
+  const x = (b.lon - a.lon) * Math.cos(latRad);
+  const y = b.lat - a.lat;
+  return x * x + y * y;
+}
+
+export function findNearestStationFast(
+  pos: LocationCoords,
+  stations: Station[],
+): Station {
+  let nearest = stations[0];
+  let minDist = Infinity;
+
+  for (const s of stations) {
+    const d = fastDistance(pos, { lat: s.lat, lon: s.lon });
+   
+    if (d < minDist) {
+      minDist = d;
+      nearest = s;
+    }
+  }
+
+  return nearest;
+}
+
+export function findNearestRegionFast(
+  pos: LocationCoords,
+  stations: RegIdRow[],
+): RegIdRow {
+  let nearest = stations[0];
+  let minDist = Infinity;
+
+  for (const s of stations) {
+    const d = fastDistance(pos, { lat: s.lat, lon: s.lon });
+   
+    if (d < minDist) {
+      minDist = d;
+      nearest = s;
+    }
+  }
+
+  return nearest;
 }

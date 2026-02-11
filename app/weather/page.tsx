@@ -9,26 +9,27 @@ import { useEffect, useState } from "react";
 
 import type {
   LocationCoords,
-  Station,
-  StationXY,
   KakaoCoord2RegionResponse,
-  KakaoSearchResponse,
   KmaObservation,
 } from "@/types/kma";
 
 // function import
 import {
-  findNearestStationFast,
   getCoordinates,
-  formatWeather,
-  extract3HourTemps,
   getCurrentTime,
   getWeatherIcon,
   outdoorScore,
   outdoorGrade,
   getCurrentTimeKoreanFormat,
   getUVTime,
+  skyToEmoji,
+  getSKY,
 } from "@/lib/utils";
+import UVCard from "./UVCard";
+import { getRunningTip } from "@/lib/runningTips";
+import { getAnalysisFactors } from "@/lib/runningAnalysis";
+import RunningAnalysisCard from "./RunningAnalysisCard";
+import WeatherInfoCard from "./WeatherInfoCard";
 
 export async function getLegalDongName(
   pos: LocationCoords,
@@ -67,31 +68,18 @@ export async function getLegalDongName(
     .join(" ");
 }
 
-async function getWeatherData(stn: number): Promise<KmaObservation | null> {
+async function getWeatherData(
+  coords: LocationCoords,
+): Promise<KmaObservation | null> {
   try {
     const tm = getCurrentTime();
-
-    const res = await fetch(`/api/weather?stn=${stn}&tm=${tm}`);
+    const res = await fetch(
+      `/api/weather?stn=&lat=${coords.lat}&lon=${coords.lon}&tm=${tm}`,
+    );
     if (!res.ok) return null;
-
     return (await res.json()) as KmaObservation;
   } catch (e) {
     console.error(e);
-    return null;
-  }
-}
-async function getUltraViolet(stn: number): Promise<number | null> {
-  try {
-    const tm = getUVTime();
-    //console.log(tm);
-
-    const res = await fetch(`/api/ultraviolet?stn=${stn}&tm=${tm}`);
-    if (!res.ok) return null;
-
-    const data = (await res.json()) as { uv: number };
-    return data.uv;
-  } catch (e) {
-    //console.error(e);
     return null;
   }
 }
@@ -101,15 +89,17 @@ export default function WeatherPage() {
   const [dongName, setDongName] = useState<string | null>(null);
   const [dateTime, setDateTime] = useState<string | null>(null);
   const [grade, setGrade] = useState<string | null>(null);
+  const [score, setScore] = useState<number>(0);
   const [weather, setWeather] = useState<KmaObservation | null>(null);
   const [icon, setIcon] = useState<string | null>(null);
-  const [uv, setUV] = useState<number | null>(null);
+  const [sky, setSky] = useState<number | null>(null);
 
   useEffect(() => {
     (async () => {
       try {
         const coords = await getCoordinates();
         setPos(coords);
+        //console.log(coords.lat, coords.lon);
 
         const dong = await getLegalDongName(
           coords,
@@ -118,17 +108,20 @@ export default function WeatherPage() {
         setDongName(dong);
         setDateTime(getCurrentTimeKoreanFormat());
 
-        const w = await getWeatherData(108);
+        const w = await getWeatherData(coords);
         setWeather(w);
         //TODO 날씨 아이콘 구현
+        /*
         const icon = getWeatherIcon({
           caTot: w?.CA_TOT ?? 0,
           ww: w?.WW ?? 0,
         });
-        //
-        const uv = await getUltraViolet(108);
-        setUV(uv);
-
+        */
+        const skyValue = getSKY({
+          caTot: w?.CA_TOT ?? 0,
+          ww: w?.WW ?? 0,
+        });
+        setSky(skyValue);
 
         //TODO 러닝 최적도 분석 함수
         const obs: KmaObservation = {
@@ -141,6 +134,7 @@ export default function WeatherPage() {
         };
 
         const score = outdoorScore(obs); // 75
+        setScore(score);
         const grade = outdoorGrade(score); // "보통"
         setGrade(grade);
         //console.log(grade);
@@ -178,13 +172,8 @@ export default function WeatherPage() {
 
           <div className="flex items-center gap-2">
             <div className="flex items-center justify-center w-10">
-              <span className="text-4xl leading-none block">
-                <Image
-                  src={`/icons/weather/${icon ?? "default"}.svg`}
-                  width={52}
-                  height={52}
-                  alt="날씨"
-                />
+              <span className="text-3xl leading-none block">
+                {skyToEmoji(sky ?? undefined, new Date())}
               </span>
             </div>
             <div className="flex flex-col justify-center leading-none pl-1">
@@ -200,129 +189,36 @@ export default function WeatherPage() {
           </div>
 
           <div className="flex flex-wrap gap-3 justify-center">
-            <div className="bg-white rounded-xl flex items-center p-3 text-xs shadow gap-3 min-w-[70px]">
-              <div className="text-lg bg-[#DBEAFE] rounded-md">
-                <Image
-                  src="/icons/humidity-mid-outline.svg"
-                  width={24}
-                  height={24}
-                  alt="습도"
-                />
-              </div>
-              <div className="text-left">
-                {weather?.HM && (
-                  <>
-                    <div className="font-semibold text-[0.65rem]">습도</div>
-                    <div className="text-gray-500 text-xs">{weather?.HM}%</div>
-                  </>
-                )}
-              </div>
-            </div>
-            <div className="bg-white rounded-xl flex items-center p-3 shadow gap-3 min-w-[70px]">
-              <div className="text-lg bg-[#DBFCE7] rounded-md">
-                <Image
-                  src="/icons/wind-line.svg"
-                  width={24}
-                  height={24}
-                  alt="풍속"
-                />
-              </div>
-              <div className="text-left">
-                {weather?.WS && (
-                  <>
-                    <div className="font-semibold text-[0.65rem]">풍속</div>
-                    <div className="text-gray-500 text-xs">
-                      {weather?.WS} m/s
-                    </div>
-                  </>
-                )}
-              </div>
-            </div>
+            <WeatherInfoCard
+              iconSrc="/icons/humidity-mid-outline.svg"
+              iconBg="bg-[#DBEAFE]"
+              label="습도"
+              value={weather?.HM}
+              unit="%"
+            />
 
-            <div className="bg-white rounded-xl flex items-center p-3 text-[0.65rem] shadow gap-3 min-w-[70px]">
-              <div className="text-lg bg-[#F3E8FF] rounded-md">
-                <Image
-                  src="/icons/view-fill.svg"
-                  width={24}
-                  height={24}
-                  alt="가시거리"
-                />
-              </div>
-              <div className="text-left">
-                {weather?.VS && (
-                  <>
-                    <div className="text-[0.65rem] font-semibold">가시거리</div>
-                    <div className="text-gray-500 text-xs">{weather?.VS} m</div>
-                  </>
-                )}
-              </div>
-            </div>
+            <WeatherInfoCard
+              iconSrc="/icons/wind-line.svg"
+              iconBg="bg-[#DBFCE7]"
+              label="풍속"
+              value={weather?.WS}
+              unit="m/s"
+            />
 
-            <div className="bg-white rounded-xl flex items-center p-3 text-xs shadow gap-3 min-w-[70px]">
-              <div className="text-lg rounded-md bg-[#FFEDD4]">
-                <Image
-                  src="/icons/ultraviolet-outline.svg"
-                  width={24}
-                  height={24}
-                  alt="자외선"
-                />
-              </div>
-              <div className="text-left">
-                {uv && (
-                  <>
-                    <div className="font-semibold text-[0.65rem]">자외선</div>
-                    <div className="text-gray-500 text-xs">{uv}</div>
-                  </>
-                )}
-              </div>
-            </div>
+            <WeatherInfoCard
+              iconSrc="/icons/view-fill.svg"
+              iconBg="bg-[#F3E8FF]"
+              label="가시거리"
+              value={weather?.VS}
+              unit="m"
+            />
+            <UVCard pos={pos} />
           </div>
         </div>
       </div>
 
       {/*-- 러닝 최적도 분석 -->*/}
-      <div className="min-w-[375px] items-stretch p-4">
-        <div className="p-4 bg-white border border-gray-200 rounded-xl shadow-sm ">
-          <div className="flex items-center gap-2">
-            <Image src="/icons/cbi--bulb.svg" width={24} height={24} alt="" />
-            <h2>러닝 최적도 분석</h2>
-          </div>
-
-          <p className="text-xs text-gray-500">현재 날씨 기준 러닝 가이드</p>
-
-          <div className="flex items-center gap-3 p-3">
-            <div className="flex items-center justify-center w-10 h-10 bg-green-100 rounded-full">
-              <Image
-                src="/icons/picon--rise.svg"
-                width={24}
-                height={24}
-                className="w-6 h-6"
-                alt="분석"
-              />
-            </div>
-            <div>
-              <div className="font-semibold text-green-700">
-                러닝하기 {grade}
-              </div>
-              <div className="text-xs text-gray-600">날씨 조건 분석 완료</div>
-            </div>
-          </div>
-
-          <div className="bg-gray-200 text-gray-700 text-xs font-semibold rounded-xl p-3">
-            분석요인
-            <br />
-            <span className="text-gray-500">적정 기온</span>
-          </div>
-
-          <div className="bg-blue-50 text-blue-700 text-xs rounded-xl p-3">
-            러닝 팁
-            <br />
-            <span className="text-gray-900">
-              가벼운 바람이 불고 있습니다. 호흡에 유의하며 페이스를 유지하세요!
-            </span>
-          </div>
-        </div>
-      </div>
+      <RunningAnalysisCard weather={weather} />
       <Footer />
       <Navi />
     </>

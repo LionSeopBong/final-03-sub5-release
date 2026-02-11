@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import STATIONS from "@/data/stn.json"; // 관측소 목록
 
-import Fetch3Hours from "./dongne";
+import Fetch3Hours from "@/app/weather/widget/Dongne";
 
 import {
   formatLabel,
@@ -21,7 +21,7 @@ import {
 } from "@/lib/localWeather";
 
 import type { HalfDayForecast, TodayHalfDayCache } from "@/lib/localWeather";
-import type { ForecastRow, MidHalfDay, RegIdRow, StnRow } from "@/types/kma";
+import type { ForecastRow, LocationCoords, MidHalfDay } from "@/types/kma";
 
 import SearchLocationBar from "./components/searchLocationBar";
 import ShortTermColumns from "./ShortTermColumns";
@@ -36,7 +36,7 @@ export async function fetch3DayForecastClient(
   if (!reg) {
     reg = "11B10101"; // 지역코드 불러오기 실패하면 기본값 사용
   }
-  const res = await fetch(`/api/forecast/3day?regId=${reg}`);
+  const res = await fetch(`/api/forecast/3day?reg=${reg}`);
 
   if (!res.ok) {
     throw new Error(`API error: ${res.status}`);
@@ -77,9 +77,13 @@ export async function fetchMidTempForecast(
 export default function ForecastPage() {
   const [data, setData] = useState<ForecastRow[]>([]);
   const [error, setError] = useState<string | null>(null);
-  const [selectedPlace, setSelectedPlace] = useState<string>("역삼동");
-  const [regidRows, setRegidRows] = useState<RegIdRow[]>([]);
-  const [regId, setRegId] = useState<string | null>("11B10101");
+  const [selectedPlace, setSelectedPlace] = useState<string>("역삼동"); // 기본값
+  const [regId, setRegId] = useState<string | null>("11B10101"); // 기본값
+  const [pos, setPos] = useState<LocationCoords | null>({
+    lat: 37.5,
+    lon: 127.03,
+  });
+
   const [midRaw, setMidRaw] = useState<string | null>(null);
   const [midTempRaw, setMidTempRaw] = useState<string | null>(null);
 
@@ -161,23 +165,12 @@ export default function ForecastPage() {
       },
     };
   });
-  /*
-  useEffect(() => {
-    fetch("/api/regid")
-      .then((res) => res.json())
-      .then((rows: RegIdRow[]) => {
-        setRegidRows(rows);
-      })
-      .catch(console.error);
-  }, []);
-*/
+
   // 오늘 포함 +0 ~ +3일 (총 4일)
-  // 1️⃣ KST 기준 오늘 날짜
   //const kstNow = new Date().toLocaleString("ko-KR", { timeZone: "Asia/Seoul" });
 
   const todayString = formatDate(new Date());
-  //console.log(data);
-  // 2️⃣ 날짜(YYYYMMDD) 기준으로만 필터
+
   const days = Array.from(
     new Set(
       data
@@ -198,7 +191,6 @@ export default function ForecastPage() {
       };
     });
   useEffect(() => {
-    //TODO 하드코딩된 11B10101 을 검색 위치에 맞춰 변경
     fetch3DayForecastClient(regId)
       .then(setData)
       .catch((err) => setError(err.message));
@@ -303,13 +295,15 @@ export default function ForecastPage() {
                 console.log("선택된 위치 이름:", place.place_name);
                 setSelectedPlace(place.place_name);
                 try {
-                  //console.log(place.x, place.y);
+                  console.log(place.x, place.y);
+                  setPos({ lat: Number(place.y), lon: Number(place.x) });
                   const nearest = findNearestStationFast(
                     { lat: Number(place.y), lon: Number(place.x) },
                     STATIONS,
                   );
-                  setRegId(nearest.fct_id);
-                  console.log("reg_id:", nearest.fct_id);
+
+                  setRegId(nearest!.fct_id);
+                  console.log("reg_id:", nearest!.fct_id);
                 } catch (err: any) {
                   console.error(err);
                   setError(err.message);
@@ -426,11 +420,10 @@ export default function ForecastPage() {
                 </div>
               </div>
             </div>
+            {/* 시간별 예보 */}
 
-            {/* 시간별 예보 
+            <Fetch3Hours pos={pos} />
 
-            <Fetch3Hours />
-            */}
             {/*{/* 시간별 예보 끝*/}
           </div>
         </div>

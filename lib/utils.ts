@@ -59,30 +59,6 @@ export async function getCoordinates(): Promise<LocationCoords> {
   });
 }
 
-export function findNearestGrid(
-  latitude: number,
-  longitude: number,
-  gridPoints: StationXY[],
-): StationXY | null {
-  if (gridPoints.length === 0) return null;
-
-  let nearest = gridPoints[0];
-  let minDistSq =
-    (nearest.lat - latitude) ** 2 + (nearest.lon - longitude) ** 2;
-
-  for (let i = 1; i < gridPoints.length; i++) {
-    const p = gridPoints[i];
-    const distSq = (p.lat - latitude) ** 2 + (p.lon - longitude) ** 2;
-
-    if (distSq < minDistSq) {
-      minDistSq = distSq;
-      nearest = p;
-    }
-  }
-
-  return nearest;
-}
-
 /** 가장 최근 발표시각(TM_FC) 계산: 00시 or 12시 */
 function getLatestTmFc(): string {
   const kst = nowKST();
@@ -493,15 +469,38 @@ function fastDistance(a: LocationCoords, b: LocationCoords): number {
   return x * x + y * y;
 }
 
+export function findNearestGrid(pos: LocationCoords, STATIONSXY: StationXY[]) {
+  let minDist = Infinity;
+  let nearest = null;
+
+  for (const item of STATIONSXY) {
+    const dLat = pos.lat - item.latitude;
+    const dLon = pos.lon - item.longitude;
+    const dist = dLat * dLat + dLon * dLon; // 거리 제곱
+
+    if (dist < minDist) {
+      minDist = dist;
+      nearest = item;
+    }
+  }
+
+  return nearest;
+}
+
 export function findNearestStationFast(
-  pos: LocationCoords,
+  pos: LocationCoords | null,
   stations: Station[],
-): Station {
-  let nearest = stations[0];
+): Station | null {
+  if (!pos || stations.length === 0) return null;
+
+  let nearest: Station = stations[0];
   let minDist = Infinity;
 
   for (const s of stations) {
-    const d = fastDistance(pos, { lat: s.lat, lon: s.lon });
+    const d = fastDistance(pos, {
+      lat: s.lat,
+      lon: s.lon,
+    });
 
     if (d < minDist) {
       minDist = d;
@@ -542,4 +541,3 @@ export function getNearestBaseTime(now: Date): string {
 
   return `${String(targetHour).padStart(2, "0")}00`;
 }
-

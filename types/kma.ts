@@ -137,9 +137,11 @@ export interface TempForecast {
   temperature: number;
 }
 
-export interface StationXY extends LocationCoords {
+export interface StationXY {
   grid_x: number;
   grid_y: number;
+  longitude: number;
+  latitude: number;
 }
 
 export type ForecastRow = {
@@ -231,15 +233,6 @@ export interface RegIdRow {
   dong: string;
   lon: number;
   lat: number;
-}
-
-export interface StnRow {
-  stn: number;
-  lon: number;
-  lat: number;
-  name_ko: string;
-  fct_id: string;
-  law_id: number;
 }
 
 

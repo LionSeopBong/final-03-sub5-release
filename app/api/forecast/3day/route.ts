@@ -5,7 +5,7 @@ import { NextResponse } from "next/server";
 export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
-    const regId = searchParams.get("regId");
+    const regId = searchParams.get("reg");
 
     if (!regId) {
       return NextResponse.json({ error: "regId is required" }, { status: 400 });

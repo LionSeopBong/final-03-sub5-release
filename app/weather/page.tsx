@@ -83,10 +83,12 @@ async function getWeatherData(
 
 export default function WeatherPage() {
   const router = useRouter();
-  const [pos, setPos] = useState<LocationCoords | null>(null);
+  const [pos, setPos] = useState<LocationCoords | null>({
+    lat: 37.5,
+    lon: 127.03,
+  });
   const [dongName, setDongName] = useState<string | null>(null);
   const [dateTime, setDateTime] = useState<string | null>(null);
-
   const [weather, setWeather] = useState<KmaObservation | null>(null);
   const [sky, setSky] = useState<number | null>(null);
 

@@ -1,6 +1,5 @@
 "use server";
 
-import { uploadFile } from "@/app/lib/file";
 import type { ErrorRes, UserInfoRes } from "@/types/api";
 
 import {
@@ -33,18 +32,6 @@ export async function createUser(
   let image = String(formData.get("image") || "");
 
   try {
-    // 파일 업로드(선택)
-    const attach = formData.get("attach");
-    if (!image && attach instanceof File && attach.size > 0) {
-      const fileRes = await uploadFile(attach);
-
-      if (fileRes.ok !== 1 || !fileRes.item?.length) {
-        return { ok: 0, message: "파일 업로드 실패" };
-      }
-
-      image = fileRes.item[0].path;
-    }
-
     const body: CreateUserBody = {
       type: String(formData.get("type") || "user") as "user" | "seller",
       email,

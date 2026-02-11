@@ -2,8 +2,8 @@ import Link from "next/link";
 
 export default function GoalHeader() {
   return (
-    <h1 className="font-semibold text-center flex flex-row justify-center items-center text-2xl">
-      <Link href="/goals" className="inline-flex items-center mt-0.2">
+    <h1 className="font-semibold relative flex justify-center   items-center text-2xl">
+      <Link href="/goals" className="absolute left-0">
         <svg
           width="15"
           height="15"

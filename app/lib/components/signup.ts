@@ -75,7 +75,6 @@ export async function checkEmail(email: string): Promise<ErrorRes | null> {
           "Content-Type": "application/json",
           "Client-Id": CLIENT_ID,
         },
-        cache: "no-store",
       },
     );
 
@@ -84,7 +83,7 @@ export async function checkEmail(email: string): Promise<ErrorRes | null> {
       | ErrorRes
       | null;
 
-    if (data?.ok === 1) return null; // 사용 가능
+    if (data?.ok === 1) return null;
     if (data?.ok === 0) return data; // 중복/에러
 
     return { ok: 0, message: "이메일 확인 중 문제가 발생했어요." };

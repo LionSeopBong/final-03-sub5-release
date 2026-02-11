@@ -17,11 +17,8 @@ type OnboardingState = {
   gender?: "male" | "female";
   birthDate?: string;
 
-  height?: number;
-  weight?: number;
-
   setMode: (mode: OnboardingMode) => void;
-  setUserId: (id?: number) => void;
+  setUserId: (id: number) => void;
 
   setEmailCredentials: (email: string, password: string) => void;
   setProfile: (p: {
@@ -30,7 +27,6 @@ type OnboardingState = {
     gender?: "male" | "female";
     birthDate?: string;
   }) => void;
-  setBody: (b: { height: number; weight: number }) => void;
 
   reset: () => void;
 };
@@ -44,7 +40,6 @@ export const useOnboardingStore = create<OnboardingState>()(
       setEmailCredentials: (email, password) => set({ email, password }),
       setProfile: ({ name, image, gender, birthDate }) =>
         set({ name, image, gender, birthDate }),
-      setBody: ({ height, weight }) => set({ height, weight }),
 
       reset: () =>
         set({
@@ -56,8 +51,6 @@ export const useOnboardingStore = create<OnboardingState>()(
           image: undefined,
           gender: undefined,
           birthDate: undefined,
-          height: undefined,
-          weight: undefined,
         }),
     }),
     {

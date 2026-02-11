@@ -4,45 +4,55 @@ import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 
-import { calculateBmi, roundBmi, bmiLabel } from "@/app/lib/components/bmi";
-import BodyButton from "@/app/onboarding/body/BodyButton";
-
+import { createUser, updateUser } from "@/actions/user";
 import { useOnboardingStore } from "@/zustand/onboardingStore";
 import useUserStore from "@/zustand/user";
 
-import { createUser, updateUser } from "@/actions/user";
-import { useShallow } from "zustand/shallow";
+import {
+  calculateBmi,
+  roundBmi,
+  bmiLabel,
+  validateHeight,
+  validateWeight,
+} from "@/app/lib/components/bmi";
+import BodyButton from "@/app/onboarding/body/BodyButton";
 
 export default function BodyForm() {
   const router = useRouter();
 
   const user = useUserStore((s) => s.user);
+  const setUser = useUserStore((s) => s.setUser);
   const accessToken = user?.token?.accessToken;
 
-  const onboarding = useOnboardingStore(
-    useShallow((s) => ({
-      mode: s.mode,
-      userId: s.userId,
-      email: s.email,
-      password: s.password,
-      name: s.name,
-      image: s.image,
-      gender: s.gender,
-      birthDate: s.birthDate,
-      reset: s.reset,
-    })),
-  );
+  const {
+    mode,
+    userId,
+    name,
+    email,
+    password,
+    image,
+    gender,
+    birthDate,
+    reset,
+  } = useOnboardingStore();
 
-  const isSocial = onboarding.mode === "oauth";
+  const isSocial = mode === "oauth";
 
-  const [heightCm, setHeightCm] = useState("170");
-  const [weightKg, setWeightKg] = useState("60");
+  const [heightCm, setHeightCm] = useState("");
+  const [weightKg, setWeightKg] = useState("");
+  const [submitted, setSubmitted] = useState(false);
+  const [heightError, setHeightError] = useState("");
+  const [weightError, setWeightError] = useState("");
 
   const heightNum = Number(heightCm);
   const weightNum = Number(weightKg);
 
   const bmi = useMemo(() => {
-    if (heightNum <= 0 || weightNum <= 0) return null;
+    const hErr = validateHeight(heightNum);
+    const wErr = validateWeight(weightNum);
+    1;
+    if (hErr || wErr) return null;
+
     return roundBmi(calculateBmi(heightNum, weightNum));
   }, [heightNum, weightNum]);
 
@@ -52,34 +62,34 @@ export default function BodyForm() {
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // 공통 검증
-    if (!onboarding.gender || !onboarding.birthDate) {
-      alert("성별과 생년월일을 입력해 주세요.");
-      return;
-    }
-    if (heightNum <= 0 || weightNum <= 0) {
-      alert("키와 몸무게를 입력해 주세요.");
-      return;
-    }
+    setSubmitted(true);
+
+    const hErr = validateHeight(heightNum);
+    const wErr = validateWeight(weightNum);
+
+    setHeightError(hErr);
+    setWeightError(wErr);
+
+    if (hErr || wErr) return;
 
     // 소셜이면 PATCH만 (POST 절대 금지)
     if (isSocial) {
-      if (!onboarding.userId) {
-        alert("userId가 없어요. 다시 로그인 해주세요.");
+      if (!userId) {
         return;
       }
       if (!accessToken) {
-        alert("토큰이 없어요. 다시 로그인 해주세요.");
         return;
       }
 
       const extraRes = user?.extra ?? {};
 
-      const patchRes = await updateUser(onboarding.userId, accessToken, {
+      const patchRes = await updateUser(userId, accessToken, {
+        ...(image && { image }),
+        name,
         extra: {
           ...extraRes,
-          gender: onboarding.gender,
-          birthDate: onboarding.birthDate,
+          gender,
+          birthDate,
           height: heightNum,
           weight: weightNum,
           onboardingDone: true,
@@ -91,19 +101,37 @@ export default function BodyForm() {
         return;
       }
 
-      onboarding.reset();
+      // 서버에서 내려준 최신 user로 zustand 갱신
+      if (patchRes && patchRes.item) {
+        setUser({
+          ...user, // 기존 토큰 유지
+          ...patchRes.item, // name/image/extra 최신값 덮어쓰기
+          token: user?.token,
+        });
+      }
+
+      reset();
       router.replace("/home");
+      return;
+    }
+
+    // // 이메일이면 POST(createUser)만
+    const imagePath =
+      image && image.startsWith("https") ? new URL(image).pathname : image;
+
+    // blob면 서버에 저장 불가
+    if (imagePath?.startsWith("blob:")) {
       return;
     }
 
     // 이메일이면 POST(createUser)만
     const fd = new FormData();
-    fd.set("email", onboarding.email ?? "");
-    fd.set("password", onboarding.password ?? "");
-    fd.set("name", onboarding.name ?? "");
-    fd.set("gender", onboarding.gender);
-    fd.set("birthDate", onboarding.birthDate);
-    if (onboarding.image) fd.set("image", onboarding.image);
+    fd.set("email", email ?? "");
+    fd.set("password", password ?? "");
+    fd.set("name", name ?? "");
+    if (gender) fd.set("gender", gender);
+    if (birthDate) fd.set("birthDate", birthDate);
+    if (image) fd.set("image", image);
     fd.set("height", String(heightNum));
     fd.set("weight", String(weightNum));
 
@@ -114,7 +142,7 @@ export default function BodyForm() {
       return;
     }
 
-    onboarding.reset();
+    reset();
     router.replace("/auth/login");
   };
 
@@ -127,10 +155,18 @@ export default function BodyForm() {
           <input
             name="height"
             value={heightCm}
-            onChange={(e) => setHeightCm(e.target.value.replace(/[^\d]/g, ""))}
+            onChange={(e) => {
+              setHeightCm(e.target.value.replace(/[^\d]/g, ""));
+              if (submitted && heightError) setHeightError("");
+            }}
             className="w-full bg-transparent focus:outline-none"
+            inputMode="numeric"
+            placeholder="예: 170"
           />
         </div>
+        {submitted && heightError && (
+          <p className="m-3 text-xs text-red-500">{heightError}</p>
+        )}
       </section>
 
       {/* Weight */}
@@ -140,10 +176,18 @@ export default function BodyForm() {
           <input
             name="weight"
             value={weightKg}
-            onChange={(e) => setWeightKg(e.target.value.replace(/[^\d]/g, ""))}
+            onChange={(e) => {
+              setWeightKg(e.target.value.replace(/[^\d]/g, ""));
+              if (submitted && weightError) setWeightError("");
+            }}
             className="w-full bg-transparent focus:outline-none"
+            inputMode="numeric"
+            placeholder="예: 60"
           />
         </div>
+        {submitted && weightError && (
+          <p className="m-3 text-xs text-red-500">{weightError}</p>
+        )}
       </section>
 
       {/* BMI */}
@@ -157,7 +201,7 @@ export default function BodyForm() {
           {labelText && <span className="ml-1">{labelText}</span>}
         </p>
 
-        <div className="mt-5 h-px w-full bg-gray-200" />
+        <div className="mt-5 h-px w-full bg-gray-300" />
 
         {/* BMI Card */}
         <div className="mt-8 rounded-2xl bg-[#EEF1F6] px-5 py-5">

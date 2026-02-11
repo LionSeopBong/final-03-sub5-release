@@ -1,3 +1,15 @@
+export function validateHeight(h: number | null) {
+  if (!h) return "키를 입력해 주세요.";
+  if (h < 90 || h > 240) return "키는 90cm ~ 240cm 범위로 입력해 주세요.";
+  return "";
+}
+
+export function validateWeight(w: number | null) {
+  if (!w) return "몸무게를 입력해 주세요.";
+  if (w < 10 || w > 230) return "몸무게는 10kg ~ 230kg 범위로 입력해 주세요.";
+  return "";
+}
+
 // bmi 계산 로직
 export function calculateBmi(heightCm: number, weightKg: number): number {
   const m = heightCm / 100;

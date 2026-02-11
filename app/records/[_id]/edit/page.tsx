@@ -1,50 +1,26 @@
 "use client";
 import { editRecord, removeRecord } from "@/app/action/records";
+import { useCalcPace } from "@/app/hooks/useCalcPace";
+import { useLoginCheck } from "@/app/hooks/useLoginCheck";
+import { useSuccessRedirect } from "@/app/hooks/useSuccessRedirect";
 import { getRecord } from "@/app/lib/recordsAPI";
 import { RunningRecord } from "@/app/lib/types";
-import useUserStore from "@/zustand/user";
 import { ArrowLeft } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
 import { useActionState, useEffect, useState } from "react";
 // 수정페이지
 export default function EditRecordPage() {
-  // const [state, formAction, isPending] = useActionState(createRecord)
   const router = useRouter();
   const params = useParams();
   const recordId = params._id as string;
-  const [state, formAction, isPending] = useActionState(editRecord, null);
-  const [deleteState, deleteAction, isDelete] = useActionState(removeRecord, null);
-  const user = useUserStore((state) => state.user);
-  // 기존 저장데이터
   const [record, setRecord] = useState<RunningRecord | null>(null);
   const [loading, setLoading] = useState(true);
+  // 수정
+  const [state, formAction, isPending] = useActionState(editRecord, null);
+  // 삭제
+  const [deleteState, deleteAction, isDelete] = useActionState(removeRecord, null);
 
   //페이스 자동 계산
-  const [hour, setHour] = useState("");
-  const [min, setMin] = useState("");
-  const [sec, setSec] = useState("");
-  const [distance, setDistance] = useState("");
-  const [pace, setPace] = useState("");
-
-  const exerciseType = record?.extra.exerciseType || "Running";
-  //수정
-  useEffect(() => {
-    if (state?.success) {
-      alert("수정 완료!");
-      router.push("/records");
-      router.refresh();
-    }
-  }, [state, router]);
-
-  // 삭제
-  useEffect(() => {
-    if (deleteState?.success) {
-      alert("삭제 완료!");
-      router.push("/records");
-      router.refresh();
-    }
-  }, [deleteState, router]);
-  // 페이스 계산
   useEffect(() => {
     const fetchRecord = async () => {
       try {
@@ -71,26 +47,18 @@ export default function EditRecordPage() {
 
     fetchRecord();
   }, [recordId]);
-  // 기존 데이터 불러오기
-  useEffect(() => {
-    const h = parseInt(hour) || 0;
-    const m = parseInt(min) || 0;
-    const s = parseInt(sec) || 0;
-    const d = parseFloat(distance) || 0;
 
-    if (d > 0 && (h > 0 || m > 0 || s > 0)) {
-      const totalMinutes = h * 60 + m + s / 60;
-      const paceInMinutes = totalMinutes / d;
-      const paceMin = Math.floor(paceInMinutes);
-      const paceSec = Math.round((paceInMinutes - paceMin) * 60);
+  const exerciseType = record?.extra.exerciseType || "Running";
 
-      if (paceSec >= 60) {
-        setPace(`${paceMin + 1}:00`);
-      } else {
-        setPace(`${paceMin}:${paceSec.toString().padStart(2, "0")}`);
-      }
-    }
-  }, [hour, min, sec, distance]);
+  // 로그인 확인
+  const { user } = useLoginCheck();
+  // 삭제
+  useSuccessRedirect(deleteState, "/records");
+  //수정
+  useSuccessRedirect(state, "/records");
+  //페이스 계산
+  const { hour, setHour, min, setMin, sec, setSec, distance, setDistance, pace, setPace } = useCalcPace(true);
+
   if (loading) {
     return <div>로딩 중...</div>;
   }
@@ -234,10 +202,9 @@ export default function EditRecordPage() {
               <input
                 type="radio"
                 id="running"
-                defaultValue={record.extra.exerciseType || "running"}
+                defaultChecked={record.extra.exerciseType === "running"}
                 name="exerciseType"
                 value="running"
-                defaultChecked
                 className="hidden "
               />
               <label htmlFor="running" className=" px-2 py-2 text-xs  rounded-lg border bg-primary text-white border-primary cursor-pointer">
@@ -249,7 +216,7 @@ export default function EditRecordPage() {
               <input
                 type="radio"
                 id="treadmill"
-                defaultValue={record.extra.exerciseType || "treadmill"}
+                defaultChecked={record.extra.exerciseType === "treadmill"}
                 name="exerciseType"
                 value="treadmill"
                 className="hidden"
@@ -260,7 +227,7 @@ export default function EditRecordPage() {
             </div>
             {/* 하이킹 */}
             <div>
-              <input type="radio" id="hiking" defaultValue={record.extra.exerciseType || "hiking"} name="exerciseType" value="hiking" className="hidden" />
+              <input type="radio" id="hiking" name="exerciseType" defaultChecked={record.extra.exerciseType === "hiking"} value="hiking" className="hidden" />
               <label htmlFor="hiking" className=" px-2 py-2 text-xs  rounded-lg border-notselectbtn-border bg-notselectbtn  border-primary cursor-pointer">
                 하이킹
               </label>
@@ -270,7 +237,7 @@ export default function EditRecordPage() {
               <input
                 type="radio"
                 id="interval"
-                defaultValue={record.extra.exerciseType || "interval"}
+                defaultChecked={record.extra.exerciseType === "interval"}
                 name="exerciseType"
                 value="interval"
                 className="hidden"

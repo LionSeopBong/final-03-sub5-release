@@ -11,6 +11,15 @@ interface LogoutButtonProps {
   onLogout: () => void;
 }
 
+export function resolveImageSrc(image?: string) {
+  const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "";
+
+  if (!image) return "/icons/et--profile-male.svg";
+  if (image.startsWith("blob:")) return image;
+  if (image.startsWith("http")) return image;
+  return `${API_URL}${image}`;
+}
+
 export function LogoutButton({ onLogout }: LogoutButtonProps) {
   const resetUser = useUserStore((state) => state.resetUser);
 
@@ -56,6 +65,7 @@ export default function ProfileMenu({ user }: ProfileMenuProps) {
   const handleLogout = () => {
     setOpen(false); // 툴팁 닫기
     alert(`${user?.name ?? "사용자"}님 로그아웃되었습니다`);
+    router.push("/");
   };
 
   return (
@@ -64,14 +74,14 @@ export default function ProfileMenu({ user }: ProfileMenuProps) {
       <button
         aria-label="profile"
         onClick={handleProfileClick}
-        className="w-7 h-7 rounded-full border border-gray-300 overflow-hidden cursor-pointer flex items-center justify-center"
+        className="w-7 h-7 rounded-full border-1 border-[#003458] overflow-hidden cursor-pointer flex items-center justify-center"
       >
         <Image
-          src={user?.image ?? "/icons/et--profile-male.svg"}
+          src={user?.image || "/icons/et--profile-male.svg"}
           className="object-cover"
-          width={36}
-          height={32}
-          style={{ width: "auto", height: "32" }}
+          width={40}
+          height={40}
+          style={{ width: "auto", height: "40" }}
           alt="프로필"
         />
       </button>

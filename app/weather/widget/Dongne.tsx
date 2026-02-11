@@ -1,25 +1,49 @@
 "use client";
 
-import { extractHour3, getCurrentTime, skyToEmoji } from "@/lib/utils";
+import {
+  extractHour3,
+  getCurrentTime,
+  skyToEmoji,
+  getNearestBaseTime,
+  findNearestGrid,
+} from "@/lib/utils";
 import { useEffect, useState } from "react";
-import { Hours3Forecast } from "@/types/kma";
+import { Hours3Forecast, LocationCoords } from "@/types/kma";
+import STATIONSXY from "@/data/stn_xy.json";
 
 const CELL_WIDTH = 60;
 const SVG_HEIGHT = 48;
 const SVG_PADDING = 6;
 
-export default function Fetch3Hours() {
+interface Fetch3HoursProps {
+  pos: LocationCoords | null;
+}
+
+export default function Fetch3Hours({ pos }: Fetch3HoursProps) {
   const [hours3, setHours3] = useState<Hours3Forecast[]>([]);
 
   useEffect(() => {
+    console.log(pos?.lat, pos?.lon);
+    if (!pos) return; // ✅ null 방지
     async function fetchWeather() {
       try {
         const today = getCurrentTime().slice(0, 8);
+        /* TODO base_time 수정 0500 0800 1100 1400 1700 2000 2300
+         * 현재 시각과 가장 가까운 시각을 base_time으로 설정함
+         * 예를 들어 현재 시각이 15:40 분이라면 base_time은 14:00
+         */
+        const now = new Date();
+        const baseTime = getNearestBaseTime(now);
+        // ✅ 가장 가까운 격자 찾기
+        const currentPos = pos; // ✅ 타입 확정 (LocationCoords)
+        const nearest = findNearestGrid(pos!, STATIONSXY);
+        if (!nearest) return;
         const res = await fetch(
-          `/api/forecast/hours?nx=63&ny=124&base_date=${today}&base_time=0500`,
+          //${coords.pos?.lon}
+          `/api/forecast/hours?nx=${nearest?.grid_x}&ny=${nearest?.grid_y}&base_date=${today}&base_time=${baseTime}`,
         );
         const data = await res.json();
-        // TODO 예보값이 없을 때는 전일 자료를 그대로 씀
+
         const items = data.response.body.items.item;
         setHours3(extractHour3(items, new Date()));
       } catch (err: any) {
@@ -28,7 +52,7 @@ export default function Fetch3Hours() {
     }
 
     fetchWeather();
-  }, []);
+  }, [pos?.lat, pos?.lon]);
 
   /* ================== 기온 그래프 계산 ================== */
 
@@ -54,7 +78,6 @@ export default function Fetch3Hours() {
   const points = temps.map((temp, i) => `${getX(i)},${getY(temp)}`).join(" ");
 
   /* ====================================================== */
-
   return (
     <div className="bg-white rounded-xl p-4 shadow mb-6">
       <p className="text-sm text-gray-400 mb-3">시간별 예보</p>

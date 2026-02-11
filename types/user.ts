@@ -2,7 +2,6 @@
 export interface User {
   _id: number;
   email: string;
-  password: string;
   name: string;
   image?: string | null;
   profileImage?: string | null;

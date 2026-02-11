@@ -59,7 +59,7 @@ export default function CommentList({ postId }: { postId: string }) {
           관리자 답변
         </h3>
         <div className="flex items-center justify-center">
-          <p className="border border-gray-200 rounded-[20px] px-20 py-10 text-gray-500 font-semibold">
+          <p className="border border-gray-200 rounded-[20px] px-20 py-10 text-gray-500 font-semibold text-center w-full">
             불러오는 중...
           </p>
         </div>
@@ -75,7 +75,7 @@ export default function CommentList({ postId }: { postId: string }) {
           관리자 답변
         </h3>
         <div className="flex items-center justify-center">
-          <p className="border border-gray-200 rounded-[20px] px-12 py-8 text-gray-500 font-semibold">
+          <p className="border border-gray-200 rounded-[20px] px-12 py-8 text-gray-500 font-semibold text-center w-full">
             아직 답변이 없습니다.
           </p>
         </div>

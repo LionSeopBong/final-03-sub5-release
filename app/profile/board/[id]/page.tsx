@@ -155,7 +155,7 @@ export default function PostDetailPage({
       <>
         <ProfileHeader title="게시글 상세" />
         <div className="flex items-center justify-center min-h-[400px]">
-          <p className="border border-gray-200 rounded-[20px] px-20 py-10 text-gray-500 font-semibold">
+          <p className="border border-gray-200 rounded-[20px] px-20 py-10 text-gray-500 font-semibold text-center w-full">
             불러오는 중...
           </p>
         </div>

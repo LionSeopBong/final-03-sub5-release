@@ -1,6 +1,8 @@
 "use client";
 
 import Navi from "@/app/components/common/Navi";
+import fetchAPI from "@/app/lib/api";
+import { uploadFile } from "@/app/lib/file";
 import ProfileButton from "@/app/profile/components/ProfileButton";
 import ProfileHeader from "@/app/profile/components/ProfileHeader";
 import useUserStore from "@/zustand/user";
@@ -30,39 +32,93 @@ export default function ProfileEdit() {
   const [nickname, setNickname] = useState(user?.name || "");
   const [birth, setBirth] = useState(user?.extra?.birthDate || "");
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  // 프로필 사진 저장
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]; // 파일 가져오기
-    if (file) {
-      const imageUrl = URL.createObjectURL(file); // 미리보기 URL 생성
-      setSelectedImage(imageUrl); // state 업데이트
+    if (!file || !user?.token?.accessToken) return;
 
-      // 파일 선택 후 모달 닫기
-      setOpenPhotoSetter(false);
-      setOpenGalleryModal(false);
+    // 미리보기 URL 생성
+    const imageUrl = URL.createObjectURL(file);
+    setSelectedImage(imageUrl); // state 업데이트
+
+    // 파일 업로드
+    const uploadResult = await uploadFile(file);
+
+    if (uploadResult.ok !== 1) {
+      alert("이미지 업로드 실패");
+      return;
     }
+
+    const imagePath = uploadResult.item[0].path;
+
+    // 유저 프로필 업데이트
+    const updateResult = await fetchAPI(`/users/${user._id}`, {
+      method: "PATCH",
+      token: user.token.accessToken,
+      body: { profileImage: imagePath },
+    });
+
+    if (updateResult.ok === 1) {
+      setUser({ ...user, profileImage: imagePath });
+    }
+
+    // 파일 선택 후 모달 닫기
+    setOpenPhotoSetter(false);
+    setOpenGalleryModal(false);
   };
 
-  const handleRemovePhoto = () => {
-    setSelectedImage(null);
+  // 사진 삭제
+  const handleRemovePhoto = async () => {
+    if (!user?.token?.accessToken) return;
+
+    const result = await fetchAPI(`/users/${user._id}`, {
+      method: "PATCH",
+      token: user.token.accessToken,
+      body: { profileImage: null },
+    });
+
+    if (result.ok === 1) {
+      setSelectedImage(null);
+      setUser({ ...user, profileImage: null });
+    } else {
+      alert("사진 삭제 실패");
+    }
     setOpenPhotoSetter(false);
   };
 
-  const handleSubmit = () => {
-    if (!user) return;
+  // 닉네임 | 성별 | 생년월일 저장
+  const handleSubmit = async () => {
+    if (!user?.token?.accessToken) return;
 
-    // zustand에 저장
-    setUser({
-      ...user,
-      name: nickname,
-      profileImage: selectedImage,
-      extra: {
-        ...user.extra,
-        gender: gender as "male" | "female",
-        birthDate: birth,
+    const result = await fetchAPI(`/users/${user._id}`, {
+      method: "PATCH",
+      token: user.token.accessToken,
+      body: {
+        name: nickname,
+        profileImage: selectedImage || undefined,
+        extra: {
+          gender: gender,
+          birthDate: birth,
+        },
       },
     });
 
-    setOpenSuccessModal(true); // 정보 업데이트 성공 모달 열기
+    if (result.ok === 1) {
+      // zustand에 저장
+      setUser({
+        ...user,
+        name: nickname,
+        profileImage: selectedImage,
+        extra: {
+          ...user.extra,
+          gender: gender as "male" | "female",
+          birthDate: birth,
+        },
+      });
+      setOpenSuccessModal(true); // 정보 업데이트 성공 모달 열기
+    } else {
+      alert("저장 실패: " + result.message);
+    }
   };
 
   return (

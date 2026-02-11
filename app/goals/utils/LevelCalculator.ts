@@ -1,9 +1,10 @@
 import { LevelInfo, leveltype, UserStatus } from "../types/index";
 
 export function calculateLevel({ pace, totalDistance }: LevelInfo) {
-  if (totalDistance === 0 || pace >= 5.5) {
+  const paceNum = Number(pace);
+  if (totalDistance === 0 || paceNum >= 5.5) {
     return "초급";
-  } else if (pace >= 4.5 && pace < 5.5) {
+  } else if (paceNum >= 4.5 && paceNum < 5.5) {
     return "중급";
   } else {
     return "고급";

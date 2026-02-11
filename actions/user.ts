@@ -9,7 +9,7 @@ import {
   SocialSignupBody,
   UpdateUserBody,
 } from "@/app/lib/usersApi.types";
-import { usersApi } from "@/app/lib/usersApi";
+import { usersApi } from "@/app/lib/usersAPI";
 
 type UserActionState = UserInfoRes | ErrorRes | null;
 
@@ -34,16 +34,16 @@ export async function createUser(
 
   try {
     // 파일 업로드(선택)
-    const attach = formData.get("attach");
-    if (!image && attach instanceof File && attach.size > 0) {
-      const fileRes = await uploadFile(attach);
+    // const attach = formData.get("attach");
+    // if (!image && attach instanceof File && attach.size > 0) {
+    //   const fileRes = await uploadFile(attach);
 
-      if (fileRes.ok !== 1 || !fileRes.item?.length) {
-        return { ok: 0, message: "파일 업로드 실패" };
-      }
+    //   if (fileRes.ok !== 1 || !fileRes.item?.length) {
+    //     return { ok: 0, message: "파일 업로드 실패" };
+    //   }
 
-      image = fileRes.item[0].path;
-    }
+    //   image = fileRes.item[0].path;
+    // }
 
     const body: CreateUserBody = {
       type: String(formData.get("type") || "user") as "user" | "seller",

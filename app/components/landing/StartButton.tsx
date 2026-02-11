@@ -1,6 +1,6 @@
 import Link from "next/link";
 
-export default function StartPage() {
+export default function StartButton() {
   return (
     <div className="fixed left-0 right-0 bottom-16 px-4 z-20">
       <Link

@@ -2,7 +2,7 @@
 
 **5분대 페이스로 완주하는 그날까지, 함께 달립니다** 🏃
 
-<div align="center"><img src="https://github.com/user-attachments/assets/d144b234-304b-42b9-b2c1-31ab68f337cb" width="280" /><img src="https://github.com/user-attachments/assets/cc1b06b8-2154-4144-95ae-1b5dcfa4d056" width="280" /><img src="https://github.com/user-attachments/assets/64af42e3-5bb3-41d6-9ba2-892c0105ed24" width="280" /></div>
+<div align="center"><img src="https://github.com/user-attachments/assets/18b80c8d-8892-4f6c-ba65-ea2a669dcb7f" width="500" /><img src="https://github.com/user-attachments/assets/277184af-7ddc-484f-ac53-32c506df9181" width="500" /></div>
 
 - [배포 URL 바로가기](https://running8-crew8.vercel.app/)
 - [WIKI 바로가기](https://github.com/FRONTENDBOOTCAMP-15th/final-03-sub5/wiki)
@@ -82,7 +82,7 @@ app/
 │   ├── login/
 │   ├── signup/
 │   └── SocialCallback/
-├── onboarding/              #  온보딩
+├── onboarding/              # 📋 온보딩
 │   ├── terms/               #    약관 동의
 │   ├── profile/             #    프로필 입력
 │   └── body/                #    신체정보 입력

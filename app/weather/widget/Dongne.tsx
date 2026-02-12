@@ -21,12 +21,13 @@ interface Fetch3HoursProps {
 
 export default function Fetch3Hours({ pos }: Fetch3HoursProps) {
   const [hours3, setHours3] = useState<Hours3Forecast[]>([]);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    console.log(pos?.lat, pos?.lon);
     if (!pos) return; // ✅ null 방지
     async function fetchWeather() {
       try {
+        setError(null); // 🔹 기존 에러 초기화
         const today = getCurrentTime().slice(0, 8);
         /* TODO base_time 수정 0500 0800 1100 1400 1700 2000 2300
          * 현재 시각과 가장 가까운 시각을 base_time으로 설정함
@@ -35,19 +36,23 @@ export default function Fetch3Hours({ pos }: Fetch3HoursProps) {
         const now = new Date();
         const baseTime = getNearestBaseTime(now);
         // ✅ 가장 가까운 격자 찾기
-        const currentPos = pos; // ✅ 타입 확정 (LocationCoords)
         const nearest = findNearestGrid(pos!, STATIONSXY);
         if (!nearest) return;
         const res = await fetch(
-          //${coords.pos?.lon}
           `/api/forecast/hours?nx=${nearest?.grid_x}&ny=${nearest?.grid_y}&base_date=${today}&base_time=${baseTime}`,
         );
+        if (!res.ok) {
+          throw new Error();
+        }
         const data = await res.json();
 
         const items = data.response.body.items.item;
         setHours3(extractHour3(items, new Date()));
-      } catch (err: any) {
-        throw err.message;
+      } catch {
+        setError(
+          "일시적인 오류로 데이터를 불러올 수 없습니다 잠시 후 다시 시도해주세요",
+        );
+        setHours3([]); // 🔹 데이터 초기화
       }
     }
 
@@ -85,106 +90,114 @@ export default function Fetch3Hours({ pos }: Fetch3HoursProps) {
       <div className="overflow-x-auto pb-2">
         <div
           className="text-[10px] text-center border-collapse"
-          style={{ minWidth: contentWidth + 60 }} // 좌측 라벨 60px 포함
+          style={{ minWidth: contentWidth + 60 }}
         >
-          {/* 시각 */}
-          <div
-            className="grid border-b border-t border-gray-100 bg-gray-50/50"
-            style={{
-              gridTemplateColumns: `60px repeat(${colCount}, ${CELL_WIDTH}px)`,
-            }}
-          >
-            <div className="py-2 font-medium border-r border-gray-100 bg-gray-50">
-              시각
+          {error ? (
+            <div className="py-12 text-sm text-gray-500 text-center">
+              {error}
             </div>
-            {hours3.map((t, i) => (
-              <div key={i} className="py-2 border-r border-gray-100">
-                {t.datetime.getHours()}시
-              </div>
-            ))}
-          </div>
-
-          {/* 날씨 */}
-          <div
-            className="grid border-b border-gray-100"
-            style={{
-              gridTemplateColumns: `60px repeat(${colCount}, ${CELL_WIDTH}px)`,
-            }}
-          >
-            <div className="py-3 bg-gray-50 font-medium border-r border-gray-100">
-              날씨
-            </div>
-            {hours3.map((t, i) => (
-              <div key={i} className="py-3 text-lg">
-                {skyToEmoji(t.sky, t.datetime)}
-              </div>
-            ))}
-          </div>
-
-          {/* 기온 */}
-          <div
-            className="grid relative h-24 border-b border-gray-100"
-            style={{
-              gridTemplateColumns: `60px ${contentWidth}px`,
-            }}
-          >
-            <div className="bg-gray-50 font-medium border-r border-gray-100 flex items-center justify-center">
-              기온
-            </div>
-
-            <div className="relative h-full">
+          ) : (
+            <>
+              {/* 시각 */}
               <div
-                className="absolute inset-0 pt-2 z-10 grid"
+                className="grid border-b border-t border-gray-100 bg-gray-50/50"
                 style={{
-                  gridTemplateColumns: `repeat(${colCount}, ${CELL_WIDTH}px)`,
+                  gridTemplateColumns: `60px repeat(${colCount}, ${CELL_WIDTH}px)`,
                 }}
               >
+                <div className="py-2 font-medium border-r border-gray-100 bg-gray-50">
+                  시각
+                </div>
                 {hours3.map((t, i) => (
-                  <span key={i}>{t.temperature}℃</span>
+                  <div key={i} className="py-2 border-r border-gray-100">
+                    {t.datetime.getHours()}시
+                  </div>
                 ))}
               </div>
 
-              <svg
-                className="absolute bottom-4 left-0"
-                width={svgWidth}
-                height={SVG_HEIGHT}
-                viewBox={`0 0 ${svgWidth} ${SVG_HEIGHT}`}
+              {/* 날씨 */}
+              <div
+                className="grid border-b border-gray-100"
+                style={{
+                  gridTemplateColumns: `60px repeat(${colCount}, ${CELL_WIDTH}px)`,
+                }}
               >
-                <polyline
-                  fill="none"
-                  stroke="#3b82f6"
-                  strokeWidth="1.5"
-                  points={points}
-                />
-                {temps.map((temp, i) => (
-                  <circle
-                    key={i}
-                    cx={getX(i)}
-                    cy={getY(temp)}
-                    r="3"
-                    fill="#3b82f6"
-                  />
+                <div className="py-3 bg-gray-50 font-medium border-r border-gray-100">
+                  날씨
+                </div>
+                {hours3.map((t, i) => (
+                  <div key={i} className="py-3 text-lg">
+                    {skyToEmoji(t.sky, t.datetime)}
+                  </div>
                 ))}
-              </svg>
-            </div>
-          </div>
-
-          {/* 강수량 */}
-          <div
-            className="grid border-b border-gray-100 text-gray-500"
-            style={{
-              gridTemplateColumns: `60px repeat(${colCount}, ${CELL_WIDTH}px)`,
-            }}
-          >
-            <div className="py-2 bg-gray-50 font-medium border-r border-gray-100">
-              강수량
-            </div>
-            {hours3.map((t, i) => (
-              <div key={i} className="py-2">
-                {Number.isNaN(t.pcp) ? 0 : t.pcp}
               </div>
-            ))}
-          </div>
+
+              {/* 기온 */}
+              <div
+                className="grid relative h-24 border-b border-gray-100"
+                style={{
+                  gridTemplateColumns: `60px ${contentWidth}px`,
+                }}
+              >
+                <div className="bg-gray-50 font-medium border-r border-gray-100 flex items-center justify-center">
+                  기온
+                </div>
+
+                <div className="relative h-full">
+                  <div
+                    className="absolute inset-0 pt-2 z-10 grid"
+                    style={{
+                      gridTemplateColumns: `repeat(${colCount}, ${CELL_WIDTH}px)`,
+                    }}
+                  >
+                    {hours3.map((t, i) => (
+                      <span key={i}>{t.temperature}℃</span>
+                    ))}
+                  </div>
+
+                  <svg
+                    className="absolute bottom-4 left-0"
+                    width={svgWidth}
+                    height={SVG_HEIGHT}
+                    viewBox={`0 0 ${svgWidth} ${SVG_HEIGHT}`}
+                  >
+                    <polyline
+                      fill="none"
+                      stroke="#3b82f6"
+                      strokeWidth="1.5"
+                      points={points}
+                    />
+                    {temps.map((temp, i) => (
+                      <circle
+                        key={i}
+                        cx={getX(i)}
+                        cy={getY(temp)}
+                        r="3"
+                        fill="#3b82f6"
+                      />
+                    ))}
+                  </svg>
+                </div>
+              </div>
+
+              {/* 강수량 */}
+              <div
+                className="grid border-b border-gray-100 text-gray-500"
+                style={{
+                  gridTemplateColumns: `60px repeat(${colCount}, ${CELL_WIDTH}px)`,
+                }}
+              >
+                <div className="py-2 bg-gray-50 font-medium border-r border-gray-100">
+                  강수량
+                </div>
+                {hours3.map((t, i) => (
+                  <div key={i} className="py-2">
+                    {Number.isNaN(t.pcp) ? 0 : t.pcp}
+                  </div>
+                ))}
+              </div>
+            </>
+          )}
         </div>
       </div>
     </div>

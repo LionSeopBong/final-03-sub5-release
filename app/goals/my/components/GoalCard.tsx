@@ -98,7 +98,7 @@ export default function GoalCard() {
       const hour = String(now.getHours()).padStart(2, "0");
       const minute = String(now.getMinutes()).padStart(2, "0");
       const second = String(now.getSeconds()).padStart(2, "0");
-      extra.startedAt = year + "." + month + "." + day + " " + hour + ":" + minute + ":" + second;
+      extra.startedAt = `${year}.${month}.${day} ${hour}:${minute}:${second}`;
     }
 
     // 서버에 상태 변경 요청
@@ -113,7 +113,9 @@ export default function GoalCard() {
   const handleCancel = function (goalId: number) {
     setCancelGoalId(goalId);
   };
-
+  const handleComplete = function (goalId: number) {
+    setCompleteGoalId(goalId);
+  };
   // 모달에서 "제거" 눌렀을 때 실제 삭제
   const confirmCancel = async function () {
     if (!cancelGoalId || !user?.token) {
@@ -150,7 +152,42 @@ export default function GoalCard() {
     }
   };
 
+  const confirmComplete = async function () {
+    if (!completeGoalId || !user?.token) {
+      setCompleteGoalId(null);
+      return;
+    }
+
+    let goal = null;
+    for (let i = 0; i < goals.length; i++) {
+      if (goals[i]._id === completeGoalId) {
+        goal = goals[i];
+        break;
+      }
+    }
+
+    if (goal) {
+      await handleStatusChange(goal, "완료");
+    }
+    setCompleteGoalId(null);
+  };
+  const confirmDelete = async function () {
+    if (!deleteGoalId || !user?.token) {
+      setDeleteGoalId(null);
+      return;
+    }
+    try {
+      await deleteGoal(deleteGoalId, user.token.accessToken);
+      const updatedGoals = await getMyGoals(user.token.accessToken);
+      setGoals(updatedGoals.item);
+    } catch (error) {
+      console.error("삭제 중 오류 발생:", error);
+    }
+    setDeleteGoalId(null);
+  };
   const [cancelGoalId, setCancelGoalId] = useState<number | null>(null);
+  const [completeGoalId, setCompleteGoalId] = useState<number | null>(null);
+  const [deleteGoalId, setDeleteGoalId] = useState<number | null>(null);
 
   const [records, setRecords] = useState<RunningRecord[]>([]);
   useEffect(
@@ -175,6 +212,27 @@ export default function GoalCard() {
   return (
     <>
       <Modal
+        isOpen={completeGoalId !== null}
+        showIcon={true}
+        title="목표 완료"
+        message="축하합니다! 목표를 완료하시겠습니까?"
+        onConfirm={confirmComplete}
+        onCancel={function () {
+          setCompleteGoalId(null);
+        }}
+      />
+      <Modal
+        isOpen={deleteGoalId !== null}
+        title="목표 삭제"
+        message="정말 삭제하시겠습니까?"
+        confirmText="삭제"
+        cancelText="돌아가기"
+        onConfirm={confirmDelete}
+        onCancel={function () {
+          setDeleteGoalId(null);
+        }}
+      />
+      <Modal
         isOpen={cancelGoalId !== null}
         title="목표 취소"
         message="취소 시 목표가 제거됩니다. 정말 취소하시겠습니까?"
@@ -194,6 +252,7 @@ export default function GoalCard() {
           }
           if (status === "진행중") {
             const progress = calcProgress(goal, records);
+            console.log(progress);
             return (
               <li
                 key={goal._id}
@@ -201,8 +260,13 @@ export default function GoalCard() {
                 className="w-full border border-gray-300 rounded-2xl p-4"
               >
                 <h3 className="font-bold text-lg mb-1">{goal.title}</h3>
-                <p className="text-gray-500 text-sm mb-4">
+                <p className="text-gray-500 text-sm mb-1">
                   {goal.extra.subtitle}
+                </p>
+                <p className="text-gray-500 text-sm mb-4">
+                  {goal.extra.goalType === "distance"
+                    ? `목표 거리: ${goal.extra.targetDistance}km`
+                    : `목표 페이스: ${goal.extra.targetPace} /KM`}
                 </p>
                 <div className="flex flex-row justify-between w-full mb-2">
                   <p className="text-sm text-gray-600">진행률</p>
@@ -217,9 +281,14 @@ export default function GoalCard() {
                 <div className="flex flex-row gap-4">
                   <button
                     onClick={function () {
-                      handleStatusChange(goal, "완료");
+                      handleComplete(goal._id);
                     }}
-                    className="flex-1 bg-primary py-2 w-full rounded-lg text-center font-semibold text-notselectbtn"
+                    disabled={progress < 100}
+                    className={
+                      progress < 100
+                        ? "flex-1 py-2 w-full rounded-lg text-center font-semibold bg-gray-300 text-gray-500 cursor-not-allowed"
+                        : "flex-1 py-2 w-full rounded-lg text-center font-semibold bg-primary text-notselectbtn"
+                    }
                   >
                     완료
                   </button>
@@ -247,8 +316,13 @@ export default function GoalCard() {
                 className="w-full border border-gray-300 p-4 rounded-2xl"
               >
                 <h3 className="font-bold text-lg mb-1">{goal.title}</h3>
-                <p className="text-gray-600 text-sm mb-4">
+                <p className="text-gray-600 text-sm mb-1">
                   {goal.extra.subtitle}
+                </p>
+                <p className="text-gray-500 text-sm mb-4">
+                  {goal.extra.goalType === "distance"
+                    ? `목표 거리: ${goal.extra.targetDistance}km`
+                    : `목표 페이스: ${goal.extra.targetPace} /KM`}
                 </p>
                 <div className="text-center mb-4">
                   <p>현재 진행 없음</p>
@@ -278,8 +352,13 @@ export default function GoalCard() {
                 className="w-full border border-gray-300 p-4 rounded-2xl"
               >
                 <h3 className="font-bold text-lg mb-1">{goal.title}</h3>
-                <p className="text-gray-600 text-sm mb-4">
+                <p className="text-gray-600 text-sm mb-1">
                   {goal.extra.subtitle}
+                </p>
+                <p className="text-gray-500 text-sm mb-4">
+                  {goal.extra.goalType === "distance"
+                    ? `목표 거리: ${goal.extra.targetDistance}km`
+                    : `목표 페이스: ${goal.extra.targetPace} /KM`}
                 </p>
                 <div className="flex flex-row justify-between w-full">
                   <p>진행률</p>
@@ -294,7 +373,7 @@ export default function GoalCard() {
                 <div className="flex flex-row gap-4">
                   <button
                     onClick={function () {
-                      handleDelete(goal._id);
+                      setDeleteGoalId(goal._id);
                     }}
                     className="flex-1 bg-primary py-2 w-full rounded-lg font-semibold text-center text-notselectbtn"
                   >

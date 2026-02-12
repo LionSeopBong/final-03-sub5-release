@@ -6,6 +6,7 @@ interface ModalProps {
   message: string;
   confirmText?: string;
   cancelText?: string;
+  showIcon?: boolean;
   onConfirm: () => void;
   onCancel: () => void;
 }
@@ -18,6 +19,7 @@ export default function Modal({
   cancelText = "취소",
   onConfirm,
   onCancel,
+  showIcon = false,
 }: ModalProps) {
   if (!isOpen) return null;
 
@@ -25,12 +27,15 @@ export default function Modal({
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
       <div className="rounded-2xl bg-white p-6 shadow-xl w-[300px]">
         <div className="flex flex-col items-center gap-3 text-center">
-          <Image
-            src="/icons/cele.svg"
-            alt="모달 아이콘"
-            width={60}
-            height={60}
-          />
+          {showIcon && (
+            <Image
+              src="/icons/cele.svg"
+              alt="모달 아이콘"
+              width={60}
+              height={60}
+            />
+          )}
+
           <h2 className="text-xl font-bold">{title}</h2>
           <p className="text-sm text-gray-600">{message}</p>
           <div className="flex w-full gap-3">

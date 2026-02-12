@@ -78,7 +78,12 @@ export default function AddRecordForm() {
                 type="number"
                 name="hour"
                 value={hour}
-                onChange={(e) => setHour(e.target.value)}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  if (value.length <= 2) {
+                    setHour(value);
+                  }
+                }}
                 placeholder="00"
                 min="0"
                 max="23"
@@ -89,7 +94,12 @@ export default function AddRecordForm() {
                 type="number"
                 name="min"
                 value={min}
-                onChange={(e) => setMin(e.target.value)}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  if (value.length <= 2) {
+                    setMin(value);
+                  }
+                }}
                 placeholder="22"
                 min="0"
                 max="59"
@@ -100,7 +110,12 @@ export default function AddRecordForm() {
                 type="number"
                 name="sec"
                 value={sec}
-                onChange={(e) => setSec(e.target.value)}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  if (value.length <= 2) {
+                    setSec(value);
+                  }
+                }}
                 placeholder="13"
                 min="0"
                 max="59"

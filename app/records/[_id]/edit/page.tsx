@@ -1,8 +1,8 @@
 "use client";
 import { editRecord, removeRecord } from "@/app/action/records";
-import { useCalcPace } from "@/app/hooks/useCalcPace";
-import { useLoginCheck } from "@/app/hooks/useLoginCheck";
-import { useSuccessRedirect } from "@/app/hooks/useSuccessRedirect";
+import { useCalcPace } from "@/hooks/useCalcPace";
+import { useLoginCheck } from "@/hooks/useLoginCheck";
+import { useSuccessRedirect } from "@/hooks/useSuccessRedirect";
 import { getRecord } from "@/app/lib/recordsAPI";
 import { RunningRecord } from "@/app/lib/types";
 import { ArrowLeft } from "lucide-react";

@@ -1,8 +1,8 @@
 "use client";
 import { addRecord } from "@/app/action/records";
-import { useCalcPace } from "@/app/hooks/useCalcPace";
-import { useLoginCheck } from "@/app/hooks/useLoginCheck";
-import { useSuccessRedirect } from "@/app/hooks/useSuccessRedirect";
+import { useCalcPace } from "@/hooks/useCalcPace";
+import { useLoginCheck } from "@/hooks/useLoginCheck";
+import { useSuccessRedirect } from "@/hooks/useSuccessRedirect";
 import { ArrowLeft } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useActionState, useState } from "react";

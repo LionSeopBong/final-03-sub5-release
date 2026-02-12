@@ -289,7 +289,7 @@ export default function EditRecordPage() {
             name="memo"
             id="memo"
             rows={3}
-            defaultValue={record.extra.memo || "미입력"}
+            defaultValue={record.content || "미입력"}
             placeholder="예:오늘의 컨디션은 어땠나요?"
             className="w-full text-xs border font-bold border-gray-200 px-2 py-2 rounded-md my-1"
           />

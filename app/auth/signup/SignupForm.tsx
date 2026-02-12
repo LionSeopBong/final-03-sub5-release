@@ -187,14 +187,14 @@ export default function SignupForm() {
               >
                 {showPassword ? (
                   <Image
-                    src="/icons/eye_off.svg"
+                    src="/icons/eye.svg"
                     alt="숨김"
                     width={20}
                     height={20}
                   />
                 ) : (
                   <Image
-                    src="/icons/eye.svg"
+                    src="/icons/eye_off.svg"
                     alt="보임"
                     width={20}
                     height={20}
@@ -234,14 +234,14 @@ export default function SignupForm() {
               >
                 {showPasswordConfirm ? (
                   <Image
-                    src="/icons/eye_off.svg"
+                    src="/icons/eye.svg"
                     alt="숨김"
                     width={20}
                     height={20}
                   />
                 ) : (
                   <Image
-                    src="/icons/eye.svg"
+                    src="/icons/eye_off.svg"
                     alt="보임"
                     width={20}
                     height={20}

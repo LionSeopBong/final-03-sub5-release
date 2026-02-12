@@ -1,7 +1,6 @@
 "use client";
 
 import Image from "next/image";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 
 import { useActionState, useEffect, useRef, useState } from "react";
@@ -26,8 +25,8 @@ export default function LoginForm() {
   const [showPassword, setShowPassword] = useState(false);
 
   // 입력값 상태 (검증용)
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [email, setEmail] = useState("admin@sub5.com");
+  const [password, setPassword] = useState("admin1234!");
 
   // Alert 로직 (분리 가능)
   const { open, message, openAlert, closeAlert } = useAlert();
@@ -70,8 +69,10 @@ export default function LoginForm() {
         <div className="relative space-y-1">
           <input
             ref={emailRef}
+            id="email"
             name="email"
             type="email"
+            inputMode="email"
             autoComplete="email"
             placeholder="you@example.com"
             value={email}
@@ -109,12 +110,13 @@ export default function LoginForm() {
         {/* 비밀번호 */}
         <div className="relative space-y-1">
           <input
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
+            id="password"
             name="password"
             type={showPassword ? "text" : "password"}
             placeholder="password"
             autoComplete="current-password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
             className={[
               "w-full border-b-2 border-gray-300 px-1 py-3 text-base",
               "caret-primary focus:border-b-primary focus:outline-none focus:ring-0",
@@ -129,14 +131,14 @@ export default function LoginForm() {
             className="absolute right-1 top-1/2 -translate-y-1/2 text-gray-500"
           >
             {showPassword ? (
+              <Image src="/icons/eye.svg" alt="숨김" width={20} height={20} />
+            ) : (
               <Image
                 src="/icons/eye_off.svg"
-                alt="숨김"
+                alt="보임"
                 width={20}
                 height={20}
               />
-            ) : (
-              <Image src="/icons/eye.svg" alt="보임" width={20} height={20} />
             )}
           </button>
         </div>

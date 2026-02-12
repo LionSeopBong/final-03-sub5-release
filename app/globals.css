@@ -43,3 +43,9 @@
   --border-medium: #d3d3d3;
   --border-dark: #acacac;
 }
+
+@layer base {
+  button {
+    cursor: pointer;
+  }
+}

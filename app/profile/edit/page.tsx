@@ -65,7 +65,10 @@ export default function ProfileEdit() {
     const updateResult = await fetchAPI(`/users/${user._id}`, {
       method: "PATCH",
       token: user.token.accessToken,
-      body: { image: imagePath },
+      body: {
+        image: imagePath,
+        extra: user.extra,
+      },
     });
 
     if (updateResult.ok === 1) {
@@ -85,7 +88,10 @@ export default function ProfileEdit() {
     const result = await fetchAPI(`/users/${user._id}`, {
       method: "PATCH",
       token: user.token.accessToken,
-      body: { image: null },
+      body: {
+        image: null,
+        extra: user.extra,
+      },
     });
 
     if (result.ok === 1) {
@@ -107,6 +113,7 @@ export default function ProfileEdit() {
       body: {
         name: nickname,
         extra: {
+          ...user.extra,
           gender: gender,
           birthDate: birth,
         },

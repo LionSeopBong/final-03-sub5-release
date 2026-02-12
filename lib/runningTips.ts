@@ -14,7 +14,7 @@ export function getRunningTip(
   // 주의
   if (score < 60) {
     if (obs.WW >= 40) {
-      return "비나 눈이 동반되고 있습니다. 미끄럼에 주의하고 러닝은 짧게 하세요.";
+      return "흐린 날씨이므로 호흡에 주의하고 러닝은 짧게 하세요.";
     }
     if (obs.WS >= 7) {
       return "강한 바람이 불고 있습니다. 심박 기준으로 페이스를 조절하세요.";

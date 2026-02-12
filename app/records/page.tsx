@@ -3,9 +3,9 @@
 import Footer from "@/app/components/common/Footer";
 import Header from "@/app/components/common/Header";
 import Navi from "@/app/components/common/Navi";
-import { useAutoScroll } from "@/app/hooks/useAutoScroll";
-import { useExportCSV } from "@/app/hooks/useExportCSV";
-import { useGetRecords } from "@/app/hooks/useGetRecords";
+import { useAutoScroll } from "@/hooks/useAutoScroll";
+import { useExportCSV } from "@/hooks/useExportCSV";
+import { useGetRecords } from "@/hooks/useGetRecords";
 import { getMonthlyDistanceChartData, getWeeklyChartData } from "@/app/lib/chart";
 import Link from "next/link";
 import { useMemo } from "react";

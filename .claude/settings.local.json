@@ -1,0 +1,7 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git -C \"C:/febc15/project-final/final-03-sub5\" diff)"
+    ]
+  }
+}

@@ -1,12 +1,11 @@
 // app/api/forecast/3day/route.ts
 import type { ForecastRow } from "@/types/kma";
-import { nowKST, parseTm } from "@/lib/utils";
 import { NextResponse } from "next/server";
 
 export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
-    const regId = searchParams.get("regId");
+    const regId = searchParams.get("reg");
 
     if (!regId) {
       return NextResponse.json({ error: "regId is required" }, { status: 400 });

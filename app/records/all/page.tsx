@@ -19,10 +19,8 @@ export default function AllRecordsView() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        console.log("데이터 조회시작");
         const token = user?.token?.accessToken;
         if (!token) {
-          console.log("로그인 필요");
           return;
         }
         const result = await getMyRecords(token);
@@ -30,7 +28,6 @@ export default function AllRecordsView() {
         if (result.ok) {
           const records = result.item.filter((item) => item.extra);
 
-          console.log("기록개수", records.length);
           setWeeklyStats(calculateWeeklyStats(records));
           setMonthlyStats(calculateMonthlyStats(records));
           setRecentPace(calculateRecentPace(records, 2));

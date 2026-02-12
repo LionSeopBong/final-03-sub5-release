@@ -3,9 +3,9 @@
 import Footer from "@/app/components/common/Footer";
 import Header from "@/app/components/common/Header";
 import Navi from "@/app/components/common/Navi";
-import { useAutoScroll } from "@/app/hooks/useAutoScroll";
-import { useExportCSV } from "@/app/hooks/useExportCSV";
-import { useGetRecords } from "@/app/hooks/useGetRecords";
+import { useAutoScroll } from "@/hooks/useAutoScroll";
+import { useExportCSV } from "@/hooks/useExportCSV";
+import { useGetRecords } from "@/hooks/useGetRecords";
 import { getMonthlyDistanceChartData, getWeeklyChartData } from "@/app/lib/chart";
 import Link from "next/link";
 import { useMemo } from "react";
@@ -16,7 +16,7 @@ export default function RecordPage() {
   // 유저 데이터
   const { data, weeklyStats, monthlyStats, recentPace, handleDelete } = useGetRecords();
   // 스크롤 위치 이벤트
-  const { acticeSection, scrollToSection, dailyRef, weeklyRecordRef, monthRecordRef, recentRef, statsRef } = useAutoScroll();
+  const { acticeSection, scrollToSection, dailyRef, weeklyRecordRef, monthRecordRef, recentRef, statsRef, navContainerRef, navButtonRefs } = useAutoScroll();
   // csv data export
   const { exportData } = useExportCSV(data);
   // 페이스 계산
@@ -54,38 +54,56 @@ export default function RecordPage() {
         </div>
 
         {/* 네비탭 */}
-        <nav data-section="daily" className=" flex px-6 py-4 gap-3 overflow-x-auto scrollbar-hide">
+        <nav data-section="daily" ref={navContainerRef} className=" flex px-6 py-4 gap-3 overflow-x-auto scrollbar-hide scroll-smooth">
           <button
+            ref={(el) => {
+              navButtonRefs.current["home"] = el;
+            }}
             onClick={() => scrollToSection("home")}
             className={`${acticeSection === "home" ? "bg-primary text-white" : "border-gray-200"} border text-sm active:border-blue-500  px-9 py-2 rounded-lg whitespace-nowrap`}
           >
             홈
           </button>
           <button
+            ref={(el) => {
+              navButtonRefs.current["daily"] = el;
+            }}
             onClick={() => scrollToSection("daily")}
             className={`text-sm ${acticeSection === "daily" ? "bg-primary text-white" : "border-gray-200"} border px-9 active:border-blue-500 py-2 rounded-lg whitespace-nowrap`}
           >
             오늘의 기록
           </button>
           <button
+            ref={(el) => {
+              navButtonRefs.current["weeklyRecord"] = el;
+            }}
             onClick={() => scrollToSection("weeklyRecord")}
             className={`text-sm ${acticeSection === "weeklyRecord" ? "bg-primary text-white" : "border-gray-200"} border px-9 py-2 rounded-lg active:border-blue-500 whitespace-nowrap`}
           >
             주간 러닝 거리
           </button>
           <button
+            ref={(el) => {
+              navButtonRefs.current["monthRecord"] = el;
+            }}
             onClick={() => scrollToSection("monthRecord")}
             className={`text-sm ${acticeSection === "monthRecord" ? "bg-primary text-white" : "border-gray-200"} border px-9 py-2 rounded-lg active:border-blue-500 whitespace-nowrap`}
           >
             월간 러닝 거리
           </button>
           <button
+            ref={(el) => {
+              navButtonRefs.current["recent"] = el;
+            }}
             onClick={() => scrollToSection("recent")}
             className={`text-sm ${acticeSection === "recent" ? "bg-primary text-white" : "border-gray-200"} border px-9 py-2 rounded-lg active:border-blue-500 whitespace-nowrap`}
           >
             최근 기록
           </button>
           <button
+            ref={(el) => {
+              navButtonRefs.current["stats"] = el;
+            }}
             onClick={() => scrollToSection("stats")}
             className={`text-sm ${acticeSection === "stats" ? "bg-primary text-white" : "border-gray-200"} border px-9 py-2 rounded-lg active:border-blue-500 whitespace-nowrap`}
           >

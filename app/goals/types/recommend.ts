@@ -7,6 +7,8 @@ export const goalData = [
     description: "러닝에 익숙해지는 첫 걸음",
     level: "초급",
     status: "진행중",
+    goalType: "distance",
+    targetDistance: 5,
   },
   {
     id: 2,
@@ -15,6 +17,8 @@ export const goalData = [
     description: "편안한 속도로 꾸준히 완주하는 것이 목표 ",
     level: "초급",
     status: "완료",
+    goalType: "distance",
+    targetDistance: 10,
   },
   {
     id: 3,
@@ -23,6 +27,8 @@ export const goalData = [
     description: "10KM 에 익숙해지면 도전하는 중급 러너의 첫 관문",
     level: "초급",
     status: "미완료",
+    goalType: "distance",
+    targetDistance: 21,
   },
   {
     id: 4,
@@ -30,6 +36,8 @@ export const goalData = [
     subtitle: "풀 마라톤 완주",
     description: "모든 러너의 꿈! 충분한 준비 후 도전하는 최종 목표",
     level: "초급",
+    goalType: "distance",
+    targetDistance: 42,
   },
 
   /* ===== 중급 ===== */
@@ -39,6 +47,8 @@ export const goalData = [
     subtitle: "빠른 페이스 스피드 챌린지",
     description: "목표 페이스: 5'00\" /km",
     level: "중급",
+    goalType: "pace",
+    targetPace: "5:00",
   },
   {
     id: 6,
@@ -46,6 +56,8 @@ export const goalData = [
     subtitle: "3km ~ 하프까지 누적 거리 챌린지",
     description: "목표 페이스: 5'00\" /km",
     level: "중급",
+    goalType: "distance",
+    targetDistance: 5,
   },
   {
     id: 7,
@@ -53,6 +65,8 @@ export const goalData = [
     subtitle: "레벨 업을 위한 챌린지",
     description: "목표 페이스: 4'30\" /km",
     level: "중급",
+    goalType: "pace",
+    targetPace: "4:30",
   },
   {
     id: 8,
@@ -60,6 +74,8 @@ export const goalData = [
     subtitle: "빠른 페이스 스피드 챌린지",
     description: "목표 페이스: 5'00\" /km",
     level: "중급",
+    goalType: "pace",
+    targetPace: "5:00",
   },
   {
     id: 9,
@@ -67,6 +83,9 @@ export const goalData = [
     subtitle: "빠른 페이스 스피드 챌린지",
     description: "목표 페이스: 4'55\" /km",
     level: "중급",
+    goalType: "pace",
+    targetPace: "4:55",
+    prerequisiteId: 8,
   },
   {
     id: 10,
@@ -74,6 +93,8 @@ export const goalData = [
     subtitle: "3km ~ 하프까지 누적 거리 챌린지",
     description: "목표 페이스: 5'00\" /km",
     level: "중급",
+    goalType: "distance",
+    targetDistance: 5,
   },
   {
     id: 11,
@@ -81,6 +102,8 @@ export const goalData = [
     subtitle: "3km ~ 하프까지 누적 거리 챌린지",
     description: "목표 페이스: 5'00\" /km",
     level: "중급",
+    goalType: "distance",
+    targetDistance: 10,
   },
   {
     id: 12,
@@ -88,6 +111,8 @@ export const goalData = [
     subtitle: "레벨 업을 위한 챌린지",
     description: "목표 페이스: 4'30\" /km",
     level: "중급",
+    goalType: "pace",
+    targetPace: "4:30",
   },
 
   /* ===== 고급 ===== */
@@ -97,6 +122,8 @@ export const goalData = [
     subtitle: "빠른 페이스 스피드 챌린지",
     description: "목표 페이스: 4'30\" /km",
     level: "고급",
+    goalType: "pace",
+    targetPace: "4:30",
   },
   {
     id: 14,
@@ -104,6 +131,8 @@ export const goalData = [
     subtitle: "빠른 페이스 스피드 챌린지",
     description: "목표 페이스: 4'20\" /km",
     level: "고급",
+    goalType: "pace",
+    targetPace: "4:20",
   },
   {
     id: 15,
@@ -111,13 +140,17 @@ export const goalData = [
     subtitle: "빠른 페이스 스피드 챌린지",
     description: "목표 페이스: 4'10\" /km",
     level: "고급",
+    goalType: "pace",
+    targetPace: "4:10",
   },
   {
     id: 16,
     title: "5km 페이스 챌린지",
     subtitle: "빠른 페이스 스피드 챌린지",
-    description: "목표 페이스: 4'30\" /km",
+    description: "목표 페이스: 4'00\" /km",
     level: "고급",
+    goalType: "pace",
+    targetPace: "4:00",
   },
   {
     id: 17,
@@ -125,6 +158,8 @@ export const goalData = [
     subtitle: "단계별 스피드 챌린지",
     description: "목표 페이스: 4'20\" /km",
     level: "고급",
+    goalType: "pace",
+    targetPace: "4:20",
   },
   {
     id: 18,
@@ -132,6 +167,9 @@ export const goalData = [
     subtitle: "단계별 스피드 챌린지",
     description: "목표 페이스: 4'10\" /km",
     level: "고급",
+    goalType: "pace",
+    targetPace: "4:10",
+    prerequisiteId: 17,
   },
   {
     id: 19,
@@ -139,6 +177,8 @@ export const goalData = [
     subtitle: "고급 레벨 거리 챌린지",
     description: "목표 페이스: 4'30\" /km",
     level: "고급",
+    goalType: "distance",
+    targetDistance: 5,
   },
   {
     id: 20,
@@ -146,5 +186,7 @@ export const goalData = [
     subtitle: "고급 레벨 거리 챌린지",
     description: "목표 페이스: 4'30\" /km",
     level: "고급",
+    goalType: "distance",
+    targetDistance: 10,
   },
 ];

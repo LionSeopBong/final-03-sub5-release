@@ -14,10 +14,11 @@ export async function GET(request: Request) {
   );
 
   const params = {
-    serviceKey: process.env.DATA_PORTAL_KMA!,    
+    serviceKey: process.env.DATA_PORTAL_KMA!,
     dataType: "JSON",
     base_date,
     base_time,
+    numOfRows: "1000",
     nx,
     ny,
   };

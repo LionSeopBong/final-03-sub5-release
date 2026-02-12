@@ -8,16 +8,14 @@ import { validateSignup, checkEmail } from "@/app/lib/components/signup";
 import { useRouter } from "next/navigation";
 import Alert from "@/app/components/ui/Alert";
 
-import { useOnboardingStore } from "@/zustand/onboardingStore";
 import useAlert from "@/hooks/useAlert";
+import { useOnboardingStore } from "@/zustand/onboardingStore";
 
 export default function SignupForm() {
   const router = useRouter();
 
   // onboarding store
-  const setEmailCredentials = useOnboardingStore(
-    (state) => state.setEmailCredentials,
-  );
+  const setEmailCredentials = useOnboardingStore((state) => state.setEmailCredentials);
 
   // 입력값
   const [email, setEmail] = useState("");
@@ -40,15 +38,7 @@ export default function SignupForm() {
 
   const [isCheckingEmail, setIsCheckingEmail] = useState(false);
 
-  const {
-    open,
-    message,
-    onConfirm,
-    showCancel,
-    openAlert,
-    openConfirm,
-    closeAlert,
-  } = useAlert();
+  const { open, message, onConfirm, showCancel, openAlert, openConfirm, closeAlert } = useAlert();
 
   const clearErrors = () => {
     setEmailError("");
@@ -92,13 +82,10 @@ export default function SignupForm() {
       }
 
       // 3) 확인 → store 저장 → 다음 단계
-      openConfirm(
-        `입력하신 계정으로\nSub.5 회원가입을 진행할까요?\n${trimmedEmail}`,
-        () => {
-          setEmailCredentials(trimmedEmail, password);
-          router.replace("/onboarding/profile");
-        },
-      );
+      openConfirm(`입력하신 계정으로\nSub.5 회원가입을 진행할까요?\n${trimmedEmail}`, () => {
+        setEmailCredentials(trimmedEmail, password);
+        router.replace("/onboarding/profile");
+      });
     } finally {
       setIsCheckingEmail(false);
     }
@@ -106,19 +93,9 @@ export default function SignupForm() {
 
   return (
     <>
-      <Alert
-        open={open}
-        message={message}
-        onClose={closeAlert}
-        onConfirm={onConfirm}
-        showCancel={showCancel}
-      />
+      <Alert open={open} message={message} onClose={closeAlert} onConfirm={onConfirm} showCancel={showCancel} />
 
-      <form
-        onSubmit={handleSubmit}
-        noValidate
-        className="mt-12 flex flex-1 flex-col"
-      >
+      <form onSubmit={handleSubmit} noValidate className="mt-12 flex flex-1 flex-col">
         <section className="space-y-8">
           {/* 이메일 */}
           <div className="space-y-2">
@@ -141,22 +118,14 @@ export default function SignupForm() {
                 aria-label="이메일 지우기"
                 className={[
                   "absolute right-0 top-1/2 -translate-y-1/2 p-2 transition-opacity",
-                  email.length > 0
-                    ? "opacity-100 pointer-events-auto"
-                    : "opacity-0 pointer-events-none",
+                  email.length > 0 ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none",
                 ].join(" ")}
                 onClick={() => {
                   setEmail("");
                   focusField("email");
                 }}
               >
-                <Image
-                  src="/icons/close_circle.svg"
-                  alt=""
-                  width={20}
-                  height={20}
-                  className=""
-                />
+                <Image src="/icons/close_circle.svg" alt="" width={20} height={20} className="" />
               </button>
             </div>
             {emailError && <p className="text-xs text-error">{emailError}</p>}
@@ -187,14 +156,14 @@ export default function SignupForm() {
               >
                 {showPassword ? (
                   <Image
-                    src="/icons/eye_off.svg"
+                    src="/icons/eye.svg"
                     alt="숨김"
                     width={20}
                     height={20}
                   />
                 ) : (
                   <Image
-                    src="/icons/eye.svg"
+                    src="/icons/eye_off.svg"
                     alt="보임"
                     width={20}
                     height={20}
@@ -202,9 +171,7 @@ export default function SignupForm() {
                 )}
               </button>
             </div>
-            {passwordError && (
-              <p className="text-xs text-error">{passwordError}</p>
-            )}
+            {passwordError && <p className="text-xs text-error">{passwordError}</p>}
           </div>
 
           {/* 비밀번호 확인 */}
@@ -226,22 +193,20 @@ export default function SignupForm() {
               {/* 비밀번호 보임/숨김 버튼 */}
               <button
                 type="button"
-                aria-label={
-                  showPasswordConfirm ? "비밀번호 숨기기" : "비밀번호 보기"
-                }
+                aria-label={showPasswordConfirm ? "비밀번호 숨기기" : "비밀번호 보기"}
                 onClick={() => setShowPasswordConfirm((prev) => !prev)}
                 className="absolute right-1 top-1/2 -translate-y-1/2 text-gray-500"
               >
                 {showPasswordConfirm ? (
                   <Image
-                    src="/icons/eye_off.svg"
+                    src="/icons/eye.svg"
                     alt="숨김"
                     width={20}
                     height={20}
                   />
                 ) : (
                   <Image
-                    src="/icons/eye.svg"
+                    src="/icons/eye_off.svg"
                     alt="보임"
                     width={20}
                     height={20}
@@ -249,9 +214,7 @@ export default function SignupForm() {
                 )}
               </button>
             </div>
-            {passwordConfirmError && (
-              <p className="text-xs text-error">{passwordConfirmError}</p>
-            )}
+            {passwordConfirmError && <p className="text-xs text-error">{passwordConfirmError}</p>}
           </div>
         </section>
 

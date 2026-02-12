@@ -47,6 +47,8 @@ export default function BodyForm() {
   const heightNum = Number(heightCm);
   const weightNum = Number(weightKg);
 
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
   const bmi = useMemo(() => {
     const hErr = validateHeight(heightNum);
     const wErr = validateWeight(weightNum);
@@ -61,89 +63,90 @@ export default function BodyForm() {
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (isSubmitting) return;
+    setIsSubmitting(true);
 
-    setSubmitted(true);
+    try {
+      setSubmitted(true);
 
-    const hErr = validateHeight(heightNum);
-    const wErr = validateWeight(weightNum);
+      const hErr = validateHeight(heightNum);
+      const wErr = validateWeight(weightNum);
 
-    setHeightError(hErr);
-    setWeightError(wErr);
+      setHeightError(hErr);
+      setWeightError(wErr);
 
-    if (hErr || wErr) return;
+      if (hErr || wErr) return;
 
-    // 소셜이면 PATCH만 (POST 절대 금지)
-    if (isSocial) {
-      if (!userId) {
-        return;
-      }
-      if (!accessToken) {
-        return;
-      }
+      if (isSocial) {
+        if (!userId) return;
+        if (!accessToken) return;
 
-      const extraRes = user?.extra ?? {};
+        const extraRes = user?.extra ?? {};
 
-      const patchRes = await updateUser(userId, accessToken, {
-        ...(image && { image }),
-        name,
-        extra: {
-          ...extraRes,
-          gender,
-          birthDate,
-          height: heightNum,
-          weight: weightNum,
-          onboardingDone: true,
-        },
-      });
-
-      if (!patchRes || patchRes.ok !== 1) {
-        alert(patchRes?.message ?? "신체 정보 저장에 실패했어요.");
-        return;
-      }
-
-      // 서버에서 내려준 최신 user로 zustand 갱신
-      if (patchRes && patchRes.item) {
-        setUser({
-          ...user, // 기존 토큰 유지
-          ...patchRes.item, // name/image/extra 최신값 덮어쓰기
-          token: user?.token,
+        const patchRes = await updateUser(userId, accessToken, {
+          ...(image && { image }),
+          name,
+          extra: {
+            ...extraRes,
+            gender,
+            birthDate,
+            height: heightNum,
+            weight: weightNum,
+            onboardingDone: true,
+          },
         });
+
+        if (!patchRes || patchRes.ok !== 1) {
+          alert(patchRes?.message ?? "신체 정보 저장에 실패했어요.");
+          return;
+        }
+
+        // 서버에서 내려준 최신 user로 zustand 갱신
+        if (patchRes && patchRes.item) {
+          setUser({
+            ...user, // 기존 토큰 유지
+            ...patchRes.item, // name/image/extra 최신값 덮어쓰기
+            token: user?.token,
+          });
+        }
+
+        reset();
+        router.replace("/home");
+        return;
+      }
+
+      // // 이메일이면 POST(createUser)만
+      const imagePath =
+        image && image.startsWith("https") ? new URL(image).pathname : image;
+
+      // blob면 서버에 저장 불가
+      if (imagePath?.startsWith("blob:")) {
+        return;
+      }
+
+      // 이메일이면 POST(createUser)만
+      const fd = new FormData();
+      fd.set("email", email ?? "");
+      fd.set("password", password ?? "");
+      fd.set("name", name ?? "");
+      if (gender) fd.set("gender", gender);
+      if (birthDate) fd.set("birthDate", birthDate);
+      if (image) fd.set("image", image);
+      fd.set("height", String(heightNum));
+      fd.set("weight", String(weightNum));
+
+      const signupRes = await createUser(null, fd);
+
+      if (!signupRes || signupRes.ok !== 1) {
+        alert(signupRes?.message ?? "회원가입에 실패했어요.");
+        return;
       }
 
       reset();
-      router.replace("/home");
-      return;
+      router.replace("/auth/login");
+    } finally {
+      setIsSubmitting(false);
     }
-
-    // // 이메일이면 POST(createUser)만
-    const imagePath =
-      image && image.startsWith("https") ? new URL(image).pathname : image;
-
-    // blob면 서버에 저장 불가
-    if (imagePath?.startsWith("blob:")) {
-      return;
-    }
-
-    // 이메일이면 POST(createUser)만
-    const fd = new FormData();
-    fd.set("email", email ?? "");
-    fd.set("password", password ?? "");
-    fd.set("name", name ?? "");
-    if (gender) fd.set("gender", gender);
-    if (birthDate) fd.set("birthDate", birthDate);
-    if (image) fd.set("image", image);
-    fd.set("height", String(heightNum));
-    fd.set("weight", String(weightNum));
-
-    const signupRes = await createUser(null, fd);
-
-    if (!signupRes || signupRes.ok !== 1) {
-      alert(signupRes?.message ?? "회원가입에 실패했어요.");
-      return;
-    }
-
-    reset();
-    router.replace("/auth/login");
   };
 
   return (
@@ -243,7 +246,7 @@ export default function BodyForm() {
         </div>
       </section>
 
-      <BodyButton />
+      <BodyButton loading={isSubmitting} />
     </form>
   );
 }

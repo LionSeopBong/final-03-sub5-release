@@ -43,3 +43,24 @@
   --border-medium: #d3d3d3;
   --border-dark: #acacac;
 }
+
+@layer base {
+  button {
+    cursor: pointer;
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade {
+  animation: fadeInUp 0.25s ease-out;
+}

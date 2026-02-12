@@ -1,13 +1,10 @@
 import { NextResponse } from "next/server";
 import type { KmaObservation } from "@/types/kma";
 
-import fs from "fs";
-import path from "path";
-
-import type { Station } from "@/types/kma";
-
 // function import
 import { findNearestStationFast } from "@/lib/utils";
+
+import STATIONS from "@/data/stn.json"; // 관측소 목록
 
 export async function GET(req: Request) {
   try {
@@ -20,13 +17,8 @@ export async function GET(req: Request) {
     if (Number.isNaN(lat) || Number.isNaN(lon)) {
       return NextResponse.json({ error: "invalid coords" }, { status: 400 });
     }
-
-    const filePath = path.join(process.cwd(), "data", "stn.json");
-    const jsonData = fs.readFileSync(filePath, "utf8");
-    const stations: Station[] = JSON.parse(jsonData);
-
-    const nearest = findNearestStationFast({ lat, lon }, stations);
-    const stn = nearest.stn;
+    const nearest = findNearestStationFast({ lat, lon }, STATIONS);
+    const stn = nearest?.stn;
     //console.log("stn: ", stn);
     const res = await fetch(
       `https://apihub.kma.go.kr/api/typ01/url/kma_sfctm2.php?stn=${stn}&tm=${tm}&authKey=${process.env.KMA_API_KEY}`,
@@ -51,10 +43,11 @@ export async function GET(req: Request) {
 
     const weather: KmaObservation = {
       CA_TOT: Number(c[25]),
-      WW: Number(c[24].slice(0, 2)),
+      WC: Number(c[22]?.slice(0, 2) ?? 0),
+      WW: Number(c[24]?.slice(0, 2) ?? 0),
       TA: Math.floor(Number(c[11])),
       HM: Number(c[13]),
-      WS: Number(c[3]),
+      WS: Math.round(Number(c[3])),
       VS: Number(c[32]),
     };
 

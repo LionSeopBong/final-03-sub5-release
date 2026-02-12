@@ -11,12 +11,10 @@
 
 // 내 목표 추가
 // import fetchAPI from "@/app/lib/api"; // 1줄
-import { goalData } from "@/app/goals/types/recommend"; // 2줄
+import { RecommendGoal } from "@/app/goals/types";
 import fetchAPI from "@/app/lib/api";
 
-type GoalItem = (typeof goalData)[number];
-
-export function createGoal(goal: GoalItem, token: string) {
+export function createGoal(goal: RecommendGoal, token: string) {
   return fetchAPI(`/posts`, {
     method: "POST",
     body: {
@@ -27,6 +25,9 @@ export function createGoal(goal: GoalItem, token: string) {
         status: "미완료",
         subtitle: goal.subtitle,
         description: goal.description,
+        goalType: goal.goalType,
+        targetPace: goal.targetPace,
+        targetDistance: goal.targetDistance,
       },
     },
     token,
@@ -36,21 +37,21 @@ export function getMyGoals(token: string) {
   return fetchAPI(`/posts/users?type=goal`, { token });
 }
 //updateGoal - 목표 상태 변경
-// export function updateGoal(_id: number, data: ,token:string ) {
-//   return (
-//     fetchAPI(`/posts/{_id}`),
-//     {
-//       method: "PATCH",
-//       body: data,
-//     }
-//   );
-// }
-// //deleteGoal - 목표 삭제
-// export function deleteGoal() {
-//   return (
-//     fetchAPI(`/posts/{_id}`),
-//     {
-//       method: "Delete",
-//     }
-//   );
-// }
+export function updateGoal(
+  _id: number,
+  currentExtra: Record<string, string | number | boolean>,
+  status: string,
+  token: string,
+) {
+  return fetchAPI(`/posts/${_id}`, {
+    method: "PATCH",
+    body: {
+      extra: { ...currentExtra, status },
+    },
+    token,
+  });
+}
+//deleteGoal - 목표 삭제
+export function deleteGoal(_id: number, token: string) {
+  return fetchAPI(`/posts/${_id}`, { method: "DELETE", token });
+}

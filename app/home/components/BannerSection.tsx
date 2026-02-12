@@ -1,6 +1,6 @@
 import Link from "next/link";
 
-export default function Banner() {
+export default function BannerSection() {
   return (
     <section className="mt-2">
       <div className="rounded-[28px] bg-gradient-to-br from-[#7CCBF0] to-[#2C7FB8] px-6 py-6 shadow-sm">
@@ -21,7 +21,7 @@ export default function Banner() {
 
         <div className="mt-6 space-y-3">
           <Link
-            href="/goal"
+            href="/goals"
             className="block w-full rounded-2xl bg-white py-3 text-center text-sm font-bold text-[#2C7FB8]"
           >
             목표 설정

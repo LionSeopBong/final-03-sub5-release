@@ -59,30 +59,6 @@ export async function getCoordinates(): Promise<LocationCoords> {
   });
 }
 
-export function findNearestGrid(
-  latitude: number,
-  longitude: number,
-  gridPoints: StationXY[],
-): StationXY | null {
-  if (gridPoints.length === 0) return null;
-
-  let nearest = gridPoints[0];
-  let minDistSq =
-    (nearest.lat - latitude) ** 2 + (nearest.lon - longitude) ** 2;
-
-  for (let i = 1; i < gridPoints.length; i++) {
-    const p = gridPoints[i];
-    const distSq = (p.lat - latitude) ** 2 + (p.lon - longitude) ** 2;
-
-    if (distSq < minDistSq) {
-      minDistSq = distSq;
-      nearest = p;
-    }
-  }
-
-  return nearest;
-}
-
 /** 가장 최근 발표시각(TM_FC) 계산: 00시 or 12시 */
 function getLatestTmFc(): string {
   const kst = nowKST();
@@ -94,56 +70,6 @@ function getLatestTmFc(): string {
 
   const fcHour = h < 12 ? "00" : "12";
   return `${y}${m}${d}${fcHour}00`;
-}
-
-export async function fetch3DayForecast(regId: string): Promise<ForecastRow[]> {
-  const serviceKey = process.env.KMA_API_KEY;
-  const tmfc = getLatestTmFc();
-
-  const url = `http://localhost:3000/api/typ01/url/fct_afs_dl.php?reg=11B10101&tmfc=2026020406&disp=1&help=0&authKey=${serviceKey}`;
-
-  const res = await fetch(url);
-
-  if (!res.ok) {
-    throw new Error(`API error: ${res.status}`);
-  }
-
-  const text = await res.text();
-  //console.log(text);
-
-  // 공백 기반 파싱 (DFS 텍스트 응답)
-  const lines = text
-    .split("\n")
-    .map((l) => l.trim())
-    .filter((l) => l && !l.startsWith("#"));
-
-  const rows: ForecastRow[] = lines.map((line) => {
-    const cols = line.split(",");
-    return {
-      REG_ID: cols[0],
-      TM_FC: cols[1],
-      TM_EF: cols[2],
-      MOD: cols[3],
-      NE: cols[4],
-      STN: cols[5],
-      W1: cols[9],
-      T: cols[10],
-      W2: cols[11],
-      TA: cols[12],
-      ST: cols[13],
-      SKY: cols[14],
-      PREP: cols[15],
-      WF: cols.slice(16).join(" "),
-    };
-  });
-
-  const now = nowKST();
-  const end = new Date(now.getTime() + 3 * 24 * 60 * 60 * 1000);
-
-  return rows.filter((r) => {
-    const ef = parseTm(r.TM_EF);
-    return ef >= now && ef <= end;
-  });
 }
 
 export function skyIconFromCA(caTot: number): WeatherIconKey {
@@ -263,25 +189,28 @@ export function getWeatherIcon({ caTot, ww }: WeatherInput): WeatherIconKey {
  * 3: 구름많음
  * 4: 흐림
  */
-export function getSKY({ caTot, ww }: WeatherInput): number {
+export function getSKY({ caTot, ww, wc }: WeatherInput): number {
+  // wc -> 5(안개),6(미세먼지),7(약한황사),8(강한황사),9(돌풍)
+  if (wc >= 5 && wc <= 9) return 4;
   // 강수·현상 우선 처리 (비/눈/소나기 등 → 흐림)
-  if (ww !== undefined) {
-    // KMA WW 코드에서 강수/현상 범주
-    // (비, 눈, 진눈개비, 소나기, 뇌우 등)
+  // wc -> 13(번개) 14(약한비) 15(중간비) 16(강한비)
+  if (wc >=13 && wc <= 16) return 8;
+  if (ww !== undefined) {    
     if (
-      (ww >= 20 && ww <= 99) // 관측 가능한 기상현상 전반
+      ww >= 20 &&
+      ww <= 99 // 관측 가능한 기상현상 전반
     ) {
-      return 4;
+      return 3;
     }
   }
 
   // 전운량 기준 처리
   if (caTot === undefined) return 1;
 
-  if (caTot <= 2) return 1;      // 맑음
-  if (caTot <= 5) return 2;      // 구름조금
-  if (caTot <= 8) return 3;      // 구름많음
-  return 4;                      // 흐림
+  if (caTot <= 2) return 1; // 맑음
+  if (caTot <= 5) return 2; // 구름조금
+  if (caTot <= 8) return 3; // 구름많음
+  return 4; // 흐림
 }
 
 export function outdoorScore(obs: KmaObservation): number {
@@ -324,10 +253,13 @@ export function outdoorScore(obs: KmaObservation): number {
   return Math.max(0, Math.min(100, score));
 }
 
-export function outdoorGrade(score: number): "좋음" | "보통" | "나쁨" {
-  if (score >= 80) return "좋음";
-  if (score >= 50) return "보통";
-  return "나쁨";
+export function outdoorGrade(
+  score: number,
+): "최적" | "양호" | "주의" | "부적합" {
+  if (score >= 85) return "최적";
+  if (score >= 60) return "양호";
+  if (score >= 45) return "주의";
+  return "부적합";
 }
 
 export function getCurrentTimeKoreanFormat(): string {
@@ -431,15 +363,25 @@ export function skyToEmoji(sky?: number, datetime?: Date): string {
   if (isNight) {
     switch (sky) {
       case 1:
-        return "🌙"; // 맑은 밤
+        return "🌕"; // 맑은 밤
       case 2:
-        return "🌙☁️"; // 구름조금 밤
+        return "🌙"; // 구름조금 밤
       case 3:
-        return "☁️🌙"; // 구름많음 밤
+        return "🌒"; // 구름많음 밤
       case 4:
         return "☁️"; // 흐린 밤
+      case 5:
+        return "🌫️"; // 안개
+      case 6:
+        return "😷"; // 황사
+      case 7:
+        return "❄"; // 눈
+      case 8:
+        return "⛈"; // 소나기
+      case 9:
+        return "⚡"; // 뇌전
       default:
-        return "🌙";
+        return "❓";
     }
   }
 
@@ -453,8 +395,57 @@ export function skyToEmoji(sky?: number, datetime?: Date): string {
       return "⛅"; // 구름많음
     case 4:
       return "☁️"; // 흐림
+    case 5:
+      return "🌫️"; // 안개
+    case 6:
+      return "😷"; // 황사
+    case 7:
+      return "❄"; // 눈
+    case 8:
+      return "⛈"; // 소나기
+    case 9:
+      return "⚡"; // 뇌전
     default:
       return "❓";
+  }
+}
+
+export function skyToSimpleEmoji(
+  sky: string | null | undefined,
+  pref: number | null,
+): string {
+  /* ✅ pref 우선 처리 */
+  if (pref !== null) {
+    switch (pref) {
+      case 1:
+        return "☔"; // 비
+      case 2:
+        return "☔/❄"; // 비/눈
+      case 3:
+        return "❄"; // 눈
+      case 4:
+        return "❄/☔"; // 눈/비
+      default:
+        break; // pref 값이 있지만 의미 없으면 sky로 fallback
+    }
+  }
+
+  /* ✅ sky 처리 */
+  switch (sky) {
+    case "DB01":
+    case "WB01": // 맑음
+      return "☀️";
+    case "DB02":
+    case "WB02": // 구름조금
+      return "🌤️";
+    case "DB03":
+    case "WB03": // 구름많음
+      return "⛅";
+    case "DB04":
+    case "WB04": // 흐림
+      return "☁️";
+    default:
+      return "-";
   }
 }
 
@@ -462,7 +453,7 @@ export function formatDate(date: Date) {
   const y = date.getFullYear();
   const m = String(date.getMonth() + 1).padStart(2, "0");
   const d = String(date.getDate()).padStart(2, "0");
-  return `${y}${m}${d}`;
+  return `${y}${m}${d}`; //20260210 형식으로 반환
 }
 
 export function formatLabel(date: Date) {
@@ -471,7 +462,6 @@ export function formatLabel(date: Date) {
   return `${day}일(${weekday})`;
 }
 
-
 function fastDistance(a: LocationCoords, b: LocationCoords): number {
   const latRad = ((a.lat + b.lat) * 0.5 * Math.PI) / 180;
   const x = (b.lon - a.lon) * Math.cos(latRad);
@@ -479,16 +469,39 @@ function fastDistance(a: LocationCoords, b: LocationCoords): number {
   return x * x + y * y;
 }
 
+export function findNearestGrid(pos: LocationCoords, STATIONSXY: StationXY[]) {
+  let minDist = Infinity;
+  let nearest = null;
+
+  for (const item of STATIONSXY) {
+    const dLat = pos.lat - item.latitude;
+    const dLon = pos.lon - item.longitude;
+    const dist = dLat * dLat + dLon * dLon; // 거리 제곱
+
+    if (dist < minDist) {
+      minDist = dist;
+      nearest = item;
+    }
+  }
+
+  return nearest;
+}
+
 export function findNearestStationFast(
-  pos: LocationCoords,
+  pos: LocationCoords | null,
   stations: Station[],
-): Station {
-  let nearest = stations[0];
+): Station | null {
+  if (!pos || stations.length === 0) return null;
+
+  let nearest: Station = stations[0];
   let minDist = Infinity;
 
   for (const s of stations) {
-    const d = fastDistance(pos, { lat: s.lat, lon: s.lon });
-   
+    const d = fastDistance(pos, {
+      lat: s.lat,
+      lon: s.lon,
+    });
+
     if (d < minDist) {
       minDist = d;
       nearest = s;
@@ -507,7 +520,7 @@ export function findNearestRegionFast(
 
   for (const s of stations) {
     const d = fastDistance(pos, { lat: s.lat, lon: s.lon });
-   
+
     if (d < minDist) {
       minDist = d;
       nearest = s;
@@ -515,4 +528,16 @@ export function findNearestRegionFast(
   }
 
   return nearest;
+}
+
+export function getNearestBaseTime(now: Date): string {
+  const BASE_TIMES = [5, 8, 11, 14, 17, 20, 23];
+
+  const currentHour = now.getHours();
+
+  // 현재 시각 이하 중 가장 큰 발표 시각 선택
+  const targetHour =
+    [...BASE_TIMES].reverse().find((h) => h <= currentHour) ?? 23;
+
+  return `${String(targetHour).padStart(2, "0")}00`;
 }

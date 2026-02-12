@@ -10,7 +10,8 @@ interface Props {
 export default function SearchLocationBar({ onSelect }: Props) {
   const [keyword, setKeyword] = useState("");
   const [items, setItems] = useState<KakaoPlace[]>([]);
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(false);  
+
 
   // 추천 검색어 조회
   useEffect(() => {
@@ -50,6 +51,8 @@ export default function SearchLocationBar({ onSelect }: Props) {
       setKeyword(exactMatch.place_name);
       setOpen(false);
       onSelect(exactMatch);
+        // ✅ 좌표 출력
+    console.log("선택 좌표:", exactMatch.x, exactMatch.y);
     } else {
       // 정확히 일치하는 추천 검색어가 없으면 input 텍스트 기반 임시 객체 사용
       const manualPlace: KakaoPlace = {
@@ -62,6 +65,8 @@ export default function SearchLocationBar({ onSelect }: Props) {
       };
       setOpen(false);
       onSelect(manualPlace);
+        // ✅ 좌표 출력
+  console.log("선택 좌표:", manualPlace.x, manualPlace.y);
     }
   };
 

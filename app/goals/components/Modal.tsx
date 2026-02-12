@@ -1,52 +1,59 @@
 import Image from "next/image";
 
-export default function Modal() {
+interface ModalProps {
+  isOpen: boolean;
+  title: string;
+  message: string;
+  confirmText?: string;
+  cancelText?: string;
+  showIcon?: boolean;
+  onConfirm: () => void;
+  onCancel: () => void;
+}
+
+export default function Modal({
+  isOpen,
+  title,
+  message,
+  confirmText = "확인",
+  cancelText = "취소",
+  onConfirm,
+  onCancel,
+  showIcon = false,
+}: ModalProps) {
+  if (!isOpen) return null;
+
   return (
-    <>
-      {/* 모달 1: 설정 완료 */}
-      <dialog hidden className="rounded-2xl p-6 shadow-xl">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+      <div className="rounded-2xl bg-white p-6 shadow-xl w-[300px]">
         <div className="flex flex-col items-center gap-3 text-center">
-          <Image
-            src="/icons/cele.svg"
-            alt="목표 추가완료"
-            width={60}
-            height={60}
-          />
-          <h2 className="text-xl font-bold">설정 완료!</h2>
-          <p>
-            <strong className="text-primary">_________완주</strong>
-          </p>
-          <p className="text-sm text-gray-600">
-            목표가 추가되었어요!
-            <br />
-            시작하기 버튼을 눌러 시작해보세요!
-          </p>
-          <button className="w-full rounded-lg bg-primary py-3 text-white">
-            확인
-          </button>
-        </div>
-      </dialog>
+          {showIcon && (
+            <Image
+              src="/icons/cele.svg"
+              alt="모달 아이콘"
+              width={60}
+              height={60}
+            />
+          )}
 
-      {/* 모달 2: 축하합니다 완주 성공   */}
-
-      <dialog hidden className="rounded-2xl p-6 shadow-xl">
-        <div className="flex flex-col items-center gap-3 text-center">
-          <Image
-            src="/icons/cele.svg"
-            alt="목표 추가완료"
-            width={60}
-            height={60}
-          />
-          <h2 className="text-xl font-bold">축하합니다!</h2>
-          <p>
-            <strong className="text-primary">_________완주를</strong>
-          </p>
-          <p className="text-sm text-gray-600">완료했어요!</p>
-          <button className="w-full rounded-lg bg-primary py-3 text-white">
-            확인
-          </button>
+          <h2 className="text-xl font-bold">{title}</h2>
+          <p className="text-sm text-gray-600">{message}</p>
+          <div className="flex w-full gap-3">
+            <button
+              onClick={onCancel}
+              className="flex-1 rounded-lg bg-gray-200 py-3 text-gray-700 font-semibold"
+            >
+              {cancelText}
+            </button>
+            <button
+              onClick={onConfirm}
+              className="flex-1 rounded-lg bg-primary py-3 text-white font-semibold"
+            >
+              {confirmText}
+            </button>
+          </div>
         </div>
-      </dialog>
-    </>
+      </div>
+    </div>
   );
 }

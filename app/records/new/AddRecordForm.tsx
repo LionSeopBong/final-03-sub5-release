@@ -1,8 +1,8 @@
 "use client";
 import { addRecord } from "@/app/action/records";
-import { useCalcPace } from "@/app/hooks/useCalcPace";
-import { useLoginCheck } from "@/app/hooks/useLoginCheck";
-import { useSuccessRedirect } from "@/app/hooks/useSuccessRedirect";
+import { useCalcPace } from "@/hooks/useCalcPace";
+import { useLoginCheck } from "@/hooks/useLoginCheck";
+import { useSuccessRedirect } from "@/hooks/useSuccessRedirect";
 import { ArrowLeft } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useActionState, useState } from "react";
@@ -78,7 +78,12 @@ export default function AddRecordForm() {
                 type="number"
                 name="hour"
                 value={hour}
-                onChange={(e) => setHour(e.target.value)}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  if (value.length <= 2) {
+                    setHour(value);
+                  }
+                }}
                 placeholder="00"
                 min="0"
                 max="23"
@@ -89,7 +94,12 @@ export default function AddRecordForm() {
                 type="number"
                 name="min"
                 value={min}
-                onChange={(e) => setMin(e.target.value)}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  if (value.length <= 2) {
+                    setMin(value);
+                  }
+                }}
                 placeholder="22"
                 min="0"
                 max="59"
@@ -100,7 +110,12 @@ export default function AddRecordForm() {
                 type="number"
                 name="sec"
                 value={sec}
-                onChange={(e) => setSec(e.target.value)}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  if (value.length <= 2) {
+                    setSec(value);
+                  }
+                }}
                 placeholder="13"
                 min="0"
                 max="59"

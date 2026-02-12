@@ -1,6 +1,5 @@
 "use client";
 
-import Modal from "../components/Modal";
 import GoalStats from "@/app/goals/my/components/GoalStats";
 import GoalFilter from "@/app/goals/my/components/GoalFilter";
 import GoalCard from "@/app/goals/my/components/GoalCard";
@@ -12,7 +11,12 @@ import useUserStore from "@/zustand/user"; // 추가!
 import useGoalsStore from "@/zustand/goals";
 export default function GoalListPage() {
   const user = useUserStore((state) => state.user);
-  const { goals, setGoals, filter, setFilter } = useGoalsStore();
+  const setGoals = useGoalsStore((state) => state.setGoals);
+
+  const goals = useGoalsStore((state) => state.goals);
+  const userLevel = useGoalsStore((state) => state.userLevel);
+  const levelIcon = userLevel?.level === "초급" ? "🌱" : userLevel?.level === "중급" ? "🌿" : "🌳";
+  const levelGoalCount = goals.filter((goal) => goal.extra.level === userLevel?.level || !goal.extra.level).length;
   useEffect(() => {
     const fetchGoals = async () => {
       if (user?.token) {
@@ -33,15 +37,12 @@ export default function GoalListPage() {
             flex flex-col gap-4 px-4"
         >
           <GoalHeader />
-          <section className="">🌱초급 총 3개</section>
-          {/* 중급: 🌿중급 총 5개 */}
-          {/* 고급: 🌳고급 총 7개 */}
-          {/* 통계를 가로로 배치 */}
+          {userLevel && <section>{levelIcon}{userLevel.level} 총 {levelGoalCount}개</section>}
+          {/* 통계를 가로로 배치*/}
           <GoalStats />
           <GoalFilter />
           <GoalCard />
         </div>
-        <Modal />
       </main>
     </>
   );

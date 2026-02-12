@@ -5,24 +5,98 @@ import Navi from "@/app/components/common/Navi";
 import GoalsActions from "@/app/goals/components/GoalsActions";
 import LevelHeader from "@/app/goals/components/LevelHeader";
 import RunningCard from "@/app/goals/components/RunningCard";
-import { LevelDummy } from "@/app/goals/config/levelConfig";
 import useGoalsStore from "@/zustand/goals";
+import useUserStore from "@/zustand/user";
 import { useEffect } from "react";
+import { getMyRecords } from "@/app/lib/recordsAPI";
+import { leveltype } from "@/app/goals/types";
+
+//pace 문자열 -> 숫자
+function paceToNumber(pace: string) {
+  const [min, sec] = pace.split(":").map(Number);
+  return min + sec / 60;
+}
+//숫자 → 페이스 문자열
+function numberToPace(num: number) {
+  const min = Math.floor(num);
+  const sec = Math.round((num - min) * 60);
+  return `${min}:${String(sec).padStart(2, "0")}`;
+}
+//padStart 이건 문자열 전용 메서드
+// 레벨 판별
+function getLevel(avgPace: number): { level: leveltype; icon: string } {
+  if (avgPace < 4.5) return { level: "고급", icon: "🔥" };
+  if (avgPace < 5.5) return { level: "중급", icon: "🏃" };
+  return { level: "초급" as const, icon: "🌱" };
+}
 
 export default function GoalsPage() {
-  const currentUserId = 2;
-
-  const leveling = LevelDummy.find((item) => {
-    if (item.userId === currentUserId) {
-      return true;
-    }
-  });
+  const user = useUserStore((state) => state.user);
   const setUserLevel = useGoalsStore((state) => state.setUserLevel);
+
   useEffect(() => {
-    if (leveling) {
-      setUserLevel(leveling);
-    }
-  }, [leveling, setUserLevel]);
+    const calcLevel = async () => {
+      if (!user?.token) {
+        return;
+      }
+      const result = await getMyRecords(user.token.accessToken); //서버에서 내 러닝 기록 가져오기
+      const records = result.item.filter((record) => record.type === "record");
+
+      if (records.length === 0) {
+        // 신규 레벨
+        setUserLevel({
+          userId: user._id,
+          level: "초급",
+          icon: "🌱",
+          pace: "0:00",
+          totalDistance: 0,
+          monthlyRuns: 0,
+          userStatus: "신규",
+        });
+        return;
+      }
+
+      const paceRecords = records.filter((record) => record.extra.pace);
+      const paces = paceRecords.map((record) =>
+        paceToNumber(record.extra.pace),
+      );
+
+      const avgPace = paces.reduce((sum, pace) => sum + pace, 0) / paces.length;
+      const totalDistRaw = records.reduce(
+        (sum, record) => sum + (record.extra.distance || 0),
+        0,
+      );
+      const totalDist = Math.round(totalDistRaw * 100) / 100;
+      const { level, icon } = getLevel(avgPace);
+
+      const dates = records.map((record) => record.extra.date);
+      dates.sort();
+      const lastDate = dates[dates.length - 1];
+
+      const today = new Date();
+      const last = new Date(lastDate);
+      const diffDays =
+        (today.getTime() - last.getTime()) / (1000 * 60 * 60 * 24);
+
+      let userStatus: "신규" | "복귀" | "꾸준";
+      if (diffDays > 14) {
+        userStatus = "복귀";
+      } else {
+        userStatus = "꾸준";
+      }
+
+      setUserLevel({
+        userId: user._id,
+        level,
+        icon,
+        pace: numberToPace(avgPace),
+        totalDistance: totalDist,
+        monthlyRuns: records.length,
+        userStatus: userStatus,
+      });
+    };
+    calcLevel();
+  }, [user]);
   return (
     <>
       <Header />

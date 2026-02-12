@@ -6,8 +6,9 @@ import { LevelInfo } from "../types";
 import { useEffect } from "react";
 import useGoalsStore from "@/zustand/goals";
 export default function RunningCard() {
-  const { monthlyStats, setMonthlyStats } = useStatsStore();
+  const { setMonthlyStats } = useStatsStore();
   const userLevel = useGoalsStore((state) => state.userLevel);
+
   useEffect(() => {
     if (userLevel) {
       setMonthlyStats({
@@ -18,7 +19,7 @@ export default function RunningCard() {
     }
   }, [userLevel, setMonthlyStats]);
   const level = calculateLevel({
-    pace: userLevel?.pace ?? 0,
+    pace: userLevel?.pace ?? 0, // 널 병합 연산자
     totalDistance: userLevel?.totalDistance ?? 0,
   } as LevelInfo);
 
@@ -35,7 +36,7 @@ export default function RunningCard() {
           <div className="flex justify-between items-center px-5 py-4 hover:bg-gray-50 transition-all cursor-pointer">
             <dt className="text-sm font-medium text-gray-700">평균 페이스</dt>
             <dd className="text-lg font-bold text-gray-900">
-              {userLevel?.pace}
+              {userLevel?.pace === 0 ? "기록 없음" : userLevel?.pace + "/KM"}
             </dd>
           </div>
           <div className="flex justify-between items-center px-5 py-4 hover:bg-gray-50 transition-all cursor-pointer">
@@ -43,7 +44,9 @@ export default function RunningCard() {
               완주 거리 (누적 거리)
             </dt>
             <dd className="text-lg font-bold text-gray-900">
-              {userLevel?.totalDistance}KM
+              {userLevel?.totalDistance === 0
+                ? "기록 없음"
+                : userLevel?.totalDistance + "KM"}
             </dd>
           </div>
           <div className="flex justify-between items-center px-5 py-4 hover:bg-gray-50 transition-all cursor-pointer">
@@ -51,7 +54,9 @@ export default function RunningCard() {
               월간 러닝 횟수
             </dt>
             <dd className="text-lg font-bold text-gray-900">
-              {userLevel?.monthlyRuns}회
+              {userLevel?.monthlyRuns === 0
+                ? "기록 없음"
+                : userLevel?.monthlyRuns + "회"}
             </dd>
           </div>
         </dl>

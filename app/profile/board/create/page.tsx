@@ -5,9 +5,11 @@ import fetchAPI from "@/app/lib/api";
 import ProfileHeader from "@/app/profile/components/ProfileHeader";
 import useUserStore from "@/zustand/user";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 export default function CreatePost() {
+  const router = useRouter();
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [isSubmitSuccess, setIsSubmitSuccess] = useState(false);
   const [title, setTitle] = useState("");
@@ -23,6 +25,7 @@ export default function CreatePost() {
     setTitle("");
     setContent("");
     setShowValidation(false);
+    router.push("/profile/board/inquiry-board");
   };
 
   async function PostSubmit(e: React.FormEvent<HTMLFormElement>) {
@@ -111,6 +114,7 @@ export default function CreatePost() {
               type="submit"
               className="mt-2 w-full rounded-full bg-[#003458] py-3 text-white font-semibold disabled:bg-gray-300 cursor-pointer flex items-center justify-center gap-2"
               disabled={showValidation && (!title.trim() || !content.trim())}
+              onClick={() => {}}
             >
               <Image
                 src="/icons/chatbubble.svg"

@@ -13,7 +13,7 @@ export default function MyBoard() {
   // useState
   const [currentPage, setCurrentPage] = useState(1);
   const [posts, setPosts] = useState<PostListItem[]>([]);
-  const [totalPages, setTotalPages] = useState(1); // 🔥 추가
+  const [totalPages, setTotalPages] = useState(1);
 
   // zustand 상태 가져오기
   const user = useUserStore((state) => state.user);
@@ -29,7 +29,6 @@ export default function MyBoard() {
       const result = await fetchAPI(
         `/posts/users?type=qna&page=${currentPage}&limit=5`,
         {
-          // 🔥 수정
           method: "GET",
           token: token,
         },
@@ -37,14 +36,14 @@ export default function MyBoard() {
 
       if (result.ok === 1) {
         setPosts(result.item || []);
-        setTotalPages(Number(result.pagination?.totalPages) || 1); // 🔥 추가
+        setTotalPages(Number(result.pagination?.totalPages) || 1);
       } else {
         console.error(result.message || "게시글 불러오기 실패");
       }
     };
 
     fetchMyPosts();
-  }, [token, currentPage]); // 🔥 currentPage 추가
+  }, [token, currentPage]);
 
   // 날짜 형식 변경 - 연도/월/일만 표시
   const formatDate = (dateString: string) => {

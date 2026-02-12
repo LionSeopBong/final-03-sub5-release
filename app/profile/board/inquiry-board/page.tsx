@@ -17,6 +17,10 @@ export default function InquiryListPage() {
   const [posts, setPosts] = useState<PostListItem[]>([]);
   const [isLoading, setIsloading] = useState(true);
   const [totalPages, setTotalPages] = useState(1);
+  // 검색 키워드 상태 추가
+  const [searchKeyword, setSearchKeyword] = useState("");
+  // 추가: 실제 적용된 검색어
+  const [appliedKeyword, setAppliedKeyword] = useState("");
 
   const user = useUserStore((state) => state.user);
   const token = user?.token?.accessToken;
@@ -66,29 +70,43 @@ export default function InquiryListPage() {
     fetchNotices();
   }, []);
 
-  // API 호출
+  // fetchPosts 함수를 useEffect 밖으로 분리 + keyword 파라미터 추가
+  const fetchPosts = async (page: number, keyword: string = "") => {
+    setIsloading(true);
+
+    // keyword가 있으면 쿼리 파라미터에 추가
+    const keywordParam = keyword
+      ? `&keyword=${encodeURIComponent(keyword)}`
+      : "";
+    const result = await fetchAPI(
+      `/posts?type=qna&page=${page}&limit=10${keywordParam}`,
+      {
+        method: "GET",
+      },
+    );
+
+    if (result.ok === 1) {
+      setPosts(result.item || []);
+      setTotalPages(Number(result.pagination?.totalPages) || 1);
+    } else {
+      console.error(result.message || "게시글 불러오기 실패");
+    }
+
+    setIsloading(false);
+  };
+
+  // 검색 핸들러 추가
+  const handleSearch = () => {
+    setCurrentPage(1); // 검색 시 1페이지로 리셋
+    setAppliedKeyword(searchKeyword); // 수정: appliedKeyword에 검색어 적용
+  };
+
+  // useEffect 수정: fetchPosts 호출 시 searchKeyword 전달
+  // 수정: appliedKeyword를 의존성으로 변경
   useEffect(() => {
-    const fetchPosts = async () => {
-      setIsloading(true);
-
-      const result = await fetchAPI(
-        `/posts?type=qna&page=${currentPage}&limit=10`,
-        {
-          method: "GET",
-        },
-      );
-
-      if (result.ok === 1) {
-        setPosts(result.item || []);
-        setTotalPages(Number(result.pagination?.totalPages) || 1);
-      } else {
-        console.error(result.message || "게시글 불러오기 실패");
-      }
-
-      setIsloading(false);
-    };
-    fetchPosts();
-  }, [currentPage]);
+    fetchPosts(currentPage, appliedKeyword);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentPage, appliedKeyword]);
 
   return (
     <>
@@ -127,18 +145,18 @@ export default function InquiryListPage() {
         {/* 검색 창 + 문의하기 */}
         <div className="board-search flex flex-col gap-3 items-center text-center mb-4">
           <div className="w-full flex gap-2.5 min-w-0">
-            <select className="rounded-sm border border-gray-300 p-1.5 shrink-0 cursor-pointer">
-              <option value="name">이름</option>
-              <option value="title">제목</option>
-              <option value="content">내용</option>
-            </select>
             <input
               type="text"
+              placeholder="제목으로 검색"
+              value={searchKeyword}
+              onChange={(e) => setSearchKeyword(e.target.value)}
+              onKeyDown={(e) => e.key === "Enter" && handleSearch()}
               className="flex-1 border border-gray-300 hover:border-gray-400 focus:border-gray-400 focus:outline-none active:border-gray-400 rounded-sm p-1.5 min-w-0"
             />
             <button
               type="button"
               className="rounded-sm border border-[#003458] bg-[#003458] text-white px-2 py-1.5 cursor-pointer"
+              onClick={handleSearch}
             >
               검색
             </button>

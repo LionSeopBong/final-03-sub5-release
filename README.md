@@ -240,14 +240,15 @@ app/
 ## 4️⃣ 화면 흐름 소개
 
 <div align="center">
+<img src="./public/소셜로그인.gif" height="520" />
   <img src="./public/날씨.gif" width="300" height="520" />
   <img src="./public/러닝기록1.gif" height="520" />
-  <img src="./public/러닝기록2.gif" height="520" />
   <br/><br/>
+  <img src="./public/러닝기록2.gif" height="520" />
   <img src="./public/러닝기록3.gif" height="520" />
   <img src="./public/러닝기록4.gif" height="520" />
-  <img src="./public/목표.gif" height="520" />
   <br/><br/>
+  <img src="./public/목표.gif" height="520" />
   <img src="./public/프로필.gif" height="520" />
 </div>
 

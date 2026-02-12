@@ -32,6 +32,7 @@ function getLevel(avgPace: number): { level: leveltype; icon: string } {
 
 export default function GoalsPage() {
   const user = useUserStore((state) => state.user);
+  const userLevel = useGoalsStore((state) => state.userLevel);
   const setUserLevel = useGoalsStore((state) => state.setUserLevel);
 
   useEffect(() => {
@@ -40,8 +41,8 @@ export default function GoalsPage() {
         return;
       }
       const result = await getMyRecords(user.token.accessToken); //서버에서 내 러닝 기록 가져오기
-      const records = result.item.filter((record) => record.type === "record");
 
+      const records = result.item.filter((record) => record.type === "record");
       if (records.length === 0) {
         // 신규 레벨
         setUserLevel({
@@ -107,13 +108,18 @@ export default function GoalsPage() {
     max-w-[767px]      
     md:max-w-[375px]   flex flex-col gap-4 px-4"
         >
-          {/* 탭 LevelIcon 상단 */}
-          <LevelHeader />
-          {/* 메인 중간 : 분석결과 카드 */}
-          <RunningCard />
-          {/* 버튼들 */}
-          <GoalsActions />
-          {/* 네비게이션 */}
+          {userLevel === null ? (
+            <p>데이터 달려오는 중...</p>
+          ) : (
+            <>
+              <LevelHeader />
+              {/* 메인 중간 : 분석결과 카드 */}
+              <RunningCard />
+              {/* 버튼들 */}
+              <GoalsActions />
+              {/* 네비게이션 */}
+            </>
+          )}
         </div>
       </main>
       <Footer />

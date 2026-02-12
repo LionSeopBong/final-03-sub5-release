@@ -11,7 +11,7 @@ export function getAnalysisFactors(
   if (obs.WW >= 50)
     factors.push({ label: "악천후", penalty: 30 });
   else if (obs.WW >= 40)
-    factors.push({ label: "비 또는 눈", penalty: 20 });
+    factors.push({ label: "안개 미세먼지", penalty: 20 });
   else if (obs.WW >= 20)
     factors.push({ label: "박무/연무", penalty: 10 });
 

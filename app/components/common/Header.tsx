@@ -1,6 +1,5 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import ProfileMenu from "./ProfileMenu";
@@ -26,13 +25,14 @@ export default function Header() {
         </div>
 
         {/* 우측 아이콘 */}
-        <div className="flex items-center gap-8">
+        <div className="flex items-center gap-8 ">
           <Link aria-label="weather" href="/weather">
             <Image
               src="/icons/arcticons--weather.svg"
+              className="contrast-200 brightness-75" // 대비를 높여 선을 더 뚜렷하게
               alt="날씨"
-              width={24}
-              height={24}
+              width={38}
+              height={38}
               priority
             />
           </Link>

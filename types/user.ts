@@ -3,7 +3,7 @@ export interface User {
   _id: number;
   email: string;
   name: string;
-  image?: string;
+  image?: string | null;
   profileImage?: string | null;
   token?: {
     accessToken: string;

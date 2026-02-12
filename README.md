@@ -88,7 +88,7 @@ SUB5는 단순한 기록 앱이 아닙니다.
 
 ### Version Control
 
-[![Version control](https://skillicons.dev/icons?i=git,github)](https://skillicons.dev)
+[![Version control](https://skillicons.dev/icons?i=github)](https://skillicons.dev)
 
 ### CI/CD
 

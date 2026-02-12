@@ -20,7 +20,7 @@ export default function SocialLoginButtons() {
           aria-label="Google 로그인"
           className="h-9 w-9  flex items-center justify-center"
           onClick={() =>
-            signIn("google", { callbackUrl: "/auth/SocialCallback" })
+            signIn("google", { callbackUrl: "/auth/social-callback" })
           }
         >
           <Image
@@ -37,7 +37,7 @@ export default function SocialLoginButtons() {
           aria-label="Kakao 로그인"
           className="h-9 w-9 rounded-full flex items-center justify-center"
           onClick={() =>
-            signIn("kakao", { callbackUrl: "/auth/SocialCallback" })
+            signIn("kakao", { callbackUrl: "/auth/social-callback" })
           }
         >
           <Image

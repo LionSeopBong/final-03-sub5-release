@@ -7,9 +7,9 @@ import { useRouter } from "next/navigation";
 import useUserStore from "@/zustand/user";
 import { useOnboardingStore } from "@/zustand/onboardingStore";
 import { socialLoginOrSignup } from "@/actions/user";
-import Loading from "@/app/auth/SocialCallback/loading";
+import Loading from "@/app/auth/social-callback/loading";
 
-export default function SocialCallbackPage() {
+export default function SocialCallback() {
   const { data: session, status } = useSession();
   const router = useRouter();
 

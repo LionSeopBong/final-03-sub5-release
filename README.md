@@ -223,6 +223,7 @@ app/
     ├── kakao/search/        #    카카오 장소 검색
     ├── regid/               #    지역 코드
     └── ultraviolet/         #    자외선 지수
+└──
 ```
 
 ## 4️⃣ 화면 흐름 소개

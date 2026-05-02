@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 
 import { useActionState, useEffect, useRef, useState } from "react";
 
@@ -15,9 +15,6 @@ import LoginButton from "@/app/auth/login/LoginButton";
 import useAlert from "@/hooks/useAlert";
 
 export default function LoginForm() {
-  const searchParams = useSearchParams();
-  const errorMessage = searchParams.get("error");
-
   const [userState, formAction, isPending] = useActionState(login, null);
   const router = useRouter();
   const setUser = useUserStore((state) => state.setUser);
@@ -68,11 +65,6 @@ export default function LoginForm() {
         noValidate
         className="space-y-4"
       >
-        {errorMessage && (
-          <div className="mb-4 rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-600">
-            {errorMessage}
-          </div>
-        )}
         {/* 이메일 */}
         <div className="relative space-y-1">
           <input

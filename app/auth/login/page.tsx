@@ -1,10 +1,12 @@
 "use client";
 
+import LoginErrorMessage from "@/app/auth/login/LoginErrorMessage";
 import LoginForm from "@/app/auth/login/LoginForm";
 import Image from "next/image";
 import Link from "next/link";
 
 import { useRouter } from "next/navigation";
+import { Suspense } from "react";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -37,6 +39,10 @@ export default function LoginPage() {
         </p>
 
         <div className="mt-12">
+          <Suspense fallback={null}>
+            <LoginErrorMessage />
+          </Suspense>
+
           <LoginForm />
         </div>
       </div>

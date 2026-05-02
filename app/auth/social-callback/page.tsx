@@ -47,7 +47,12 @@ export default function SocialCallback() {
         });
 
         if (!res || res.ok !== 1) {
-          return router.replace("/auth/login");
+          const message =
+            res?.message ?? "소셜 로그인 처리 중 문제가 발생했습니다.";
+
+          return router.replace(
+            `/auth/login?error=${encodeURIComponent(message)}`,
+          );
         }
 
         // 유저 저장 (token 포함)

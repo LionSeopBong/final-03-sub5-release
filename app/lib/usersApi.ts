@@ -12,6 +12,8 @@ import { ErrorRes, UserInfoRes } from "@/types/api";
 
 type UserApiResult = UserInfoRes | ErrorRes;
 
+type CheckEmailResult = { ok: 1 } | ErrorRes;
+
 export const usersApi = {
   create(body: CreateUserBody) {
     return fetchAPI("/users", {
@@ -25,6 +27,12 @@ export const usersApi = {
       method: "POST",
       body,
     }) as Promise<UserApiResult>;
+  },
+
+  checkEmail(email: string) {
+    return fetchAPI(`/users/email?email=${encodeURIComponent(email)}`, {
+      method: "GET",
+    }) as Promise<CheckEmailResult>;
   },
 
   socialLogin(body: SocialLoginBody) {

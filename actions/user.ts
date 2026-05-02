@@ -88,6 +88,18 @@ export async function socialLoginOrSignup(body: {
 
     // 실패면 회원가입
     if (!loginRes || loginRes.ok !== 1) {
+      if (body.email) {
+        const emailCheckRes = await usersApi.checkEmail(body.email.trim());
+
+        if (emailCheckRes.ok !== 1) {
+          return {
+            ok: 0,
+            message:
+              "이미 이메일로 가입된 계정입니다. 이메일 로그인으로 이용해주세요.",
+          };
+        }
+      }
+
       const signupBody: SocialSignupBody = {
         type: "user",
         loginType: body.provider,

@@ -4,7 +4,8 @@ import { Metadata } from "next";
 
 export const metadata: Metadata = {
   // url 관련 metadata 설정시 사용될 기본 경로 지정
-  metadataBase: new URL("https://localhost:3000"),
+  // metadataBase: new URL(process.env.NEXTAUTH_URL!),
+  metadataBase: new URL("http://localhost:3000"),
 
   title: {
     default: "Sub.5",
@@ -15,7 +16,6 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Sub.5",
     description: "러너를 위한 마라톤 일정 & 기록 관리",
-    // url: "https://final-03-sub5-release-three.vercel.app",
     siteName: "Sub.5",
     locale: "ko_KR",
     type: "website",
